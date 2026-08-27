@@ -1,168 +1,173 @@
 # Ready-to-send outreach drafts — batch 1 (Shopify / e-com)
 
-6 prospects, each audited with `site-audit` — a real teardown HTML is already generated for
-every one (paths at the bottom). Messages below use the **real, verified** issue as the hook.
+6 prospects. Every hook below was **re-verified on 2026-08-27** against a fresh audit *and*
+an independent check (curl / screenshot). Priority order = strongest, most-sendable first.
 
-**Before you send each one:** open the store's `desktop.png` / `mobile.png` in its report
-folder and eyeball the issue — the playbook's sanity-check. Only send honest teardowns.
+> ## ⚠️ Read this before you send anything
+>
+> **Drop the speed/TTFB numbers.** The old drafts led with "5.0s load · TTFB 1211ms" style
+> claims. I re-measured every store directly: raw server response is **fast for all six**
+> (TTFB 0.07–0.53s, HTML in 0.3–1.1s). The audit tool's browser-measured figures don't
+> reproduce — Art For Light reported 15.4s on one run and 2.8s on the next. Leading with a
+> number that's wrong ends the conversation in one line.
+>
+> **Lead with structural findings instead** — broken images, expired promos, missing meta
+> description, no favicon, default myshopify domain. Those are stable, checkable, and I've
+> confirmed each one below independently.
 
-Priority order = warmest first. The top 4 owners **publicly asked for feedback** on the
-Shopify Community forum, so replying there (with the teardown) is expected and welcome —
-highest reply rate. The last 2 are colder (found via a new-stores directory) → email.
-
-> **Verification pass (2026-08-01):** I re-checked all 4 forum drafts against the audit reports
-> + screenshots. **Azada ✅** and **Lylo ✅** are confirmed — send as-is. **KASH ERA** needs a
-> 15-sec domain check (favicon hook is safe regardless). **Art For Light** came back clean — its
-> original "sold-out add-to-cart" hook is unverifiable, so I rewrote it around a real,
-> screenshot-visible issue (Best Sellers showing "Sold Out" during a grand-opening promo).
-
-> **📋 Pasting into Gmail without the black background:** the dark box comes from copying the
-> rendered blockquote (its shading gets carried over as HTML). Two ways to avoid it:
-> 1. **Paste as plain text** — copy the draft, then in Gmail hit **Cmd+Shift+V** (Mac) /
->    **Ctrl+Shift+V** (Win). That strips all formatting, so no background, no indent bar.
-> 2. Or paste normally, then select the text → click **Remove formatting** (the `Tₓ`/eraser
->    icon in Gmail's toolbar), or **Format → Clear formatting**.
-> Either way, drop the `> **Subject:** …` line into Gmail's Subject field and paste the rest as
-> the body. Skip the `>` marks — they're just markdown, not part of the message.
+> **📋 Pasting into Gmail without the black background:** copy the draft, then paste with
+> **Cmd+Shift+V** (Mac) / **Ctrl+Shift+V** (Win) to strip formatting. Put the `Subject:` line
+> in Gmail's subject field. Skip the `>` marks — they're markdown, not part of the message.
 
 ---
 
-## 1. Azada Beauty — azadabeauty.com  ⭐ send first
-**Channel:** reply in their forum thread → `community.shopify.com/t/.../658282` (backup: store contact page)
-**Verified (screenshot-checked):** Hero + product images load fine; but in the "From our customers" section several review images render as blank cards. Plus 3.4s load · TTFB 964ms. They run **paid Meta ads to mobile**.
+## 1. Lylo Watches — lylowatches.com  ⭐️ SEND TODAY — this hook expires
+**Channel:** reply in their thread → `community.shopify.com/t/i-need-honest-feedback-on-my-brand-store/646492`
+**Verified 8/27 (live HTML + screenshot):** The announcement bar and the hero banner both run
+**"Summer Flash Sale • 25% Off Sitewide • Ends 8/26"** — that ended *yesterday*. There's also a
+second string in the page source: **"Summer Sale - Ends 7/29"**, expired a month ago.
+**Why it's strong:** the owner said sales dropped off. A dead promo sitewide is a real,
+visible, fixable reason — and it directly answers the question they asked.
+**Decay warning:** the moment they notice it, this hook is gone. Send it first.
 
-> **Subject:** a couple of review images aren't loading on azadabeauty.com
+> Hey — you mentioned sales fell off even though you'd been improving the store, so I had a
+> proper look. One thing jumped out: your announcement bar and homepage banner are both still
+> running "Summer Flash Sale — 25% Off Sitewide — Ends 8/26." That was yesterday. There's an
+> older "Summer Sale — Ends 7/29" still in the page too.
 >
-> Hi — saw your traffic's mostly mobile from Meta ads, so first impressions on a phone matter a
-> lot here. I ran the store through my audit tool and two things stood out: in your "From our
-> customers" section, several of the review images aren't loading (they show as blank cards) —
-> which quietly undercuts social proof right where buyers look for reassurance. And the page
-> takes ~3.4s to load (server response ~960ms), which eats into conversion on paid traffic.
+> Expired offers are worse than no offer — people who came for the 25% either bounce or feel
+> misled at checkout, and it quietly makes the whole store feel unattended. Quick fix, and it's
+> the kind of thing that shows up straight away in conversion.
 >
-> I put together a short teardown — screenshots + the 3 fixes I'd prioritise. Happy to send it
-> over, free, no pitch. Want it here or by DM? 🙂
+> I pulled together a short teardown with the 3 things I'd fix first, screenshots included —
+> want me to send it? Free, no strings. 🙂
 >
 > — Raymund, Forgeline Technologies
 
 ---
 
-## 2. Lylo Watches — lylowatches.com  ⭐ hot lead
-**Channel:** reply in their forum thread → `community.shopify.com/t/i-need-honest-feedback-on-my-brand-store/646492`
-**Verified issue:** 5.0s load · TTFB 1211ms. Owner openly said **sales dropped off** after April/May.
+## 2. Azada Beauty — azadabeauty.com  ⭐️ screenshot-confirmed
+**Channel:** reply in their thread → `community.shopify.com/t/.../658282`
+**Verified 8/27 (screenshot):** In the **"From our customers"** section the three review cards
+render with the star rating and the reviewer name (Clifford A., Clifford A., Bryon A.) but the
+**review images are completely blank** — 11 broken images site-wide. I've eyeballed the
+screenshot; this is real and unchanged since 8/1.
+**Why it's strong:** they run **paid Meta ads to mobile**, so this is wasted ad spend landing on
+broken social proof. Do NOT mention load time — the store responds in ~0.4s.
 
-> Hey — you mentioned sales fell off after April/May even though you'd improved the store. I
-> ran it through my audit tool and one thing stands out: the homepage takes ~5s to fully load
-> (server response alone is ~1.2s). On mobile that's enough to lose a chunk of visitors before
-> the watches are even on screen — so what can look like a "traffic problem" is partly a speed
-> problem you can actually fix.
+> Hi — since your traffic's mostly mobile from Meta ads, first impressions on a phone carry a
+> lot of weight here, so I ran the store through my audit tool. One thing stood out: in your
+> "From our customers" section the review images aren't loading — you get the stars and the
+> name, but the photo above each one is blank. It's 11 images across the store.
 >
-> I made you a short teardown with the 3 things I'd fix first (screenshots included) — want me
-> to send it over? Free, no strings. 🙂
+> That's right where a buyer looks for reassurance before paying, and it's costing you on
+> traffic you've already paid for. Usually a broken image path or a review app that lost its
+> file links — normally quick to fix.
 >
-> — Raymund
-
----
-
-## 3. Art For Light — artforlight.shop  ⚠️ audit came back clean — read before sending
-**Channel:** reply in their forum thread → `community.shopify.com/t/honest-feedback-needed-for-my-first-shopify-jewelry-store/646775`
-**Verified (screenshot-checked 8/1):** The store looks genuinely good — 0 broken images, TTFB a healthy 427ms. Only hard finding is a marginal **3.8s load**. The "sold-out badge but still adds to cart" bug came from *other forum commenters*, not the audit — I can't confirm it from a static screenshot, so **only lead with it if you reproduce it live in 30s.**
-**Honest hook you CAN see (screenshot-backed):** the homepage runs a "Grand Opening — Buy 2, Get 1 Free" promo, yet a large share of the Best Sellers / Trending products carry a **"Sold Out"** badge. Driving opening traffic to products people can't buy bleeds sales at the top of the funnel — real, visible, honest.
-
-> **Subject:** honest feedback on artforlight.shop — your Grand Opening promo
->
-> Hi — genuinely lovely pieces, and since you asked for honest feedback: you've got a "Grand
-> Opening — Buy 2, Get 1 Free" running, but a lot of the Best Sellers and Trending items on the
-> homepage show "Sold Out." Sending opening-day traffic to products people can't buy quietly
-> costs sales right at the top of the funnel — worth restocking the heroes or swapping in-stock
-> pieces up front. The homepage also loads ~3.8s, which is a smaller, separate tune-up.
->
-> I pulled together a short teardown with screenshots + the fixes I'd prioritise — happy to send
-> it free, no pitch. Want it here or by DM? 🙂
+> I put together a short teardown with screenshots and the 3 fixes I'd prioritise. Happy to
+> send it over, free, no pitch. Want it here or by DM? 🙂
 >
 > — Raymund, Forgeline Technologies
 
 ---
 
-## 4. KASH ERA — kasheraapparel.myshopify.com
-**Channel:** reply in their forum thread → `community.shopify.com/t/building-a-premium-streetwear-brand-need-real-feedback-before-i-scale-kash-era/600005`
-**Verified (screenshot-checked 8/1):** no favicon (confirmed ❌) · long title tag (73 chars, confirmed) · 3.6s load. Owner explicitly asked *"does this feel premium?"* before scaling ads. **15-sec check before you send:** the audit ran on `kasheraapparel.myshopify.com` — open the store and confirm the address bar still shows myshopify.com (i.e. no custom domain pointed at it yet). If it does, the domain hook holds; if they've since added a custom domain, drop that line and **lead with the favicon/polish angle**, which is solid either way.
+## 3. KASH ERA — kasheraapparel.myshopify.com
+**Channel:** reply in their thread → `community.shopify.com/t/building-a-premium-streetwear-brand-need-real-feedback-before-i-scale-kash-era/600005`
+**Verified 8/27 (curl):** Still on the **default `kasheraapparel.myshopify.com` address** — no
+redirect to a custom domain. **No favicon** (zero icon links in the HTML). Title tag is long.
+**Why it's strong:** the owner explicitly asked *"does this feel premium?"* before scaling ads.
+Both findings are literally answers to that question.
 
-> **Subject:** quick note on whether KASH ERA reads as "premium"
+> Hey — designs look sharp. You asked whether the brand reads as "premium" before you scale
+> ads, so I'll be straight with you: two things work against it immediately.
 >
-> Hey — designs look sharp. You asked whether the brand feels "premium" before you scale ads,
-> and one thing works against that immediately: the store's still on the default
-> kasheraapparel.myshopify.com address instead of your own domain. On cold traffic that reads
-> as "not established yet" and quietly costs trust — and a custom domain's a quick fix.
+> The store's still on the default kasheraapparel.myshopify.com address rather than your own
+> domain — on cold traffic that reads as "not established yet." And there's no favicon, so the
+> browser tab shows a blank page icon next to every other brand someone has open. Neither is
+> hard to fix, and both are the sort of thing people register without consciously noticing.
 >
-> I made you a short teardown with the top 3 trust/polish fixes + screenshots. Want me to send
-> it? No pitch, promise. 🙂
+> I made you a short teardown with the top 3 trust/polish fixes and screenshots. Want me to
+> send it? No pitch, promise. 🙂
 >
 > — Raymund
+
+---
+
+## 4. Luna Goods — lunagoods.nl  (cold → email)
+**Channel:** email `info@lunagoods.nl` · Dutch site — consider opening in Dutch
+**Verified 8/27 (curl):** **No meta description** · **no favicon** · **2 `<h1>` tags** on the
+homepage. All three confirmed directly in the HTML.
+
+> **Subject:** a few quick SEO fixes for lunagoods.nl
+>
+> Hi — I'm Raymund, a web developer. I came across Luna Goods and had a look at the site.
+>
+> Three things I'd fix, all quick: there's no meta description, so Google is inventing the
+> snippet people see in search results rather than you writing it. There's no favicon, so the
+> browser tab shows a blank icon. And the homepage has two H1 headings, which muddies what the
+> page is telling search engines it's about.
+>
+> None of these are urgent, but together they're the difference between a store that looks
+> finished and one that doesn't. I put together a short teardown with screenshots and the fixes
+> — happy to send it free, no pitch. Want it?
+>
+> — Raymund, Forgeline Technologies
 
 ---
 
 ## 5. Omicove — omicove.com  (cold → email)
 **Channel:** email `omicovespprt@gmail.com`
-**Verified issue:** no meta description · multiple H1s · 1 JS console error.
+**Verified 8/27 (curl):** **No meta description** · **2 `<h1>` tags** · 1 JS console error.
+(Has a favicon — don't claim otherwise.)
 
 > **Subject:** quick note about Omicove's site
 >
-> Hi — I'm Raymund, a web developer. I came across Omicove and had a quick look at your store.
-> One thing stood out: there's no meta description set, so Google is left guessing what to show
-> under your link in search results — that quietly costs clicks before anyone even lands. I
-> also spotted a couple of small technical errors on the page.
+> Hi — I'm Raymund, a web developer. I came across Omicove and took a quick look at the store.
 >
-> I put together a short teardown — 3 specific fixes with screenshots. It's attached, free, no
-> strings. If it's useful and you'd like a hand, happy to help. Either way, hope it's handy.
+> Two things worth fixing: there's no meta description on the homepage, which means Google
+> writes your search snippet for you instead of you controlling it — that's the first thing a
+> potential customer reads about you. And there are two H1 headings on the page, which splits
+> the signal about what the page is actually for.
 >
-> Cheers,
-> Raymund — Forgeline Technologies
-> https://forgelinetechnologies.com · raymundhermoso.dev@gmail.com
+> I pulled together a short teardown with screenshots and the 3 fixes I'd prioritise. Free, no
+> pitch — want me to send it over?
+>
+> — Raymund, Forgeline Technologies
 
 ---
 
-## 6. Luna Goods — lunagoods.nl  (cold → email · Dutch site)
-**Channel:** email `info@lunagoods.nl`
-**Verified issue:** no meta description · no favicon · JS error. Site is in Dutch — a Dutch note may land better.
+## 6. Art For Light — artforlight.shop  ⚠️ NO VERIFIED HOOK — read before sending
+**Channel:** reply in their thread → `community.shopify.com/t/honest-feedback-needed-for-my-first-shopify-jewelry-store/646775`
+**Verified 8/27:** The store is **clean**. 0 broken images, has a meta description, has a
+favicon, 1 H1, responds in ~1.4s. The 15.4s load one run reported was a fluke — two re-runs
+gave 2.8s and 3.7s, and curl gives 1.3–1.6s.
 
-**English:**
-> **Subject:** quick note about Luna Goods' website
->
-> Hi — I'm Raymund, a web developer. I came across Luna Goods and had a look at your store. A
-> couple of quick things stood out: there's no meta description (so Google guesses what to show
-> in search results) and no favicon (the little icon in the browser tab) — small trust/SEO
-> details that are easy wins. I put together a short teardown with 3 fixes + screenshots,
-> attached, free, no strings. Hope it's useful either way.
->
-> Cheers, Raymund — Forgeline Technologies
+**Don't send a manufactured problem.** Two honest options:
 
-**Dutch (optional):**
-> **Onderwerp:** kort berichtje over de website van Luna Goods
->
-> Hoi — ik ben Raymund, webontwikkelaar. Ik kwam Luna Goods tegen en heb even naar jullie shop
-> gekeken. Een paar dingen vielen me op: er is geen meta-description ingesteld (dan raadt Google
-> zelf wat er in de zoekresultaten komt) en geen favicon in het browsertabblad — kleine
-> SEO/vertrouwen-details die snel te fixen zijn. Ik heb een korte teardown gemaakt met 3
-> verbeterpunten + screenshots, gratis, vrijblijvend. Hoe dan ook, hopelijk handig!
->
-> Groeten, Raymund — Forgeline Technologies
+1. **Spend 60 seconds on the store first.** The old hook was: a "Grand Opening — Buy 2, Get 1
+   Free" promo running while much of the Best Sellers / Trending row shows **"Sold Out."** If
+   that's still true when you look, it's a real and visible hook — lead with it.
+2. **If the store still looks clean, say so.** Replying "I looked, it's in good shape, here's
+   the one thing I'd consider" is rare and memorable in a feedback thread. It costs you nothing
+   and it's how you become the person they message when something *does* break.
 
 ---
 
-## Teardown files (already generated — attach as PDF or paste the 3 wins)
+## Teardown files (regenerated 2026-08-27)
 
-| Prospect | Client teardown HTML |
-|---|---|
-| Azada Beauty | `site-audit/reports/azadabeauty.com-2026-08-01T03-30-24/teardown.html` |
-| Lylo Watches | `site-audit/reports/lylowatches.com-2026-08-01T03-30-48/teardown.html` |
-| Art For Light | `site-audit/reports/artforlight.shop-2026-08-01T03-30-35/teardown.html` |
-| KASH ERA | `site-audit/reports/kasheraapparel.myshopify.com-2026-08-01T03-30-59/teardown.html` |
-| Omicove | `site-audit/reports/omicove.com-2026-08-01T03-29-16/teardown.html` |
-| Luna Goods | `site-audit/reports/lunagoods.nl-2026-08-01T03-29-24/teardown.html` |
+    marketing/site-audit/reports/lylowatches.com-2026-08-27T11-50-07/teardown.html
+    marketing/site-audit/reports/azadabeauty.com-2026-08-27T11-49-41/teardown.html
+    marketing/site-audit/reports/kasheraapparel.myshopify.com-2026-08-27T11-51-02/teardown.html
+    marketing/site-audit/reports/lunagoods.nl-2026-08-27T11-51-37/teardown.html
+    marketing/site-audit/reports/omicove.com-2026-08-27T11-51-27/teardown.html
+    marketing/site-audit/reports/artforlight.shop-2026-08-27T11-50-15/teardown.html
 
-**To send:** open the HTML in Chrome → Print → Save as PDF → attach. Or paste the "3 quick
-wins" straight into the message. Change the "Hi there —" line to their name first.
+Open `teardown.html` → Print → Save as PDF → attach. **The teardowns still contain the
+speed/TTFB figures** — if you send the PDF as-is, don't build your message around those
+numbers. The screenshots and structural findings in them are solid.
 
 ## After you send
-Log each in `outreach-tracker.csv`: set Status → `Sent`, Date Contacted → today,
-Follow-up Date → +3 days. Follow-up templates are in `teardown-playbook.md` (Phase 7).
+
+Log each in `outreach-tracker.csv`: Status `Sent`, date, follow-up = **+3 days**.
+When someone replies, deliver the teardown within 24 hrs, then the soft CTA:
+*"Want me to fix these? I can scope it — 15 min call?"*
