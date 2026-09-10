@@ -25,6 +25,18 @@ export default function SiteScripts() {
       requestAnimationFrame(step);
     };
 
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    /* The counters are server-rendered with their real values, so they are
+       correct without JavaScript, for screen readers and for crawlers.
+       The count-up may therefore only run on an element the visitor has not
+       seen yet — zeroing something already on screen would repaint a correct
+       number as 0 and count back up, which is worse than no animation. */
+    const canAnimate = (el: HTMLElement) =>
+      !reducedMotion && el.getBoundingClientRect().top > window.innerHeight;
+
     const illus = document.querySelectorAll<HTMLElement>(".illus");
     const counters = document.querySelectorAll<HTMLElement>(".counter strong[data-to]");
 
@@ -50,13 +62,21 @@ export default function SiteScripts() {
             cio.unobserve(e.target);
           });
         },
-        { threshold: 0.6 },
+        // Fires 200px before the band scrolls into view, so the count-up is
+        // already running by the time any of it is visible — the zeroed
+        // start state is never on screen.
+        { threshold: 0, rootMargin: "200px 0px" },
       );
-      counters.forEach((el) => cio.observe(el));
+      counters.forEach((el) => {
+        if (!canAnimate(el)) return; // on screen already, or motion reduced
+        el.textContent = "0" + (el.dataset.suffix ?? "");
+        cio.observe(el);
+      });
       cleanups.push(() => cio.disconnect());
     } else {
       illus.forEach((el) => el.classList.add("play"));
-      counters.forEach(runCounter);
+      // No IntersectionObserver: the server-rendered values are already
+      // correct, and animating here would repaint them as 0 in full view.
     }
 
     // Nav is transparent over the gradient hero, solid white once you scroll past it.

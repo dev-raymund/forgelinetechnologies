@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { openGraph } from "@/lib/metadata";
 import Link from "next/link";
 import { getPublishedPosts } from "@/lib/queries";
 import { formatDate } from "@/lib/markdown";
+import "../site.css";
 import "./blog.css";
 
 export const revalidate = 3600;
@@ -9,6 +11,12 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "Blog",
   description: "Notes on building, shipping, and keeping websites fast.",
+  alternates: { canonical: "/blog" },
+  openGraph: openGraph({
+    url: "/blog",
+    title: "Blog — Forgeline Technologies",
+    description: "Notes on building, shipping, and keeping websites fast.",
+  }),
 };
 
 export default async function BlogIndex() {

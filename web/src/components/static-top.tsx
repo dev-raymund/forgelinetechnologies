@@ -34,7 +34,11 @@ export default function StaticTop() {
           <a href="#products">Products</a>
           <a href="#process">Process</a>
           <a href="#work">Work</a>
-          <a href="/blog">Blog</a>
+          {/* Blog link removed while the blog is effectively empty — an
+              underbuilt blog in the nav reads as an abandoned business. The
+              /blog route still works and /admin still publishes; only this
+              link is gone. Restore it once three useful posts are live
+              (see lib/blog.ts, MIN_PUBLIC_POSTS). */}
           
           <a href="#about">About</a>
           <a href="#faq">FAQ</a>
@@ -351,10 +355,10 @@ export default function StaticTop() {
     
     <section className="counters-band wv-grad">
       <div className="counters">
-        <div className="counter"><strong data-to="6" data-suffix="+">0</strong><span>Years building</span></div>
-        <div className="counter"><strong data-to="17">0</strong><span>Projects shipped</span></div>
-        <div className="counter"><strong data-to="4">0</strong><span>Countries served</span></div>
-        <div className="counter"><strong data-to="100" data-suffix="%">0</strong><span>Code ownership</span></div>
+        <div className="counter"><strong data-to="6" data-suffix="+">6+</strong><span>Years building</span></div>
+        <div className="counter"><strong data-to="17">17</strong><span>Projects shipped</span></div>
+        <div className="counter"><strong data-to="4">4</strong><span>Countries served</span></div>
+        <div className="counter"><strong data-to="100" data-suffix="%">100%</strong><span>Code ownership</span></div>
       </div>
     </section>
 

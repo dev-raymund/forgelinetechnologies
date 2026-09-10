@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { openGraph } from "@/lib/metadata";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPostBySlug, getPublishedPosts } from "@/lib/queries";
 import { renderMarkdown, formatDate } from "@/lib/markdown";
+import "../../site.css";
 import "../blog.css";
 
 export const revalidate = 3600;
@@ -31,12 +33,17 @@ export async function generateMetadata({
   return {
     title: post.title,
     description: post.excerpt,
+    alternates: { canonical: `/blog/${post.slug}` },
     openGraph: {
-      title: post.title,
-      description: post.excerpt,
-      type: "article",
-      publishedTime: post.publishedAt?.toISOString(),
-      images: post.coverUrl ? [post.coverUrl] : undefined,
+      ...openGraph({
+        url: `/blog/${post.slug}`,
+        title: post.title,
+        description: post.excerpt,
+        type: "article",
+        publishedTime: post.publishedAt?.toISOString(),
+      }),
+      // A post cover replaces the default card when one exists.
+      ...(post.coverUrl ? { images: [post.coverUrl] } : {}),
     },
   };
 }
