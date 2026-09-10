@@ -2,8 +2,7 @@
 
 Automated website **teardown** tool. Point it at any URL and it produces a polished,
 **client-ready HTML teardown** with your **3 quick wins**, key metrics, and desktop +
-mobile screenshots — a document you send as-is (or as a PDF). No video, no narration
-(see item 5 in [../TODO.md](../TODO.md)).
+mobile screenshots — a document you send as-is (or as a PDF). No video, no narration.
 
 Free & open-source (Playwright). No API keys, no accounts. Uses your existing
 Google Chrome — no big browser download.
@@ -11,7 +10,7 @@ Google Chrome — no big browser download.
 ## One-time setup
 
 ```bash
-cd marketing/site-audit
+cd tools/site-audit
 npm install          # installs the Playwright library only (small, fast)
 ```
 

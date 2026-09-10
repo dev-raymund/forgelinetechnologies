@@ -79,5 +79,4 @@ Netlify and add `netlify` to the `<form>` tag to use Netlify Forms.)
 ## After it's live
 
 This is your hub. Put the URL in your Upwork/Contra profile, GitHub bio,
-LinkedIn, build-in-public posts, and every proposal. See `../BUSINESS-PLAN.md`
-for the full client-getting plan.
+LinkedIn, build-in-public posts, and every proposal.
