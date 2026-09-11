@@ -25,7 +25,7 @@ export type TechGroup = {
 export const techGroups: TechGroup[] = [
   {
     title: "Front-end",
-    note: "What the customer actually touches, built to stay fast on a phone.",
+    note: "What your customers actually touch. Built to stay fast on a phone, which is where most of them are.",
     items: [
       { name: "React", icon: "react" },
       { name: "Next.js" },
@@ -38,7 +38,7 @@ export const techGroups: TechGroup[] = [
   },
   {
     title: "Back-end",
-    note: "The part that has to be correct, not just pleasant.",
+    note: "The part that has to be correct rather than merely pleasant — logins, business rules, money.",
     items: [
       { name: "PHP", icon: "php" },
       { name: "Laravel", icon: "laravel" },
@@ -48,7 +48,7 @@ export const techGroups: TechGroup[] = [
   },
   {
     title: "Commerce & CMS",
-    note: "Platforms used where they earn their keep, and skipped where they do not.",
+    note: "Used where the platform genuinely earns its keep, and skipped where it would get in the way.",
     items: [
       { name: "WordPress", icon: "wordpress" },
       { name: "WooCommerce", icon: "woocommerce" },
@@ -57,7 +57,7 @@ export const techGroups: TechGroup[] = [
   },
   {
     title: "Data",
-    note: "Modelled once, properly, because this is the expensive thing to change later.",
+    note: "Your data is structured around how the business actually works, so the system stays maintainable as it grows.",
     items: [
       { name: "PostgreSQL" },
       { name: "MySQL", icon: "mysql" },
@@ -66,7 +66,7 @@ export const techGroups: TechGroup[] = [
   },
   {
     title: "Tooling & Delivery",
-    note: "How work gets from a branch to production without drama.",
+    note: "How a change reaches your live site without drama, and how it gets undone if it needs to be.",
     items: [
       { name: "Git", icon: "git" },
       { name: "Docker", icon: "docker" },

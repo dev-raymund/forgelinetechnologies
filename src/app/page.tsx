@@ -46,10 +46,10 @@ export default function HomePage() {
 
       <Hero />
       <ServicesOverview />
-      <FeaturedWork />
       <WhyForgeline />
-      <Technology />
+      <FeaturedWork />
       <Process />
+      <Technology ground="paper" />
       <Partnership />
       <Founder />
       <Faq />

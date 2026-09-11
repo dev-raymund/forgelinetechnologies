@@ -27,10 +27,11 @@ export function Partnership() {
               Part of a wider technology ecosystem
             </h2>
             <p className="mt-3 max-w-[40ch] text-[0.9375rem] leading-relaxed text-muted">
-              Forgeline and {partner.name} are partner companies with
-              complementary focus. When a project needs capability on both
-              sides, you can reach it without going and finding a second
-              supplier.
+              Forgeline and {partner.name} are partner companies covering
+              different ground. Forgeline builds the digital product;{" "}
+              {partner.name} handles the wider business technology around it.
+              Where a project needs both, you can draw on both without finding
+              a second supplier and then managing the gap between them.
             </p>
           </div>
 

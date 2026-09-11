@@ -13,13 +13,18 @@ import { techGroups } from "@/data/technologies";
  * Set in mono because these genuinely are technical names, not because small
  * text looks more serious in a monospace face.
  */
-export function Technology() {
+export function Technology({
+  ground = "white",
+}: {
+  /** Set per page so the alternation stays correct wherever this is placed. */
+  ground?: "paper" | "white";
+} = {}) {
   return (
-    <Section id="technology" ground="white" size="md" labelledBy="tech-title">
+    <Section id="technology" ground={ground} size="md" labelledBy="tech-title">
       <SectionHeading
         id="tech-title"
-        title="Tools chosen per problem"
-        dek="No stack is right for every project. WordPress is the correct answer more often than developers like to admit, and it is the wrong one when a business needs software rather than pages."
+        title="Chosen for the problem, not the résumé"
+        dek="No stack is right for every project, so the recommendation depends on what you are building and who has to maintain it. WordPress is the correct answer more often than developers like to admit — and the wrong one when a business needs software rather than pages."
       />
 
       <dl className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">

@@ -29,10 +29,10 @@ export function ClosingCta() {
                 Tell us what you need built
               </h2>
               <p className="mt-6 max-w-[52ch] text-dek text-on-ink-muted">
-                Send the project details and you get a reply from the developer
-                who would build it — not a sales sequence. If it is a fit, the
-                next step is a call and a fixed quote. If it is not, we will
-                say so.
+                Send the project details and they go straight to the developer
+                who would build it. No sales sequence and no qualification
+                call — the next conversation is about the actual project. If it
+                is not a fit, you will be told that instead.
               </p>
 
               <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">

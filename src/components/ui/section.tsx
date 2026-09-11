@@ -71,21 +71,40 @@ export function SectionHeading({
   /** Optional right-hand counterweight, e.g. a link or a count. */
   aside?: ReactNode;
 }) {
+  // A grid, not a flex row. Under flex the title column collapsed toward its
+  // longest word whenever the dek competed for space, so a longer heading
+  // broke into a stack of short lines. Explicit column spans give the title a
+  // predictable measure regardless of how long either string is.
+  const hasAside = Boolean(aside);
+
   return (
     <div className="relative mb-12 md:mb-16">
       <span className="rail-node hidden md:block" aria-hidden="true" />
-      <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between md:gap-12">
-        <div className="max-w-[34ch]">
-          <h2 id={id} className="text-title font-semibold">
-            {title}
-          </h2>
-        </div>
+      <div className="grid gap-6 md:grid-cols-12 md:items-end md:gap-10">
+        <h2
+          id={id}
+          className={`text-title font-semibold ${
+            hasAside ? "md:col-span-5" : "md:col-span-6"
+          }`}
+        >
+          {title}
+        </h2>
         {dek ? (
-          <p className="max-w-[52ch] text-dek text-muted [.on-ink_&]:text-on-ink-muted">
+          <p
+            className={`max-w-[52ch] text-dek text-muted [.on-ink_&]:text-on-ink-muted ${
+              hasAside
+                ? "md:col-span-4 md:col-start-6"
+                : "md:col-span-5 md:col-start-8"
+            }`}
+          >
             {dek}
           </p>
         ) : null}
-        {aside}
+        {aside ? (
+          <div className="md:col-span-2 md:col-start-11 md:justify-self-end">
+            {aside}
+          </div>
+        ) : null}
       </div>
     </div>
   );

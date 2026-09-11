@@ -48,9 +48,10 @@ export function Hero() {
             style={{ animationDelay: "340ms" }}
           >
             <p className="text-dek text-on-ink-muted">
-              Forgeline is a web engineering studio. You get a fixed scope, a
-              fixed price, and direct access to the person writing the code —
-              from the first call through to the day it goes live.
+              A web engineering studio. You get a fixed scope, a fixed price
+              and direct access to the person writing the code — from the
+              first call to the day it goes live, and you own everything at
+              the end of it.
             </p>
           </div>
 

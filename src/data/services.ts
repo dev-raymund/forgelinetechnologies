@@ -31,9 +31,9 @@ export const services: Service[] = [
     title: "Websites & Digital Experiences",
     slug: "websites",
     summary:
-      "Marketing sites, corporate sites and landing pages built for speed, search and conversion.",
+      "Marketing and corporate sites that load fast, get found, and your own team can keep current.",
     description:
-      "The site most businesses have is slow, hard to edit, and built by someone who has since disappeared. We build the other kind: fast, structured so your team can actually change the content, and engineered so search engines and customers both find what they came for.",
+      "For businesses whose current site is slow, awkward to edit, or was built by someone who has since disappeared. You get a site that works properly on any device, that search engines can actually read, and that your team can update without raising a ticket for every wording change.",
     includes: [
       "Marketing and corporate websites",
       "Landing pages and campaign sites",
@@ -49,9 +49,9 @@ export const services: Service[] = [
     title: "Web Applications",
     slug: "web-applications",
     summary:
-      "Portals, dashboards, booking systems and internal tools — software that runs in a browser.",
+      "Portals, dashboards, booking systems and internal tools — for when a spreadsheet has stopped coping.",
     description:
-      "When a spreadsheet stops coping and off-the-shelf software almost fits, the gap is a web application. We build the portals, dashboards and internal tools that carry real work: authentication, roles, data you can trust, and an interface people will actually use.",
+      "For businesses running important work through spreadsheets, email threads and software that almost fits. You get a system built around the process you actually follow, with proper logins and permissions, data you can rely on, and an interface your team will use without being made to.",
     includes: [
       "Customer and client portals",
       "Dashboards and reporting interfaces",
@@ -67,9 +67,9 @@ export const services: Service[] = [
     title: "E-commerce",
     slug: "ecommerce",
     summary:
-      "Shopify, WooCommerce and custom commerce — storefronts built to sell and to maintain.",
+      "Shopify, WooCommerce and custom storefronts — built to sell, and to still be maintainable next year.",
     description:
-      "A storefront is a product catalogue, a payment system, a shipping system and a content site wearing one coat. We build on Shopify or WooCommerce where the platform earns its keep, and custom where it does not — then make sure adding a product next year does not require a developer.",
+      "For businesses selling online where the storefront has to handle real products, real payments and real shipping rules. You get a store on whichever platform genuinely suits your catalogue and your margins — and one where adding a product next year does not mean hiring a developer.",
     includes: [
       "Shopify and WooCommerce builds",
       "Custom commerce and checkout",
@@ -87,7 +87,7 @@ export const services: Service[] = [
     summary:
       "Software shaped around how your business actually works, not how a template assumed it would.",
     description:
-      "Every business has a process that no product quite supports — the quoting rule, the approval chain, the way stock is counted. Custom software is worth building at exactly that point: where the workaround costs more every month than the build would cost once.",
+      "For businesses with a process no off-the-shelf product supports — the quoting rule, the approval chain, the way stock gets counted. It is worth building at the point where the workaround costs more every month than the build would cost once. You get software that fits the business, instead of a business bent to fit the software.",
     includes: [
       "Business systems and workflow tools",
       "Data modelling and database design",
@@ -103,9 +103,9 @@ export const services: Service[] = [
     title: "APIs & Integrations",
     slug: "apis-integrations",
     summary:
-      "Connecting websites, applications, databases and third-party systems so data moves once.",
+      "Connect your site or app to the systems you already use — payments, CRMs, databases and third-party services.",
     description:
-      "Most businesses already own the systems they need; the data just does not move between them. We build the REST APIs and integrations that connect a site to a CRM, a payment provider, a listing feed or an internal database — so information is entered once and is correct everywhere.",
+      "For businesses entering the same information twice because two systems do not talk to each other. You get the connections that move data between your website, your CRM, your payment provider and your internal tools — so something is entered once and is then correct everywhere it appears.",
     includes: [
       "REST API design and build",
       "Third-party service integration",
@@ -121,9 +121,9 @@ export const services: Service[] = [
     title: "Ongoing Development",
     slug: "ongoing-development",
     summary:
-      "A developer on tap, month to month — features, fixes and maintenance after launch.",
+      "A developer on hand month to month for the features, fixes and maintenance that come after launch.",
     description:
-      "Launch is the start of a website's life, not the end of it. Ongoing development covers the features you did not scope yet, the fixes you will need, and the hosting, updates and monitoring that keep a site healthy — without hiring someone full time.",
+      "For businesses that need development to continue but do not need a full-time hire. You get the features that were not in the original scope, the fixes you will inevitably want, and the hosting, updates and monitoring that keep a site healthy — month to month, and cancellable.",
     includes: [
       "New features and improvements",
       "Bug fixes and technical support",

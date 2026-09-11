@@ -53,7 +53,7 @@ export const projects: Project[] = [
     kind: "Web App",
     sector: "Education",
     description:
-      "A student-to-university matching platform, built as a custom application with a REST API carrying data between search, listings and the enquiry flow.",
+      "A custom platform that matches students to universities, built around a search and enquiry journey that had to stay quick across a large set of listings. A dedicated REST API moves the data between search, listings and enquiries.",
     image: "/assets/projects/tgs-hub.jpg",
     imageAlt: "Talk Global Study student matching platform",
     liveUrl: "https://talkglobalstudy.com",
@@ -66,7 +66,7 @@ export const projects: Project[] = [
     kind: "E-commerce",
     sector: "Yacht Sales",
     description:
-      "Yacht sales and charter listings on a custom WordPress theme, with ACF modelling the specification fields each vessel needs.",
+      "A yacht sales and charter site where no two vessels share the same specifications. A custom WordPress theme models those fields per listing, so the team adds new boats themselves rather than waiting on a developer.",
     image: "/assets/projects/mhc.jpg",
     imageAlt: "Multihull Central yacht sales and charter website",
     liveUrl: "https://www.multihullcentral.com/",
@@ -79,7 +79,7 @@ export const projects: Project[] = [
     kind: "Website",
     sector: "Real Estate",
     description:
-      "A property listing and sales site whose real engineering problem was the filtering — several criteria narrowing a large listing set without the page slowing down.",
+      "A property listing and sales site where buyers narrow a large set of listings by several criteria at once. Making that filtering stay responsive as the list grows was the real engineering problem behind it.",
     image: "/assets/projects/bh-sellers-advocate.jpg",
     imageAlt: "BH Sellers Advocate property listing website",
     liveUrl: "https://bhsellersadvocate.com.au/",
@@ -92,7 +92,7 @@ export const projects: Project[] = [
     kind: "E-commerce",
     sector: "Winery",
     description:
-      "An award-winning winery and restaurant storefront, combining online sales with seasonal menus that change through the year.",
+      "A storefront for an award-winning winery that also runs a restaurant, so it sells wine online while carrying menus that change with the season. Both live in one build, and the team updates either without touching the other.",
     image: "/assets/projects/missionestate.jpg",
     imageAlt: "Mission Estate winery and restaurant storefront",
     liveUrl: "https://missionestate.co.nz/",
@@ -105,7 +105,7 @@ export const projects: Project[] = [
     kind: "Website",
     sector: "Real Estate",
     description:
-      "A real-estate agent site integrated with MLS/IDX, pulling live listing data from the external feed into the site's own presentation layer.",
+      "An agent site that shows current listings without anyone re-entering them by hand. It reads the MLS/IDX feed directly and renders that external data in the site's own presentation layer.",
     image: "/assets/projects/lisasherman.jpg",
     imageAlt: "Lisa Sherman Realty website with MLS listing integration",
     liveUrl: "https://lisashermanrealty.com/",
@@ -118,7 +118,7 @@ export const projects: Project[] = [
     kind: "E-commerce",
     sector: "Automotive",
     description:
-      "Vehicle conversion and 4x4 bus sales, on a custom build using ACF to handle configurable options that differ for every vehicle.",
+      "A vehicle conversion and sales site where almost no two builds share the same options. A custom build handles the configurable specifications per vehicle, so the catalogue stays accurate as the range changes.",
     image: "/assets/projects/bus4x4.jpg",
     imageAlt: "Bus 4x4 vehicle conversion and sales website",
     liveUrl: "https://www.bus4x4.com.au/",
@@ -131,7 +131,7 @@ export const projects: Project[] = [
     kind: "Custom Build",
     sector: "Real Estate",
     description:
-      "A real-estate agent site hand-coded in plain HTML, CSS and JavaScript — no framework, no page builder, and a front end that stays small because of it.",
+      "An agent site built to open quickly for buyers browsing listings on a phone. Hand-coded in plain HTML, CSS and JavaScript — no framework and no page builder, which is why the front end stays small.",
     image: "/assets/projects/real-estate.jpg",
     imageAlt: "Marci Metzger Realty hand-coded website",
     liveUrl: "https://real-estate-flame-two.vercel.app/",
@@ -143,7 +143,7 @@ export const projects: Project[] = [
     kind: "E-commerce",
     sector: "Supplements",
     description:
-      "A supplements brand storefront with custom product templates, structured so new product types don't need a developer each time.",
+      "A storefront for a supplements brand with a range that keeps expanding. Custom product templates are structured so an entirely new kind of product can be added by the team, not by a developer.",
     image: "/assets/projects/nutracraft.jpg",
     imageAlt: "Nutracraft supplements storefront",
     liveUrl: "https://nutracraft.com",
@@ -155,7 +155,7 @@ export const projects: Project[] = [
     kind: "E-commerce",
     sector: "Food",
     description:
-      "A sustainable food brand where the storytelling carries as much weight as the catalogue — editorial content and commerce in a single build.",
+      "A sustainable food brand where the story does as much selling as the catalogue. Editorial content and the storefront run in one build, so the brand narrative and the buying journey stay together.",
     image: "/assets/projects/leaftblade.jpg",
     imageAlt: "Leaft Blade sustainable food brand storefront",
     liveUrl: "https://www.leaftblade.com/",
@@ -167,7 +167,7 @@ export const projects: Project[] = [
     kind: "E-commerce",
     sector: "Travel",
     description:
-      "Adventure travel experiences sold as products, on a custom theme built around trip listings rather than physical stock.",
+      "Adventure travel trips sold the way products are, though nothing physical ever ships. A custom theme is built around trips, dates and availability instead of stock levels.",
     image: "/assets/projects/offrouteadventures.jpg",
     imageAlt: "Off Route Adventures travel booking website",
     liveUrl: "https://offrouteadventures.com/",
@@ -179,7 +179,7 @@ export const projects: Project[] = [
     kind: "Website",
     sector: "Finance",
     description:
-      "A wealth management and financial services site on a custom theme, with ACF structuring the service and adviser content.",
+      "A wealth management site where prospective clients want to understand both the services and the people before they make contact. A custom theme keeps the service and adviser content structured and consistent as the firm grows.",
     image: "/assets/projects/stickmanwealth.jpg",
     imageAlt: "Stickman Wealth financial services website",
     liveUrl: "https://www.stickmanwealth.com.au/",
@@ -191,7 +191,7 @@ export const projects: Project[] = [
     kind: "Website",
     sector: "Interior",
     description:
-      "Interior design services and a product showcase, built on Avada with ACF handling the structured product data behind it.",
+      "An interior design site that doubles as a product showcase. The product data sits in a structured layer behind the pages, so the range is presented consistently rather than rebuilt page by page.",
     image: "/assets/projects/perfect_floors.jpg",
     imageAlt: "Perfect Floors interior design website",
     liveUrl: "https://perfectfloors.com.au/",
@@ -203,7 +203,7 @@ export const projects: Project[] = [
     kind: "Website",
     sector: "Finance",
     description:
-      "A mortgage and investment advisory site on a custom theme, with ACF structuring loan products alongside the advisory content.",
+      "A mortgage and investment advisory site that has to present loan products clearly alongside the advice itself. Both are structured, so products stay comparable as their terms change.",
     image: "/assets/projects/fast_track_home_loans.jpg",
     imageAlt: "Fast Track Home Loans mortgage advisory website",
     liveUrl: "https://fasttrackhomeloans.com.au/",
@@ -215,7 +215,7 @@ export const projects: Project[] = [
     kind: "Website",
     sector: "Local Business",
     description:
-      "A locksmith service site built around one job: getting someone to the emergency contact fast, from any page and on any device.",
+      "A locksmith site built around a single job: someone locked out needs the emergency number now. Every page puts it within reach, on any device.",
     image: "/assets/projects/coffscitylockmart.jpg",
     imageAlt: "Coffs City Lockmart locksmith website",
     liveUrl: "https://www.coffscitylockmart.com.au/",
@@ -227,7 +227,7 @@ export const projects: Project[] = [
     kind: "Website",
     sector: "Local Business",
     description:
-      "A regional locksmith site with appointment scheduling built in, so routine bookings arrive without a phone call.",
+      "A regional locksmith site with scheduling built in, so routine jobs get booked without tying up the phone for calls that did not need a person.",
     image: "/assets/projects/karrathalocksmith.jpg",
     imageAlt: "Karratha Lock Service locksmith website",
     liveUrl: "https://karrathalockservice.com/",
@@ -239,7 +239,7 @@ export const projects: Project[] = [
     kind: "Website",
     sector: "Consultancy",
     description:
-      "A sales and marketing consultancy brand site, with the content architecture built around their distinct service lines.",
+      "A brand site for a sales and marketing consultancy whose service lines each need to stand on their own. The content architecture is built around those lines rather than flattening them into a single offer.",
     image: "/assets/projects/weareignition.jpg",
     imageAlt: "Ignition Consulting brand website",
     liveUrl: "https://weareignition.co.nz/",
@@ -251,7 +251,7 @@ export const projects: Project[] = [
     kind: "Website",
     sector: "Nonprofit",
     description:
-      "A mission-driven site for a nonprofit refuge supporting vulnerable girls, built to make the work — and the ways to help — immediately legible.",
+      "A site for a nonprofit refuge supporting vulnerable girls, built so a visitor grasps the work and finds the way to help without hunting for it.",
     image: "/assets/projects/kalingahouse.jpg",
     imageAlt: "Kalinga House nonprofit refuge website",
     liveUrl: "https://kalingahouse.org/",

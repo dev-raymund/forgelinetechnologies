@@ -29,7 +29,7 @@ export const processSteps: ProcessStep[] = [
     number: "02",
     title: "Plan",
     summary:
-      "We map the build — architecture, key pages and features, and the order things happen in. Decisions that are expensive to reverse get made here, on purpose.",
+      "We map out what gets built, in what order, and which decisions would be expensive to change later. You see the plan and the price in writing before anything is made.",
     outcome: "An agreed scope, a technical approach and visible milestones.",
   },
   {

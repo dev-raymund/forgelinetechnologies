@@ -24,20 +24,20 @@ const forgelineChain = ["You", "The developer", "Your product"];
 
 const consequences = [
   {
-    title: "Nothing is lost in relay",
-    body: "The person who hears the requirement is the person who implements it. No brief gets summarised twice before it reaches the code.",
+    title: "Fewer misunderstandings",
+    body: "The person who hears what you need is the person who builds it. Nothing is summarised twice on its way to the code, so what ships matches what you actually asked for.",
   },
   {
-    title: "Decisions happen in one step",
-    body: "Technical questions get answered by someone who can answer them, on the call, rather than taken away and brought back next week.",
+    title: "Faster decisions",
+    body: "Questions get answered on the call by someone who can genuinely answer them, rather than taken away and brought back next week.",
   },
   {
-    title: "Accountability has one address",
-    body: "When something is wrong there is no question of whose scope it was. It is the same person either way.",
+    title: "One point of accountability",
+    body: "If something is wrong there is no discussion about whose scope it was. It is the same person either way, which makes it quicker to put right.",
   },
   {
-    title: "Handover is clean",
-    body: "Code, accounts and documentation, all transferred. You own the result outright and you are free to take it anywhere.",
+    title: "A handover you can act on",
+    body: "Code, accounts and documentation all transfer to you. You own the result outright and you are free to take it to anyone.",
   },
 ];
 
@@ -98,7 +98,7 @@ export function WhyForgeline() {
       <SectionHeading
         id="why-title"
         title="Fewer layers between you and the build"
-        dek="Most project failures are communication failures. A brief gets relayed, summarised and reinterpreted until what ships is not what was asked for. Removing the relay removes the failure."
+        dek="Bigger teams exist for good reasons, and on large programmes they are the right answer. But on a website or a web application, every handoff between people is somewhere the brief can drift — and that is where most projects go wrong, long before the code does."
       />
 
       <div className="grid gap-12 md:grid-cols-12 md:gap-8">

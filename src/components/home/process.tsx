@@ -14,7 +14,7 @@ import { processSteps } from "@/data/process";
  */
 export function Process() {
   return (
-    <Section id="process" ground="paper" size="lg" labelledBy="process-title">
+    <Section id="process" ground="white" size="lg" labelledBy="process-title">
       <SectionHeading
         id="process-title"
         title="No black box"

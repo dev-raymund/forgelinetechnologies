@@ -29,7 +29,7 @@ export const faqs: Faq[] = [
   {
     question: "How does fixed-price development work?",
     answer:
-      "Scope is agreed before any code is written, and the price is fixed against that scope. You approve a number and a plan, then the number does not move unless you ask for something that was not in the plan — in which case you get a new fixed price for that addition before it is built.",
+      "Scope is agreed first, and the price is fixed against it. You approve a plan and a number, and that number does not move. If you later want something the plan did not cover, it gets its own fixed price before it is built — and you can always say no to it.",
   },
   {
     question: "Who owns the code?",
@@ -39,7 +39,7 @@ export const faqs: Faq[] = [
   {
     question: "Can you work with an existing website?",
     answer:
-      "Yes. Taking over an existing build, fixing one that was left unfinished, migrating a site between platforms, or making a slow one fast are all normal work. You do not have to start again to get help.",
+      "Yes, and it is common. Taking over an existing build, finishing one that was abandoned, moving between platforms, or making a slow site fast are all normal work. You do not have to start again to get help.",
   },
   {
     question: "Can you build a custom web application?",
@@ -59,7 +59,7 @@ export const faqs: Faq[] = [
   {
     question: "How long does a typical project take?",
     answer:
-      "A focused website is one to two weeks. A production web application is usually four to eight weeks. Anything larger gets broken into milestones so you see working software throughout rather than waiting for one delivery at the end.",
+      "A focused website is one to two weeks. A production web application is usually four to eight weeks. Anything bigger gets split into milestones, so you are seeing working software throughout rather than waiting on a single delivery at the end.",
   },
   {
     question: "What happens after launch?",
@@ -69,6 +69,6 @@ export const faqs: Faq[] = [
   {
     question: "How does Forgeline work with TechZQuad?",
     answer:
-      "They are partner companies with complementary focus. Forgeline handles digital product and web engineering; TechZQuad covers broader business technology and IT — automation, CRM, infrastructure, support and training. When a project needs capability on both sides, you can reach it without going and finding a second supplier.",
+      "They are partner companies covering different ground. Forgeline builds the digital product — sites, applications, storefronts, integrations. TechZQuad handles the wider business technology around it: automation, CRM, infrastructure, support and training. If your project needs both, you can use both.",
   },
 ];
