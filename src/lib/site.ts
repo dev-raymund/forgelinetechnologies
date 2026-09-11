@@ -43,6 +43,14 @@ export const stats = [
 /** Markets with delivered work behind the "4 countries" figure. */
 export const markets = ["Australia", "New Zealand", "United States", "Philippines"] as const;
 
+/**
+ * The same four in running prose. Two of them take a definite article, which
+ * no join() of the list above can produce — so the sentence form is written
+ * once here rather than assembled wrongly at each call site.
+ */
+export const marketsSentence =
+  "Australia, New Zealand, the United States and the Philippines";
+
 export const founder = {
   name: "Raymund Hermoso",
   role: "Founder & Lead Developer",
