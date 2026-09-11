@@ -17,15 +17,15 @@ export function ProjectCard({
   priority?: boolean;
 }) {
   return (
-    <Link href={`/work/${project.slug}`} className="group block">
-      <div className="relative aspect-[16/10] overflow-hidden border border-rule bg-white">
+    <Link href={`/work/${project.slug}`} className="media-card group block">
+      <div className="media-frame relative aspect-[16/10] overflow-hidden border border-rule bg-white">
         <Image
           src={project.image}
           alt={project.imageAlt}
           fill
           priority={priority}
           sizes="(min-width: 1024px) 30vw, (min-width: 768px) 45vw, 92vw"
-          className="object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+          className="media-zoom object-cover object-top"
         />
       </div>
       <div className="mt-4 flex items-center gap-3">

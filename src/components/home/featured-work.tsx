@@ -39,14 +39,14 @@ export function FeaturedWork() {
       <ul className="grid gap-x-8 gap-y-12 md:grid-cols-2 md:gap-y-16">
         {featuredProjects.map((project) => (
           <li key={project.slug}>
-            <Link href={`/work/${project.slug}`} className="group block">
-              <div className="relative aspect-[16/10] overflow-hidden border border-rule bg-white">
+            <Link href={`/work/${project.slug}`} className="media-card group block">
+              <div className="media-frame relative aspect-[16/10] overflow-hidden border border-rule bg-white">
                 <Image
                   src={project.image}
                   alt={project.imageAlt}
                   fill
                   sizes="(min-width: 768px) 45vw, 92vw"
-                  className="object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+                  className="media-zoom object-cover object-top"
                 />
               </div>
 

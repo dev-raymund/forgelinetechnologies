@@ -188,6 +188,44 @@
       padding-left: var(--spacing-rail);
     }
   }
+
+  /* ------------------------------------------------------------------ media
+
+     Project thumbnail zoom, carried across from the previous site: a 5% scale
+     over half a second, with the card lifting a few pixels under it.
+
+     The old version paired the lift with a growing drop shadow. That is left
+     behind deliberately — this design separates surfaces with fine borders,
+     and a soft grey shadow under every card would read as a different system
+     bolted on. The border darkens instead, which does the same job in the
+     language already in use.
+
+     Written here rather than as utility classes on each element so the two
+     places that render a project card cannot drift apart, and so the
+     reduced-motion rule below has something reliable to target. */
+  .media-card {
+    transition: transform 0.3s ease;
+  }
+
+  .media-zoom {
+    transition: transform 0.5s ease;
+  }
+
+  .media-frame {
+    transition: border-color 0.3s ease;
+  }
+
+  .media-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .media-card:hover .media-zoom {
+    transform: scale(1.05);
+  }
+
+  .media-card:hover .media-frame {
+    border-color: var(--color-rule-strong);
+  }
 }
 
 /* ==========================================================================
@@ -243,5 +281,13 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* Collapsing the duration alone would leave the zoom and the lift snapping
+     into place instantly, which is worse than not moving at all. Cancel the
+     transforms themselves. */
+  .media-card:hover,
+  .media-card:hover .media-zoom {
+    transform: none;
   }
 }
