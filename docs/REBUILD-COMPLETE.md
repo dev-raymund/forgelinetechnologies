@@ -2,12 +2,18 @@
 
 ## BLOCKED
 
-The codebase is finished, verified and committed. It is **blocked on three
-dashboard steps that only you can do** — creating the Neon project, clearing
-the Vercel Root Directory, and attaching the domain. Until those are done the
-schema cannot be applied and the site cannot serve, so this is not COMPLETE.
+The codebase is finished, verified and committed, and the database is live.
+**Two Vercel steps remain** and only you can do them: clearing the Root
+Directory (still `web`) and attaching the domain. Until then the site cannot
+serve, so this is not COMPLETE.
 
 Nothing in the code is outstanding.
+
+| Blocker | Status |
+|---|---|
+| Neon database created and schema applied | **done** — 2026-09-11 |
+| Vercel Root Directory cleared | **outstanding** |
+| Domain attached to the project | **outstanding** |
 
 ---
 
@@ -41,24 +47,37 @@ Solutions".
 
 ## 3. Database setup
 
-Written and typechecked, **not yet applied**.
+**Applied and verified** against the live database on 2026-09-11.
 
 `src/db/schema.ts` defines four tables — `users`, `projects`, `posts`,
-`inquiries` — with 12 indexes including the composite
+`inquiries` — with 14 indexes including the composite
 `(source_ip, created_at)` that serves the rate-limit query.
 
 `src/db/index.ts` throws when `DATABASE_URL` is absent, deliberately.
 `src/lib/queries.ts` wraps reads in a retry for Neon cold starts.
 
-Apply with `npm run db:push`, then verify against `information_schema` and
-`pg_indexes` — see `docs/database-setup.md`. Do not trust the CLI's output;
-on the previous database a push partially applied and left indexes missing.
+Applied with `npm run db:push` and verified against `information_schema`
+and `pg_indexes` rather than the CLI's own report:
+
+```
+TABLES 4: inquiries, posts, projects, users
+  inquiries 12 cols · posts 10 · projects 13 · users 8
+INDEXES 14  (4 primary keys, 3 unique, 7 declared)
+  including inquiries_ip_created_idx on (source_ip, created_at)
+```
 
 ## 4. Neon status
 
-**Not created.** This needs a new Neon project and its pooled connection
-string, which is step 1 below. The schema is ready to push the moment it
-exists.
+**Live.** A new Neon project was provisioned through the Vercel–Neon
+integration (Neon's own "New project" button is disabled for
+integration-managed accounts).
+
+Host `ep-green-night-b3xhc0n4-pooler` in `ap-southeast-1` — Singapore, the
+same region Vercel serves from, so queries do not cross regions. Confirmed
+empty before the push, so nothing was overwritten.
+
+The integration injects `DATABASE_URL` into the connected Vercel project
+automatically, which removes that variable from the manual list.
 
 The previous database is untouched and still holds the old data. A verified
 export sits in `backups/2026-09-11/` (gitignored).
@@ -135,7 +154,7 @@ The repository is ready. The project is not.
 
 | Variable | Needed | Consequence if missing |
 |---|---|---|
-| `DATABASE_URL` | **Yes** | Build fails once any page reads the database |
+| `DATABASE_URL` | **Yes** | Injected automatically by the Neon integration |
 | `SESSION_SECRET` | Recommended | Nothing yet — reserved for auth |
 | `RESEND_API_KEY` | Optional | Both emails skipped |
 | `CONTACT_EMAIL` | Optional | Notification skipped |
@@ -146,16 +165,16 @@ this codebase and would move every route under a prefix.
 
 ## 11. Manual dashboard actions still required
 
-1. **Neon** — create a new project, copy the pooled connection string into
-   `.env` locally, then run `npm run db:push` and verify.
-2. **Vercel** — clear Root Directory (currently `web`); add `DATABASE_URL`
-   and `SESSION_SECRET` to Production; attach both
-   `forgelinetechnologies.com` (primary) and `www.forgelinetechnologies.com`.
+1. ~~**Neon** — create the project and apply the schema.~~ **Done.**
+2. **Vercel** — clear Root Directory (currently `web`); add `SESSION_SECRET`
+   to Production (`DATABASE_URL` is injected by the Neon integration);
+   attach both `forgelinetechnologies.com` (primary) and
+   `www.forgelinetechnologies.com`.
 3. **Push** — only after step 2, or the build fails on the stale path.
 4. **Resend** *(optional now)* — API key, `CONTACT_EMAIL`, and a verified
    sending domain.
 
-Steps 1 and 2 are hard blockers.
+Step 2 is the remaining hard blocker.
 
 ## 12. Unresolved issues
 

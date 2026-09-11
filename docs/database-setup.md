@@ -81,7 +81,7 @@ select tablename, indexname, indexdef
  order by tablename, indexname;
 ```
 
-Expected once applied: **4 tables** and **12 indexes** — 4 primary keys, 3
+Expected once applied: **4 tables** and **14 indexes** — 4 primary keys, 3
 unique constraints (`users.email`, `projects.slug`, `posts.slug`) and 7
 declared indexes.
 
