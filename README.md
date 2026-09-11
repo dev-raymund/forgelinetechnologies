@@ -1,86 +1,50 @@
-# Digital Twin — marketing/creative agency
+# ForgeLine Technologies
 
-An AI digital twin of you (the founder) that:
+Web Development & Digital Solutions — the studio site.
 
-- **talks to prospects** in your voice, qualifies them, and books calls
-- **captures & scores leads** automatically (hot / warm / cold)
-- **escalates** high-value opportunities to you
-- **drafts content** (LinkedIn, Instagram, email, cold DMs) that sounds like you
+A single Next.js application at the repository root. Technical foundation
+only: no marketing pages, no design system, no content yet.
 
-Built on the Claude API (Opus 4.8). This is **Phase 1** of the agency plan — the twin itself.
+## Stack
 
-## How it works
+Next.js 16 (App Router) · React 19 · TypeScript strict · Neon Postgres +
+Drizzle · Resend · Zod · plain CSS
 
-```
-src/
-  client.ts       Anthropic client (reads ANTHROPIC_API_KEY)
-  config.ts       models + agency identity (from .env)
-  persona.ts      builds the system prompt (identity, voice, behavior rules)
-  retrieval.ts    lightweight RAG over the knowledge base (no extra API keys)
-  tools.ts        lead tools the twin can call (capture_lead, book_call, escalate)
-  leads.ts        lead storage (data/leads.json) + deterministic qualification scoring
-  twin.ts         the engine: streaming agentic chat loop + content generation
-  cli.ts          terminal interface to talk to your twin
-  knowledge/      YOUR brain & voice — edit these markdown files
-    about.md          who you are / positioning   (always in context)
-    voice.md          how you talk                (always in context)
-    services.md       packages & pricing          (retrieved on demand)
-    faq.md            common questions            (retrieved on demand)
-    case-studies.md   proof                       (retrieved on demand)
-```
-
-The twin's **voice and facts come entirely from `src/knowledge/`** — it's instructed never to invent prices, results, or guarantees. Make it yours by editing those five files.
-
-## Setup
+## Getting started
 
 ```bash
 npm install
-cp .env.example .env        # then add your ANTHROPIC_API_KEY and agency details
-npm run chat
+cp .env.example .env      # then fill in DATABASE_URL at minimum
+npm run dev               # http://localhost:3000
 ```
 
-Get an API key at https://platform.claude.com/.
+## Scripts
 
-## Using it
-
-At the `prospect ▸` prompt, type as if you were a prospect — the twin responds as you, qualifies, and captures the lead. Commands:
-
-| Command | What it does |
+| Command | Does |
 |---|---|
-| `/post <brief>` | draft a LinkedIn post in your voice |
-| `/ig <brief>` | draft an Instagram caption |
-| `/email <brief>` | draft a nurture email |
-| `/dm <brief>` | draft a cold outreach DM |
-| `/leads` | show captured leads, ranked by qualification |
-| `/reset` | start a fresh conversation |
-| `/help` · `/exit` | help / quit |
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm start` | Serve the production build |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm test` | Validation tests via `node --test` |
+| `npm run db:push` | Apply `src/db/schema.ts` to Neon |
+| `npm run db:studio` | Drizzle Studio |
 
-Captured leads are saved to `data/leads.json`.
+## Routes
 
-### Try it
+`/` · `/robots.txt` · `/sitemap.xml` · 404
 
-```
-prospect ▸ hey, I run a coaching business doing about 30k a month but my content is all over the place and I have no time. can you help?
-prospect ▸ /post why most founder content sounds like everyone else
-```
+## Documentation
 
-## Customizing your twin
+| Document | Covers |
+|---|---|
+| `docs/new-architecture.md` | Structure and why the app is at the root |
+| `docs/database-setup.md` | Tables, indexes, applying and verifying the schema |
+| `docs/environment.md` | Every variable, where it is read, what breaks |
+| `docs/resend-setup.md` | Email configuration and failure behaviour |
+| `docs/vercel-setup.md` | Exact deployment settings |
+| `docs/REBUILD-COMPLETE.md` | Current status and outstanding manual steps |
 
-1. **Edit `src/knowledge/about.md` and `voice.md`** — this is what makes it sound like *you*. Add real phrases you use.
-2. **Edit `services.md`, `faq.md`, `case-studies.md`** — put in your real offers, pricing, and (honest) results.
-3. **Set identity in `.env`** — `AGENCY_NAME`, `FOUNDER_NAME`, `BOOKING_LINK`, `TIMEZONE`.
-
-## Cost & models
-
-Defaults to `claude-opus-4-8` for best voice and sales reasoning. To cut cost, set `TWIN_CHAT_MODEL=claude-haiku-4-5` in `.env`.
-
-## Where this goes next (Phase 2/3)
-
-This core is built to plug into the rest of the agency plan:
-
-- **Website chat widget** — wrap `chatTurn()` in an HTTP endpoint (e.g. Express/Next API route) and drop a chat bubble on your site.
-- **DM/email auto-responder** — call `chatTurn()` from your inbox/DM webhook.
-- **Real booking + CRM** — replace the `book_call`/`capture_lead` tool bodies in `tools.ts` with Cal.com + HubSpot/Notion calls.
-- **Semantic retrieval** — swap the keyword scorer in `retrieval.ts` for Voyage embeddings when the knowledge base grows.
-
-`npm run typecheck` validates the build.
+`docs/legacy/` documents the previous application, removed on 2026-09-11 and
+recoverable at commit `28f6bfa`.
