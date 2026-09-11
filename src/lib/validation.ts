@@ -22,6 +22,13 @@ export const BUDGETS = [
   "Not sure yet",
 ] as const;
 
+export const TIMELINES = [
+  "As soon as possible",
+  "Within 1–3 months",
+  "In 3–6 months",
+  "Just exploring",
+] as const;
+
 const trimmed = z.string().trim();
 
 export const inquirySchema = z.object({
@@ -43,6 +50,7 @@ export const inquirySchema = z.object({
     .optional()
     .default(""),
   budget: z.union([z.enum(BUDGETS), z.literal("")]).optional().default(""),
+  timeline: z.union([z.enum(TIMELINES), z.literal("")]).optional().default(""),
   message: trimmed
     .min(20, "A sentence or two about the project, please.")
     .max(5000, "That message is too long."),

@@ -7,6 +7,7 @@ import {
   formatIssues,
   PROJECT_TYPES,
   BUDGETS,
+  TIMELINES,
 } from "../src/lib/validation.ts";
 
 const valid = {
@@ -102,9 +103,17 @@ test("accepts every declared budget, and the empty choice", () => {
   }
 });
 
+test("accepts every declared timeline, and the empty choice", () => {
+  for (const timeline of [...TIMELINES, ""]) {
+    const r = inquirySchema.safeParse(withOverride({ timeline }));
+    assert.equal(r.success, true, `expected ${timeline || "(empty)"} to pass`);
+  }
+});
+
 test("rejects values outside the declared enums", () => {
   assert.equal(inquirySchema.safeParse(withOverride({ budget: "$1 billion" })).success, false);
   assert.equal(inquirySchema.safeParse(withOverride({ projectType: "Skywriting" })).success, false);
+  assert.equal(inquirySchema.safeParse(withOverride({ timeline: "Yesterday" })).success, false);
 });
 
 test("a populated honeypot still PARSES — it must not signal detection", () => {

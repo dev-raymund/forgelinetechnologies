@@ -51,6 +51,7 @@ export async function submitInquiry(
     website: field("website"),
     projectType: field("projectType"),
     budget: field("budget"),
+    timeline: field("timeline"),
     message: field("message"),
     companyWebsite: field("companyWebsite"),
   });
@@ -100,6 +101,7 @@ export async function submitInquiry(
       website: data.website,
       projectType: data.projectType,
       budget: data.budget,
+      timeline: data.timeline,
       message: data.message,
       source: "contact-form",
       sourceIp: ip,

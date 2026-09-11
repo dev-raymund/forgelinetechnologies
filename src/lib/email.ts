@@ -89,6 +89,7 @@ export async function sendInquiryNotification(
     ${row("Website", data.website)}
     ${row("Project type", data.projectType)}
     ${row("Budget", data.budget)}
+    ${row("Timeline", data.timeline)}
     ${row("Received", receivedAt.toISOString())}
   </table>
   <p style="margin:20px 0 6px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#7b8494;">Message</p>
@@ -102,7 +103,8 @@ export async function sendInquiryNotification(
       subject: `New enquiry — ${data.name}${data.company ? ` (${data.company})` : ""}`,
       html: shell(
         "New project enquiry",
-        [data.projectType, data.budget].filter(Boolean).join(" · ") || "No category given",
+        [data.projectType, data.budget, data.timeline].filter(Boolean).join(" · ") ||
+        "No category given",
         details,
       ),
     });

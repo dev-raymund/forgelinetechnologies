@@ -89,6 +89,7 @@ export const inquiries = pgTable(
     website: varchar("website", { length: 300 }).notNull().default(""),
     projectType: varchar("project_type", { length: 60 }).notNull().default(""),
     budget: varchar("budget", { length: 60 }).notNull().default(""),
+    timeline: varchar("timeline", { length: 60 }).notNull().default(""),
     message: text("message").notNull(),
     // Where the enquiry came from, e.g. "contact-form".
     source: varchar("source", { length: 60 }).notNull().default("contact-form"),
@@ -97,6 +98,9 @@ export const inquiries = pgTable(
     // "new" | "contacted" | "qualified" | "closed"
     status: varchar("status", { length: 24 }).notNull().default("new"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    // Set by the application when status changes; enquiries are triaged, not
+    // edited, so there is no trigger behind this.
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
     index("inquiries_status_idx").on(t.status),
