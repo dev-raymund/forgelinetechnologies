@@ -41,10 +41,10 @@ function shell(heading: string, intro: string, body: string): string {
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;background:#f2f4f7;padding:32px 16px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#3c4453;">
-  <table role="presentation" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#fff;border:1px solid #e2e6ee;border-radius:4px;">
+  <table role="presentation" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#fff;border:1px solid #e2e6ee;border-top:3px solid #ea580c;border-radius:4px;">
     <tr><td style="padding:30px 30px 0;">
       <p style="margin:0;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#7b8494;">${esc(site.name)}</p>
-      <h1 style="margin:10px 0 0;font-size:21px;line-height:1.25;color:#16191f;">${esc(heading)}</h1>
+      <h1 style="margin:10px 0 0;font-size:21px;line-height:1.25;color:#16233d;">${esc(heading)}</h1>
       <p style="margin:10px 0 0;font-size:15px;line-height:1.6;">${esc(intro)}</p>
     </td></tr>
     <tr><td style="padding:22px 30px 30px;">${body}</td></tr>
@@ -56,12 +56,12 @@ function row(label: string, value: string): string {
   if (!value) return "";
   return `<tr>
     <td style="padding:8px 0;border-bottom:1px solid #eef1f6;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#7b8494;width:38%;vertical-align:top;">${esc(label)}</td>
-    <td style="padding:8px 0;border-bottom:1px solid #eef1f6;font-size:14px;color:#16191f;">${esc(value)}</td>
+    <td style="padding:8px 0;border-bottom:1px solid #eef1f6;font-size:14px;color:#16233d;">${esc(value)}</td>
   </tr>`;
 }
 
 function messageBlock(message: string): string {
-  return `<div style="white-space:pre-wrap;font-size:14px;line-height:1.65;color:#16191f;background:#f7f9fc;border:1px solid #e2e6ee;border-radius:4px;padding:14px;">${esc(message)}</div>`;
+  return `<div style="white-space:pre-wrap;font-size:14px;line-height:1.65;color:#16233d;background:#f7f9fc;border:1px solid #e2e6ee;border-radius:4px;padding:14px;">${esc(message)}</div>`;
 }
 
 /**

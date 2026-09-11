@@ -54,7 +54,7 @@ function Chain({
     <div>
       <p
         className={`font-mono text-micro ${
-          emphasis ? "text-signal-bright" : "text-on-ink-muted"
+          emphasis ? "text-accent-bright" : "text-on-ink-muted"
         }`}
       >
         {label}
@@ -68,14 +68,14 @@ function Chain({
               <span
                 aria-hidden="true"
                 className={`absolute left-[3px] top-[14px] h-full w-px ${
-                  emphasis ? "bg-signal-bright/40" : "bg-rule-ink"
+                  emphasis ? "bg-accent-bright/45" : "bg-rule-ink"
                 }`}
               />
             ) : null}
             <span
               aria-hidden="true"
               className={`relative z-10 size-[7px] shrink-0 rounded-full ${
-                emphasis ? "bg-signal-bright" : "bg-on-ink-muted"
+                emphasis ? "bg-accent-bright" : "bg-on-ink-muted"
               }`}
             />
             <span

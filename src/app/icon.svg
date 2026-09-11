@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Forgeline Technologies">
-  <rect width="32" height="32" rx="4" fill="#05080f"/>
+  <rect width="32" height="32" rx="6" fill="#0d2350"/>
   <path d="M9.75 8.5H22.25V12.15H14.4V23.5H9.75V8.5Z" fill="#ffffff"/>
-  <rect x="14.4" y="14.9" width="6.4" height="3.5" rx="0.4" fill="#55a0f2"/>
+  <rect x="14.4" y="14.9" width="6.4" height="3.5" rx="0.4" fill="#f97316"/>
 </svg>

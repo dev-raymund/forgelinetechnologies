@@ -3,17 +3,18 @@ import { site } from "@/lib/site";
 /**
  * The Forgeline lockup.
  *
- * The source asset sets its wordmark in system fonts and fills the tile with
- * a gradient, so it never quite belonged to any page it sat on. This is the
- * same mark, treated: the tile and the F are one path with an even-odd fill,
- * which knocks the letterform out as a hole. The mark therefore takes the
- * colour of whatever it is placed on via `currentColor`, and the F shows the
- * ground through it — monochrome on paper, monochrome on ink, no variants to
- * keep in sync.
+ * Drawn to match /assets/forgeline-logo.svg exactly: a white rounded tile with
+ * a hairline stroke, the F in brand navy, and the crossbar in brand orange.
  *
- * The wordmark is live text in Archivo rather than outlines, so the lockup is
- * set in the same face as the rest of the site. The full gradient asset is
- * kept for the favicon, where colour earns its place.
+ * An earlier version knocked the F out of a single-colour tile so the mark
+ * took `currentColor`. That was a neat trick and the wrong one — it threw away
+ * the two colours the brand is actually built from. The tile stays white on
+ * both grounds because it is a badge; that is how the asset is drawn, and it
+ * reads correctly on navy as well as on paper.
+ *
+ * The wordmark is live text in Archivo and inherits `currentColor`, so the
+ * lockup is set in the same face as the rest of the site and adapts to
+ * whatever it sits on.
  */
 export function Logo({
   showWordmark = true,
@@ -32,13 +33,27 @@ export function Logo({
         focusable="false"
         className="shrink-0"
       >
+        <rect
+          x="0.5"
+          y="0.5"
+          width="39"
+          height="39"
+          rx="10.5"
+          fill="#ffffff"
+          stroke="var(--color-rule)"
+          strokeWidth="1"
+        />
         <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          fill="currentColor"
-          d="M10.5 0 H29.5 A10.5 10.5 0 0 1 40 10.5 V29.5 A10.5 10.5 0 0 1 29.5 40 H10.5 A10.5 10.5 0 0 1 0 29.5 V10.5 A10.5 10.5 0 0 1 10.5 0 Z
-             M12.5 10.5 H28.5 V15.5 H18 V29.5 H12.5 Z
-             M18 18.2 H26.4 V22.8 H18 Z"
+          d="M12.5 10.5 H28.5 V15.5 H18 V29.5 H12.5 Z"
+          fill="var(--color-brand-navy)"
+        />
+        <rect
+          x="18"
+          y="18.2"
+          width="8.4"
+          height="4.6"
+          rx="0.6"
+          fill="var(--color-accent)"
         />
       </svg>
       {showWordmark ? (

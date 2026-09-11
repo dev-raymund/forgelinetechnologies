@@ -35,7 +35,7 @@ export default async function Image({
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          background: "#0a121a",
+          background: "#0a1a33",
           padding: "72px 80px",
         }}
       >
@@ -55,7 +55,7 @@ export default async function Image({
         </div>
 
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <span style={{ color: "#19d2fe", fontSize: 25, letterSpacing: "0.04em" }}>
+          <span style={{ color: "#fb923c", fontSize: 25, letterSpacing: "0.04em" }}>
             Service {service.number}
           </span>
           <span
@@ -73,7 +73,7 @@ export default async function Image({
           </span>
           <span
             style={{
-              color: "#99a6b2",
+              color: "#9fb0c9",
               fontSize: 28,
               lineHeight: 1.35,
               marginTop: 20,
@@ -85,8 +85,8 @@ export default async function Image({
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <div style={{ width: 64, height: 3, background: "#19d2fe" }} />
-          <span style={{ color: "#99a6b2", fontSize: 22 }}>
+          <div style={{ width: 64, height: 3, background: "#f97316" }} />
+          <span style={{ color: "#9fb0c9", fontSize: 22 }}>
             {site.url.replace("https://", "")}
           </span>
         </div>
