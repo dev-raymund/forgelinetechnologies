@@ -10,7 +10,7 @@ import { Process } from "@/components/home/process";
 import { Partnership } from "@/components/home/partnership";
 import { Founder } from "@/components/home/founder";
 import { Faq } from "@/components/home/faq";
-import { ClosingCta } from "@/components/home/closing-cta";
+import { ClosingCta } from "@/components/sections/cta-band";
 
 export const metadata: Metadata = {
   // `absolute` so the homepage title is not suffixed by the layout template.

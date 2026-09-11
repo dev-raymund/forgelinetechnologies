@@ -1,0 +1,109 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { PageHeader } from "@/components/sections/page-header";
+import { ClosingCta } from "@/components/sections/cta-band";
+import { Section } from "@/components/ui/section";
+import { services } from "@/data/services";
+import { getProject } from "@/data/projects";
+
+export const metadata: Metadata = {
+  title: "Services",
+  description:
+    "Websites, web applications, e-commerce, custom software, APIs and integrations, and ongoing development — six services, each commissioned on its own.",
+  alternates: { canonical: "/services" },
+};
+
+/**
+ * Services index.
+ *
+ * Each entry carries its deliverables and the real projects that demonstrate
+ * it. A service claim standing next to a live build is worth more than another
+ * paragraph describing the service.
+ */
+export default function ServicesPage() {
+  return (
+    <>
+      <PageHeader
+        meta={`${services.length} services`}
+        title="What we build, and what you get"
+        dek="Six services, each one something a business commissions on its own rather than a bullet inside a bigger package. Every one of them has shipped work behind it."
+      />
+
+      <Section ground="paper" size="lg" labelledBy="services-list">
+        <h2 id="services-list" className="sr-only">
+          Services
+        </h2>
+
+        <div className="flex flex-col gap-16 md:gap-20">
+          {services.map((service) => {
+            const evidence = service.evidence
+              .map((slug) => getProject(slug))
+              .filter((p) => p !== undefined);
+
+            return (
+              <article
+                key={service.slug}
+                className="grid gap-8 border-t border-graphite/80 pt-8 md:grid-cols-12 md:gap-10"
+              >
+                <div className="md:col-span-5">
+                  <span className="font-mono text-micro text-faint">
+                    {service.number}
+                  </span>
+                  <h3 className="mt-3 text-subtitle font-semibold text-graphite">
+                    <Link
+                      href={`/services/${service.slug}`}
+                      className="transition-colors hover:text-signal"
+                    >
+                      {service.title}
+                    </Link>
+                  </h3>
+                  <p className="mt-4 max-w-[46ch] text-[0.9375rem] leading-relaxed text-muted">
+                    {service.description}
+                  </p>
+                  <Link
+                    href={`/services/${service.slug}`}
+                    className="mt-6 inline-block text-[0.9375rem] font-medium text-graphite underline decoration-rule-strong underline-offset-[6px] transition-colors hover:text-signal hover:decoration-signal"
+                  >
+                    {service.title} in detail
+                  </Link>
+                </div>
+
+                <div className="md:col-span-4">
+                  <h4 className="font-mono text-micro text-faint">Includes</h4>
+                  <ul className="mt-3 flex flex-col gap-2">
+                    {service.includes.map((item) => (
+                      <li
+                        key={item}
+                        className="text-[0.9375rem] leading-relaxed text-graphite"
+                      >
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="md:col-span-3">
+                  <h4 className="font-mono text-micro text-faint">Shipped</h4>
+                  <ul className="mt-3 flex flex-col gap-2">
+                    {evidence.map((p) => (
+                      <li key={p.slug}>
+                        <Link
+                          href={`/work/${p.slug}`}
+                          className="text-[0.9375rem] text-graphite underline decoration-rule-strong underline-offset-4 transition-colors hover:text-signal hover:decoration-signal"
+                        >
+                          {p.title}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </Section>
+
+      <ClosingCta />
+    </>
+  );
+}

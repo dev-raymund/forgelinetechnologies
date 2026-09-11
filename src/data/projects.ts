@@ -27,6 +27,23 @@ export type Project = {
   stack: string[];
   /** Surfaced on the homepage. Curated, not the whole list. */
   featured?: boolean;
+
+  /**
+   * Case-study fields. All optional and all currently unset — the detail page
+   * renders whichever are present and omits the rest.
+   *
+   * They exist so a real case study can be written for a project without a
+   * schema change or a component rewrite. They are deliberately empty rather
+   * than filled with plausible-sounding narrative: an invented challenge or a
+   * fabricated result is the fastest way to lose a technical buyer, and the
+   * brief is explicit that no fake case studies are to be created.
+   */
+  overview?: string;
+  challenge?: string;
+  approach?: string;
+  /** Only ever populated with outcomes that were actually measured. */
+  outcome?: string;
+  gallery?: { src: string; alt: string }[];
 };
 
 export const projects: Project[] = [
@@ -255,4 +272,20 @@ export const projectKinds: ProjectKind[] = [
 
 export function getProject(slug: string): Project | undefined {
   return projects.find((p) => p.slug === slug);
+}
+
+/** Projects sharing a kind, excluding one. Used for "related" on a detail page. */
+export function relatedProjects(slug: string, limit = 3): Project[] {
+  const current = getProject(slug);
+  if (!current) return [];
+  const sameKind = projects.filter(
+    (p) => p.slug !== slug && p.kind === current.kind,
+  );
+  const rest = projects.filter((p) => p.slug !== slug && p.kind !== current.kind);
+  return [...sameKind, ...rest].slice(0, limit);
+}
+
+/** True when a project has enough written for a case-study layout. */
+export function hasCaseStudy(p: Project): boolean {
+  return Boolean(p.overview || p.challenge || p.approach || p.outcome);
 }

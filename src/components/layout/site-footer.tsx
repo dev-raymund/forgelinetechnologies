@@ -30,7 +30,7 @@ export function SiteFooter() {
             <p className="mt-6 text-[0.9375rem]">
               <a
                 href={`mailto:${site.email}`}
-                className="text-on-ink underline decoration-rule-ink-strong underline-offset-4 transition-colors hover:text-signal-bright hover:decoration-signal-bright"
+                className="break-words text-on-ink underline decoration-rule-ink-strong underline-offset-4 transition-colors hover:text-signal-bright hover:decoration-signal-bright"
               >
                 {site.email}
               </a>
@@ -68,6 +68,7 @@ export function SiteFooter() {
             <ul className="mt-4 flex flex-col gap-2.5">
               {[
                 { href: "/work", label: "Work" },
+                { href: "/pricing", label: "Pricing" },
                 { href: "/process", label: "Process" },
                 { href: "/about", label: "About" },
                 { href: "/contact", label: "Contact" },

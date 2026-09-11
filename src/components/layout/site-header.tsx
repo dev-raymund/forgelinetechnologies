@@ -18,6 +18,7 @@ import { Logo } from "@/components/ui/logo";
 const nav = [
   { href: "/work", label: "Work" },
   { href: "/services", label: "Services" },
+  { href: "/pricing", label: "Pricing" },
   { href: "/process", label: "Process" },
   { href: "/about", label: "About" },
 ];
@@ -65,7 +66,7 @@ export function SiteHeader() {
             <Logo />
           </Link>
 
-          <nav aria-label="Primary" className="hidden md:block">
+          <nav aria-label="Primary" className="hidden lg:block">
             <ul className="flex items-center gap-8">
               {nav.map((item) => {
                 const active =
@@ -87,7 +88,7 @@ export function SiteHeader() {
             </ul>
           </nav>
 
-          <div className="hidden md:block">
+          <div className="hidden lg:block">
             <Link
               href="/contact"
               className="rounded-sm bg-ink px-4 py-2.5 text-[0.9375rem] font-medium text-white transition-colors hover:bg-signal"
@@ -101,7 +102,7 @@ export function SiteHeader() {
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
             aria-controls={panelId}
-            className="-mr-2 inline-flex h-10 w-10 items-center justify-center rounded-sm text-graphite md:hidden"
+            className="-mr-2 inline-flex h-10 w-10 items-center justify-center rounded-sm text-graphite lg:hidden"
           >
             <span className="sr-only">{open ? "Close menu" : "Open menu"}</span>
             <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
@@ -128,7 +129,7 @@ export function SiteHeader() {
       <div
         id={panelId}
         hidden={!open}
-        className="border-t border-rule bg-paper md:hidden"
+        className="border-t border-rule bg-paper lg:hidden"
       >
         <nav aria-label="Primary" className="shell py-6">
           <ul className="flex flex-col">

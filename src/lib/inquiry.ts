@@ -21,13 +21,27 @@ import { sendInquiryNotification, sendInquiryConfirmation } from "@/lib/email";
 export type InquiryState =
   | { status: "idle" }
   | { status: "error"; message: string; errors?: FieldErrors }
-  | { status: "success"; message: string };
+  | {
+      status: "success";
+      message: string;
+      /**
+       * Whether a confirmation actually reached the sender. The UI must not
+       * tell someone to watch for an email that was never sent — email is
+       * optional configuration here, and it skips silently when absent.
+       */
+      confirmationSent: boolean;
+    };
 
 const RATE_LIMIT = 5;
 const RATE_WINDOW_MS = 60 * 60 * 1000;
 
+/**
+ * No response-time commitment. The previous wording promised one business day,
+ * which has never been confirmed — and a missed promise on the first
+ * interaction costs more trust than the promise was ever worth.
+ */
 const SUCCESS =
-  "Thanks — your enquiry is in. You will hear back within one business day.";
+  "Thanks — your project details are in, and they go straight to the developer who would build it.";
 
 async function clientIp(): Promise<string> {
   const h = await headers();
@@ -69,7 +83,9 @@ export async function submitInquiry(
   // 2. honeypot — report ordinary success and write nothing. A validation
   //    error here would tell a bot it had been detected.
   if (data.companyWebsite) {
-    return { status: "success", message: SUCCESS };
+    // Mirrors the genuine response exactly, including the flag, so nothing in
+    // the reply distinguishes a dropped submission from a stored one.
+    return { status: "success", message: SUCCESS, confirmationSent: false };
   }
 
   const ip = await clientIp();
@@ -127,5 +143,9 @@ export async function submitInquiry(
     console.error("[inquiry] confirmation not sent:", confirmation.error);
   }
 
-  return { status: "success", message: SUCCESS };
+  return {
+    status: "success",
+    message: SUCCESS,
+    confirmationSent: confirmation.ok === true,
+  };
 }

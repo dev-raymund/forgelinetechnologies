@@ -1,202 +1,121 @@
-# FORGELINE REBUILD STATUS:
+# Forgeline rebuild — status
 
-## BLOCKED
+**The site is built.** Every page, the design system, the contact pipeline,
+SEO and the accessibility pass are done and verified locally.
 
-The codebase is finished, verified and committed, and the database is live.
-**Two Vercel steps remain** and only you can do them: clearing the Root
-Directory (still `web`) and attaching the domain. Until then the site cannot
-serve, so this is not COMPLETE.
+**It is not live, and nothing is backed up.** Both are outside the codebase
+and only you can resolve them. See *Outstanding* below.
 
-Nothing in the code is outstanding.
+---
 
-| Blocker | Status |
+## 1. What exists
+
+| Area | State |
 |---|---|
-| Neon database created and schema applied | **done** — 2026-09-11 |
-| Vercel Root Directory cleared | **outstanding** |
-| Domain attached to the project | **outstanding** |
+| Next.js 16.3.4 · React 19.2.8 · TypeScript strict · App Router | done |
+| Tailwind v4 design system, tokens in `globals.css` | done |
+| Homepage, 11 sections | done |
+| `/work` + 17 project pages | done |
+| `/services` + 6 service pages | done |
+| `/pricing`, `/process`, `/about`, `/contact` | done |
+| Contact pipeline: validate → honeypot → rate limit → Neon → Resend | done, verified end to end |
+| Neon Postgres + Drizzle, schema applied and verified | done |
+| SEO: metadata, canonicals, Open Graph, sitemap, robots, structured data | done |
+| Accessibility and responsive passes | done, verified |
 
----
+**38 static pages.** The previous site had **2 real URLs**; the sitemap now
+lists **30**.
 
-## 1. New project structure
+## 2. Design system
 
-```
-company/
-├── src/
-│   ├── app/      layout · page · not-found · robots · sitemap · globals.css
-│   ├── db/       schema.ts · index.ts
-│   └── lib/      site · queries · validation · email · inquiry
-├── public/assets/  38 files carried across and byte-verified
-├── tests/        validation.test.ts
-├── docs/         current docs; legacy/ holds the removed system's
-├── tools/        site-audit CLI, untouched
-├── backups/      database export, gitignored
-└── package.json · tsconfig.json · next.config.ts · drizzle.config.ts
-    eslint.config.mjs · .env.example · .gitignore · README.md
-```
+Palette derives from the logo gradient (`#016ecc` → `#19d2fe`). The dark
+ground is a deep blue-slate (`#0a121a`) rather than a tinted black, so the
+brand sits in the darkness itself.
 
-One application, at the root. **No `vercel.json`.**
+Archivo for all text; JetBrains Mono only for genuine data — stack names,
+figures, indices. The structural device is a left rail with a hairline spine
+and a node per section, which collapses below `48rem`.
 
-## 2. Next.js setup
+Tokens live in `src/app/globals.css` under `@theme`. Change a colour there and
+it changes everywhere; no component hardcodes one.
 
-Next 16.3.4 · React 19.2.8 · TypeScript strict · App Router · ESLint 9 ·
-plain CSS. No Tailwind, no UI library, no animation library.
+## 3. Content sources
 
-Four routes: `/`, 404, `/robots.txt`, `/sitemap.xml`. The homepage is a
-placeholder reading "ForgeLine Technologies" and "Web Development & Digital
-Solutions".
+Nothing on the site is invented.
 
-## 3. Database setup
+- **17 projects** — transcribed from `backups/2026-09-11/works.json` into
+  `src/data/projects.ts`, descriptions verbatim.
+- **Pricing** — carried unchanged from the previous site, recoverable at commit
+  `28f6bfa` in `web/src/components/static-top.tsx`. Currency is unstated there
+  and is deliberately not asserted here.
+- **Figures** — 6+ years, 17 projects, 4 countries, 100% code ownership. These
+  render as server-side text; the previous site animated them up from a literal
+  `0` in the HTML, so crawlers saw a studio claiming six years of nothing.
 
-**Applied and verified** against the live database on 2026-09-11.
+There are **no testimonials and no case studies**, because none exist. The
+case-study fields on `Project` are present and empty so real ones can be added
+without a schema change. Do not fill them with plausible-sounding narrative.
 
-`src/db/schema.ts` defines four tables — `users`, `projects`, `posts`,
-`inquiries` — with 14 indexes including the composite
-`(source_ip, created_at)` that serves the rate-limit query.
+## 4. Verification
 
-`src/db/index.ts` throws when `DATABASE_URL` is absent, deliberately.
-`src/lib/queries.ts` wraps reads in a retry for Neon cold starts.
-
-Applied with `npm run db:push` and verified against `information_schema`
-and `pg_indexes` rather than the CLI's own report:
-
-```
-TABLES 4: inquiries, posts, projects, users
-  inquiries 12 cols · posts 10 · projects 13 · users 8
-INDEXES 14  (4 primary keys, 3 unique, 7 declared)
-  including inquiries_ip_created_idx on (source_ip, created_at)
-```
-
-## 4. Neon status
-
-**Live.** A new Neon project was provisioned through the Vercel–Neon
-integration (Neon's own "New project" button is disabled for
-integration-managed accounts).
-
-Host `ep-green-night-b3xhc0n4-pooler` in `ap-southeast-1` — Singapore, the
-same region Vercel serves from, so queries do not cross regions. Confirmed
-empty before the push, so nothing was overwritten.
-
-The integration injects `DATABASE_URL` into the connected Vercel project
-automatically, which removes that variable from the manual list.
-
-The previous database is untouched and still holds the old data. A verified
-export sits in `backups/2026-09-11/` (gitignored).
-
-## 5. Resend status
-
-**Implemented, not configured.** `src/lib/email.ts` provides
-`sendInquiryNotification` and `sendInquiryConfirmation`.
-
-Neither ever throws; both return `{ ok, skipped?, error? }` and skip cleanly
-when unconfigured. Environment is read lazily inside the functions so
-importing the module can never fail a build. All interpolated values are
-HTML-escaped. No test email has been sent.
-
-Note: until a sending domain is verified in Resend, confirmations to
-prospects will not be delivered — an unverified account only reaches its own
-address.
-
-## 6. Contact backend status
-
-Complete as a backend. **No UI** — the contact page is a later phase.
-
-`src/lib/inquiry.ts` runs: validate → honeypot → rate limit → insert →
-notify → confirm.
-
-- Honeypot parses successfully and is dropped afterwards, returning ordinary
-  success. A validation error would tell a bot it had been detected.
-- Rate limit is 5/hour per IP, counted in the database because serverless
-  instances share no memory.
-- Storage happens before either email, and email results are logged but
-  cannot change what the visitor is told.
-
-## 7. Git status
-
-Working tree **clean**. Committed as `61cbe87` —
-*chore: rebuild ForgeLine technical foundation*. 250 files: 25 added,
-174 deleted, 6 modified, 45 renamed.
-
-**Not pushed.** Pushing now would trigger a Vercel build against a Root
-Directory of `web`, which no longer exists, and fail. Push after step 2.
-
-The removed application is recoverable at `28f6bfa` on `origin/main`.
-
-## 8. Local production build status
-
-All green, verified against a clean `.next` and a real production server:
+Measured, not assumed:
 
 ```
-npm run lint        clean
-npm run typecheck   clean
-npm test            14 passed, 0 failed
-npm run build       6/6 static pages, 4 routes
-next start          / 200 · /robots.txt 200 · /sitemap.xml 200 · unknown 404
+lint            clean
+typecheck       clean
+tests           15/15
+build           38 static pages
+contrast        0 failures across 10 routes, measured from painted pixels
+overflow        0 failures across 90 viewport checks (9 widths x 10 routes)
+structure       1 h1/page, no heading skips, 0 missing alt, 0 nameless links
+keyboard        skip link first, FAQ opens on Enter, menu closes on Escape
+reduced motion  honoured; content arrives finished
+contact         stored in Neon with every field; honeypot stored 0 rows
 ```
 
-Obsolete-reference sweep: zero hits for `port-homepage`, `html-to-jsx`,
-`formspree`, `NEXT_PUBLIC_BASE_PATH`, `_archive-redesign`, `cd web`,
-`outputDirectory`, `basePath`, or any `web/` path.
+Test enquiries were deleted afterwards; `inquiries` is back to 0 rows.
 
-Full detail in `docs/local-production-verification.md`.
+## 5. Outstanding — only you can do these
 
-## 9. Vercel readiness
+### a. Nothing is backed up
 
-The repository is ready. The project is not.
+`git ls-remote origin` returns **nothing**. The GitHub repo
+`dev-raymund/forgelinetechnologies` is empty, and the local `origin/main`
+refs are stale caches of a remote that was wiped — so `git status` reports
+"up to date" and is wrong.
 
-| Setting | Required | Currently |
-|---|---|---|
-| Framework | Next.js | Next.js |
-| Root Directory | **empty** | **`web`** — must be cleared |
-| Build / Output / Install | defaults | defaults |
-| Node | 24.x | 24.x |
+Every commit exists only on this machine. Verify remote state with
+`git ls-remote origin`, never `git status`.
 
-## 10. Environment variables required
+### b. The site returns 404
 
-| Variable | Needed | Consequence if missing |
-|---|---|---|
-| `DATABASE_URL` | **Yes** | Injected automatically by the Neon integration |
-| `SESSION_SECRET` | Recommended | Nothing yet — reserved for auth |
-| `RESEND_API_KEY` | Optional | Both emails skipped |
-| `CONTACT_EMAIL` | Optional | Notification skipped |
-| `RESEND_FROM` | Optional | Both emails skipped |
+Not a code problem. The Vercel project's Root Directory still points at a
+`web/` folder that no longer exists, the domain is unattached, and the repo it
+deploys from has no commits. The Vercel connector returns 403 on project
+detail, domains and env vars, so this has to be done in the dashboard:
 
-**Never set `NEXT_PUBLIC_BASE_PATH`** in production. It does not exist in
-this codebase and would move every route under a prefix.
+1. Clear Root Directory (currently `web`) — every other default is correct.
+2. Attach `forgelinetechnologies.com` and `www.forgelinetechnologies.com`.
+3. Push the repository.
 
-## 11. Manual dashboard actions still required
+### c. Email is half-configured
 
-1. ~~**Neon** — create the project and apply the schema.~~ **Done.**
-2. **Vercel** — clear Root Directory (currently `web`); add `SESSION_SECRET`
-   to Production (`DATABASE_URL` is injected by the Neon integration);
-   attach both `forgelinetechnologies.com` (primary) and
-   `www.forgelinetechnologies.com`.
-3. **Push** — only after step 2, or the build fails on the stale path.
-4. **Resend** *(optional now)* — API key, `CONTACT_EMAIL`, and a verified
-   sending domain.
+`RESEND_API_KEY` is set. `CONTACT_EMAIL` and `RESEND_FROM` are **empty**, so
+both emails skip — enquiries are still stored, and the success screen
+correctly does not claim a confirmation was sent. Set both, and verify a
+sending domain in Resend, to turn emails on.
 
-Step 2 is the remaining hard blocker.
+A verified domain would also let the published contact address move off
+`@gmail.com`, which undercuts the positioning everywhere it appears.
 
-## 12. Unresolved issues
+### d. Social proof
 
-**Four moderate npm advisories**, all in `drizzle-kit`'s transitive esbuild
-chain. Dev-only — drizzle-kit is a CLI and never ships in the bundle. npm's
-suggested fix downgrades drizzle-kit 0.31 → 0.18, a major regression, so it
-was not taken.
+The conversation audit's largest finding, and still open: 17 real, live,
+verifiable projects and not one of them speaks. Two or three real testimonials
+would outrank every design decision in this rebuild. The slot is built; the
+quotes have to be asked for.
 
-**The live domain still returns 404** (`DEPLOYMENT_NOT_FOUND`). Unchanged by
-this rebuild, because it was never a code problem: two Vercel projects were
-deleted and the domain went with them. Resolved by step 2.
+### e. `.env.digital-twin.bak`
 
-**Vercel settings remain unverifiable from here.** The connector returns 403
-on project detail, domains, environment variables and deployments. Root
-Directory, attached domains and production env vars all have to be confirmed
-by you in the dashboard.
-
-**`.env.digital-twin.bak`** sits in the working tree, gitignored. It holds a
-real Anthropic API key from the deleted digital-twin project. Delete it once
-you are sure the key is not needed.
-
----
-
-Foundation only. No pages, design, content, SEO, analytics or CRM were built,
-and the next development phase has not been started.
+Holds a real Anthropic API key from a deleted project. Gitignored, so not
+exposed. Delete it once you are sure the key is dead.

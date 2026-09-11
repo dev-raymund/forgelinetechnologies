@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Archivo, JetBrains_Mono } from "next/font/google";
-import { site } from "@/lib/site";
+import { site, founder } from "@/lib/site";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import "./globals.css";
@@ -38,6 +38,31 @@ export const metadata: Metadata = {
     template: `%s — ${site.name}`,
   },
   description: site.description,
+  applicationName: site.name,
+  authors: [{ name: founder.name, url: site.social.linkedin }],
+  creator: founder.name,
+  publisher: site.name,
+  // Every page sets its own canonical; this only supplies the default origin.
+  openGraph: {
+    type: "website",
+    siteName: site.name,
+    locale: "en_AU",
+    url: site.url,
+    title: `${site.name} — ${site.tagline}`,
+    description: site.description,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${site.name} — ${site.tagline}`,
+    description: site.description,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
+  },
+  // No keywords array: search engines have ignored it for two decades and it
+  // only advertises that the page was optimised by someone who did not know.
 };
 
 export default function RootLayout({

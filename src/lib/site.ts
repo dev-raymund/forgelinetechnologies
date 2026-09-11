@@ -8,13 +8,23 @@
  * Spelling note: the wordmark in /assets/forgeline-logo.svg reads
  * "Forgeline" — one capital. Earlier code used "ForgeLine"; the logo wins.
  */
+/**
+ * Canonical origin. NEXT_PUBLIC_SITE_URL wins when set — preview deployments
+ * need their own origin or every canonical tag on them points at production —
+ * and the apex domain is the fallback so a missing variable degrades rather
+ * than breaks. Any trailing slash is stripped so joins never double up.
+ */
+const origin = (
+  process.env.NEXT_PUBLIC_SITE_URL || "https://forgelinetechnologies.com"
+).replace(/\/+$/, "");
+
 export const site = {
   name: "Forgeline Technologies",
   shortName: "Forgeline",
   tagline: "Web development and digital product engineering",
   description:
     "Forgeline Technologies builds websites, web applications, e-commerce platforms and custom software — scoped at a fixed price and built by the developer you brief.",
-  url: "https://forgelinetechnologies.com",
+  url: origin,
   email: "raymundhermoso.dev@gmail.com",
   social: {
     github: "https://github.com/dev-raymund",
