@@ -24,7 +24,7 @@ const initial: InquiryState = { status: "idle" };
 
 const field =
   "w-full rounded-sm border bg-white px-3.5 py-3 text-[0.9375rem] text-graphite " +
-  "transition-colors placeholder:text-faint focus:border-signal";
+  "transition-colors placeholder:text-faint focus:border-ink";
 
 export function ContactForm() {
   const [state, action, pending] = useActionState(submitInquiry, initial);
@@ -75,7 +75,7 @@ export function ContactForm() {
           ref={statusRef}
           tabIndex={-1}
           role="alert"
-          className="border-l-2 border-signal bg-white px-4 py-3 text-[0.9375rem] text-graphite"
+          className="border-l-2 border-accent bg-white px-4 py-3 text-[0.9375rem] text-graphite"
         >
           {state.message}
         </div>
@@ -158,7 +158,7 @@ export function ContactForm() {
           }
           placeholder="What are you trying to build, and what problem is it solving?"
           className={`${field} mt-2 resize-y ${
-            err("message") ? "border-signal" : "border-rule-strong"
+            err("message") ? "border-accent" : "border-rule-strong"
           }`}
         />
         {err("message") ? (
@@ -193,7 +193,7 @@ export function ContactForm() {
         <button
           type="submit"
           disabled={pending}
-          className="inline-flex items-center justify-center rounded-sm bg-signal px-6 py-3.5 text-[0.9375rem] font-medium text-white transition-colors hover:bg-signal-deep disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex items-center justify-center rounded-sm bg-accent px-6 py-3.5 text-[0.9375rem] font-medium text-ink transition-colors hover:bg-accent/85 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {pending ? "Sending…" : "Send project details"}
         </button>
@@ -236,7 +236,7 @@ function Label({
 
 function ErrorText({ id, children }: { id: string; children: React.ReactNode }) {
   return (
-    <p id={id} className="mt-2 text-[0.8125rem] font-medium text-signal">
+    <p id={id} className="mt-2 text-[0.8125rem] font-medium text-graphite">
       {children}
     </p>
   );
@@ -277,7 +277,7 @@ function Field({
         autoComplete={autoComplete}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${id}-error` : undefined}
-        className={`${field} mt-2 ${error ? "border-signal" : "border-rule-strong"}`}
+        className={`${field} mt-2 ${error ? "border-accent" : "border-rule-strong"}`}
       />
       {error ? <ErrorText id={`${id}-error`}>{error}</ErrorText> : null}
     </div>
@@ -312,7 +312,7 @@ function Select({
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${id}-error` : undefined}
         className={`${field} mt-2 appearance-none ${
-          error ? "border-signal" : "border-rule-strong"
+          error ? "border-accent" : "border-rule-strong"
         }`}
       >
         <option value="">Select one</option>

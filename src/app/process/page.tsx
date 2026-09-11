@@ -56,12 +56,12 @@ export default function ProcessPage() {
           {processSteps.map((step, i) => (
             <li
               key={step.number}
-              className={`grid gap-6 border-t border-graphite/80 py-9 md:grid-cols-12 md:gap-10 ${
+              className={`grid gap-6 border-t-2 border-accent py-9 md:grid-cols-12 md:gap-10 ${
                 i === processSteps.length - 1 ? "border-b" : ""
               }`}
             >
               <div className="md:col-span-3">
-                <span className="font-mono text-micro text-signal">
+                <span className="font-mono text-micro text-graphite">
                   {step.number}
                 </span>
                 <h3 className="mt-3 text-subtitle font-semibold text-graphite">
@@ -121,7 +121,7 @@ export default function ProcessPage() {
           <div className="md:col-span-4 md:col-start-9">
             <Link
               href="/pricing"
-              className="inline-flex items-center justify-center rounded-sm bg-signal px-5 py-3 text-[0.9375rem] font-medium text-white transition-colors hover:bg-signal-deep"
+              className="inline-flex items-center justify-center rounded-sm bg-accent px-5 py-3 text-[0.9375rem] font-medium text-ink transition-colors hover:bg-accent/85"
             >
               See what it costs
             </Link>

@@ -114,7 +114,7 @@ export default async function ProjectPage({
               href={project.liveUrl}
               rel="noopener noreferrer"
               target="_blank"
-              className="text-[0.9375rem] font-medium text-graphite underline decoration-rule-strong underline-offset-[6px] transition-colors hover:text-signal hover:decoration-signal"
+              className="text-[0.9375rem] font-medium text-graphite underline decoration-rule-strong underline-offset-[6px] transition-colors hover:text-graphite hover:decoration-accent"
             >
               Visit the live site
             </a>
@@ -202,7 +202,7 @@ export default async function ProjectPage({
             </h2>
             <Link
               href="/work"
-              className="shrink-0 text-[0.9375rem] font-medium text-graphite underline decoration-rule-strong underline-offset-[6px] transition-colors hover:text-signal hover:decoration-signal"
+              className="shrink-0 text-[0.9375rem] font-medium text-graphite underline decoration-rule-strong underline-offset-[6px] transition-colors hover:text-graphite hover:decoration-accent"
             >
               All {projects.length} projects
             </Link>

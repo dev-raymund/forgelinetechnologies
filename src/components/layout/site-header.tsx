@@ -60,7 +60,7 @@ export function SiteHeader() {
         <div className="flex h-16 items-center justify-between gap-8 md:h-[4.5rem]">
           <Link
             href="/"
-            className="text-graphite transition-colors hover:text-signal"
+            className="text-graphite transition-colors hover:text-graphite"
             aria-label={`${"Forgeline Technologies"} — home`}
           >
             <Logo />
@@ -76,7 +76,7 @@ export function SiteHeader() {
                     <Link
                       href={item.href}
                       aria-current={active ? "page" : undefined}
-                      className={`text-[0.9375rem] transition-colors hover:text-signal ${
+                      className={`text-[0.9375rem] transition-colors hover:text-graphite ${
                         active ? "text-graphite" : "text-muted"
                       }`}
                     >
@@ -91,7 +91,7 @@ export function SiteHeader() {
           <div className="hidden lg:block">
             <Link
               href="/contact"
-              className="rounded-sm bg-signal px-4 py-2.5 text-[0.9375rem] font-medium text-white transition-colors hover:bg-signal-deep"
+              className="rounded-sm bg-accent px-4 py-2.5 text-[0.9375rem] font-medium text-ink transition-colors hover:bg-accent/85"
             >
               Start a project
             </Link>
@@ -146,7 +146,7 @@ export function SiteHeader() {
           </ul>
           <Link
             href="/contact"
-            className="mt-6 block rounded-sm bg-signal px-4 py-3.5 text-center font-medium text-white"
+            className="mt-6 block rounded-sm bg-accent px-4 py-3.5 text-center font-medium text-ink"
           >
             Start a project
           </Link>

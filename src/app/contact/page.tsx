@@ -78,7 +78,7 @@ export default function ContactPage() {
                   key={item.step}
                   className="border-t border-rule py-5 last:border-b"
                 >
-                  <span className="font-mono text-micro text-signal">
+                  <span className="font-mono text-micro text-graphite">
                     {item.step}
                   </span>
                   <h3 className="mt-2 text-[1.0625rem] font-semibold text-graphite">
@@ -98,7 +98,7 @@ export default function ContactPage() {
               <p className="mt-2 text-[0.9375rem] leading-relaxed text-muted">
                 <a
                   href={`mailto:${site.email}`}
-                  className="break-words text-graphite underline decoration-rule-strong underline-offset-4 transition-colors hover:text-signal hover:decoration-signal"
+                  className="break-words text-graphite underline decoration-rule-strong underline-offset-4 transition-colors hover:text-graphite hover:decoration-accent"
                 >
                   {site.email}
                 </a>
@@ -110,7 +110,7 @@ export default function ContactPage() {
                 Want to know the cost first?{" "}
                 <Link
                   href="/pricing"
-                  className="text-graphite underline decoration-rule-strong underline-offset-4 transition-colors hover:text-signal hover:decoration-signal"
+                  className="text-graphite underline decoration-rule-strong underline-offset-4 transition-colors hover:text-graphite hover:decoration-accent"
                 >
                   Pricing is published
                 </Link>

@@ -64,7 +64,7 @@ export default function AboutPage() {
               <li>
                 <a
                   href={site.social.linkedin}
-                  className="text-[0.875rem] text-muted underline decoration-rule-strong underline-offset-4 transition-colors hover:text-signal hover:decoration-signal"
+                  className="text-[0.875rem] text-muted underline decoration-rule-strong underline-offset-4 transition-colors hover:text-graphite hover:decoration-accent"
                 >
                   LinkedIn
                 </a>
@@ -72,7 +72,7 @@ export default function AboutPage() {
               <li>
                 <a
                   href={site.social.github}
-                  className="text-[0.875rem] text-muted underline decoration-rule-strong underline-offset-4 transition-colors hover:text-signal hover:decoration-signal"
+                  className="text-[0.875rem] text-muted underline decoration-rule-strong underline-offset-4 transition-colors hover:text-graphite hover:decoration-accent"
                 >
                   GitHub
                 </a>
@@ -126,7 +126,7 @@ export default function AboutPage() {
           aside={
             <Link
               href="/work"
-              className="shrink-0 self-start text-[0.9375rem] font-medium text-on-ink underline decoration-rule-ink-strong underline-offset-[6px] transition-colors hover:text-signal-bright hover:decoration-signal-bright md:self-end"
+              className="shrink-0 self-start text-[0.9375rem] font-medium text-on-ink underline decoration-rule-ink-strong underline-offset-[6px] transition-colors hover:text-accent hover:decoration-accent md:self-end"
             >
               See the work
             </Link>
@@ -206,7 +206,7 @@ export default function AboutPage() {
               Forgeline and{" "}
               <a
                 href={partner.url}
-                className="text-graphite underline decoration-rule-strong underline-offset-4 transition-colors hover:text-signal hover:decoration-signal"
+                className="text-graphite underline decoration-rule-strong underline-offset-4 transition-colors hover:text-graphite hover:decoration-accent"
               >
                 {partner.name}
               </a>{" "}

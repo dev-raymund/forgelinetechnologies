@@ -49,7 +49,7 @@ export function Partnership() {
               <dt className="text-[0.9375rem] font-semibold text-graphite">
                 <a
                   href={partner.url}
-                  className="underline decoration-rule-strong underline-offset-4 transition-colors hover:text-signal hover:decoration-signal"
+                  className="underline decoration-rule-strong underline-offset-4 transition-colors hover:text-graphite hover:decoration-accent"
                 >
                   {partner.name}
                 </a>

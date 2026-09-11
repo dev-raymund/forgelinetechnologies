@@ -3,36 +3,29 @@ import { site } from "@/lib/site";
 /**
  * The Forgeline lockup.
  *
- * Drawn to match /assets/forgeline-logo.svg exactly: a white rounded tile with
- * a hairline stroke, the F in brand navy, and the crossbar in brand orange.
+ * This is the supplied artwork, inlined: the same geometry, the same tile,
+ * the same crossbar, and the "TECHNOLOGIES" line that the asset carries.
  *
- * An earlier version knocked the F out of a single-colour tile so the mark
- * took `currentColor`. That was a neat trick and the wrong one — it threw away
- * the two colours the brand is actually built from. The tile stays white on
- * both grounds because it is a badge; that is how the asset is drawn, and it
- * reads correctly on navy as well as on paper.
+ * Two changes, both so the mark belongs to the page rather than sitting on
+ * top of it. The wordmark is set in the site's own typeface instead of the
+ * asset's system-font stack, and the fills are wired to the colour tokens so
+ * a single lockup works on paper and on navy — no second file to keep in
+ * step. The tile stays white on both, because it is a badge and that is how
+ * the artwork is drawn.
  *
- * The wordmark is live text in Archivo and inherits `currentColor`, so the
- * lockup is set in the same face as the rest of the site and adapts to
- * whatever it sits on.
+ * `role="img"` plus a label means assistive technology announces the company
+ * name once, rather than reading "Forgeline" and "TECHNOLOGIES" as two
+ * separate strings.
  */
-export function Logo({
-  showWordmark = true,
-  className = "",
-}: {
-  showWordmark?: boolean;
-  className?: string;
-}) {
+export function Logo({ className = "" }: { className?: string }) {
   return (
-    <span className={`inline-flex items-center gap-2.5 ${className}`}>
-      <svg
-        viewBox="0 0 40 40"
-        width="26"
-        height="26"
-        aria-hidden="true"
-        focusable="false"
-        className="shrink-0"
-      >
+    <svg
+      viewBox="0 0 190 44"
+      role="img"
+      aria-label={site.name}
+      className={`h-8 w-auto ${className}`}
+    >
+      <g transform="translate(0,2)">
         <rect
           x="0.5"
           y="0.5"
@@ -45,7 +38,7 @@ export function Logo({
         />
         <path
           d="M12.5 10.5 H28.5 V15.5 H18 V29.5 H12.5 Z"
-          fill="var(--color-brand-navy)"
+          fill="var(--color-ink)"
         />
         <rect
           x="18"
@@ -55,13 +48,33 @@ export function Logo({
           rx="0.6"
           fill="var(--color-accent)"
         />
-      </svg>
-      {showWordmark ? (
-        <span className="text-[1.0625rem] font-semibold tracking-[-0.03em]">
-          {site.shortName}
-        </span>
-      ) : null}
-      <span className="sr-only">{showWordmark ? "Technologies" : site.name}</span>
-    </span>
+      </g>
+      <text
+        x="51"
+        y="25"
+        fontSize="21"
+        fontWeight="700"
+        letterSpacing="-0.6"
+        fill="currentColor"
+        style={{ fontFamily: "var(--font-sans)" }}
+      >
+        Forgeline
+      </text>
+      {/* 0.7 rather than the asset's flat grey: it has to stay legible on navy
+          as well as on paper, and at this size it needs to clear 4.5:1 on
+          both. Inheriting currentColor is what makes that possible. */}
+      <text
+        x="52"
+        y="37"
+        fontSize="8"
+        fontWeight="600"
+        letterSpacing="3"
+        fill="currentColor"
+        fillOpacity="0.7"
+        style={{ fontFamily: "var(--font-sans)" }}
+      >
+        TECHNOLOGIES
+      </text>
+    </svg>
   );
 }

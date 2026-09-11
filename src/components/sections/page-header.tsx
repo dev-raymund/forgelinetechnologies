@@ -24,7 +24,7 @@ export function PageHeader({
       <div className="shell">
         <div className="railed railed-inset pt-16 pb-16 md:pt-24 md:pb-20">
           {meta ? (
-            <p className="mb-5 font-mono text-micro text-signal-bright">{meta}</p>
+            <p className="mb-5 font-mono text-micro text-accent">{meta}</p>
           ) : null}
           <h1
             id="page-title"

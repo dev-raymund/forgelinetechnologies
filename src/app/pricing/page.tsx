@@ -57,7 +57,7 @@ export default function PricingPage() {
                 </h3>
                 <span
                   className={`font-mono text-micro ${
-                    pkg.highlight ? "text-signal-bright" : "text-faint"
+                    pkg.highlight ? "text-accent" : "text-faint"
                   }`}
                 >
                   {pkg.audience}
@@ -109,7 +109,7 @@ export default function PricingPage() {
                   href="/contact"
                   className={`inline-flex items-center justify-center rounded-sm px-5 py-3 text-[0.9375rem] font-medium transition-colors ${
                     pkg.highlight
-                      ? "bg-white text-ink hover:bg-signal-bright"
+                      ? "bg-white text-ink hover:bg-accent"
                       : "border border-rule-strong text-graphite hover:border-graphite hover:bg-paper"
                   }`}
                 >

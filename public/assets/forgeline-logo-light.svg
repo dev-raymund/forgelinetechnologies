@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 44" role="img" aria-label="Forgeline Technologies">
   <g transform="translate(0,2)">
     <rect x="0.5" y="0.5" width="39" height="39" rx="10.5" fill="#ffffff"/>
-    <path d="M12.5 10.5 H28.5 V15.5 H18 V29.5 H12.5 Z" fill="#016ecc"/>
-    <rect x="18" y="18.2" width="8.4" height="4.6" rx="0.6" fill="#19d2fe"/>
+    <path d="M12.5 10.5 H28.5 V15.5 H18 V29.5 H12.5 Z" fill="#0d2350"/>
+    <rect x="18" y="18.2" width="8.4" height="4.6" rx="0.6" fill="#f97316"/>
   </g>
   <text x="51" y="25" font-family="-apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="21" font-weight="800" letter-spacing="-0.4" fill="#ffffff">Forgeline</text>
-  <text x="52" y="37" font-family="-apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="8" font-weight="600" letter-spacing="3" fill="#b8e4fb">TECHNOLOGIES</text>
+  <text x="52" y="37" font-family="-apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="8" font-weight="600" letter-spacing="3" fill="#b9c3d6">TECHNOLOGIES</text>
 </svg>

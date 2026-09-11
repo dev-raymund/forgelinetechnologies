@@ -67,7 +67,7 @@ export function Founder() {
 
           <Link
             href="/about"
-            className="mt-8 inline-block text-[0.9375rem] font-medium text-graphite underline decoration-rule-strong underline-offset-[6px] transition-colors hover:text-signal hover:decoration-signal"
+            className="mt-8 inline-block text-[0.9375rem] font-medium text-graphite underline decoration-rule-strong underline-offset-[6px] transition-colors hover:text-graphite hover:decoration-accent"
           >
             More about the studio
           </Link>

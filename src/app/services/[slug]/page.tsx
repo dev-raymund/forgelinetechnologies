@@ -135,7 +135,7 @@ export default async function ServicePage({
         <ol className="mt-10 grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
           {processSteps.map((step) => (
             <li key={step.number} className="border-t border-graphite/80 pt-4">
-              <span className="font-mono text-micro text-signal">
+              <span className="font-mono text-micro text-graphite">
                 {step.number}
               </span>
               <h3 className="mt-2.5 text-[1.125rem] font-semibold text-graphite">
@@ -149,7 +149,7 @@ export default async function ServicePage({
         </ol>
         <Link
           href="/process"
-          className="mt-8 inline-block text-[0.9375rem] font-medium text-graphite underline decoration-rule-strong underline-offset-[6px] transition-colors hover:text-signal hover:decoration-signal"
+          className="mt-8 inline-block text-[0.9375rem] font-medium text-graphite underline decoration-rule-strong underline-offset-[6px] transition-colors hover:text-graphite hover:decoration-accent"
         >
           The full process
         </Link>
@@ -172,7 +172,7 @@ export default async function ServicePage({
                 <span className="font-mono text-micro text-faint md:col-span-1">
                   {s.number}
                 </span>
-                <span className="text-[1.0625rem] font-semibold text-graphite transition-colors group-hover:text-signal md:col-span-5">
+                <span className="text-[1.0625rem] font-semibold text-graphite transition-colors group-hover:underline group-hover:decoration-accent group-hover:underline-offset-4 md:col-span-5">
                   {s.title}
                 </span>
                 <span className="max-w-[54ch] text-[0.9375rem] text-muted md:col-span-6">

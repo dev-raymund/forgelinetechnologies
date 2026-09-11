@@ -11,46 +11,48 @@
    ========================================================================== */
 
 @theme {
-  /* Grounds. The dark is a true navy from the logo family rather than a
-     near-black: the mark is navy and orange, and a neutral black ground made
-     the brand read as an afterthought sitting on top of it. */
-  --color-ink: #0a1a33;
-  --color-ink-raised: #12274a;
-  --color-paper: #f4f7fb;
+  /* ------------------------------------------------------------------ colour
+
+     Two brand colours, both lifted straight from the logo file, plus the
+     white and the two greys that are also in it. Nothing else is introduced.
+
+       navy    #0d2350   the F and the wordmark
+       orange  #f97316   the crossbar
+       rule    #d7dce5   the tile's stroke
+       grey    #5b6675   the "TECHNOLOGIES" line
+
+     ONE CONSTRAINT SHAPES EVERYTHING BELOW: orange cannot carry text on a
+     light ground. #f97316 on paper measures 2.80:1 — under the 4.5:1 needed
+     for body text and under even the 3:1 large-text floor. So orange is used
+     as fills, rules and marks on light grounds, and as text only on navy,
+     where it measures 5.42:1. Navy carries every word on paper.
+
+     That is also why the focus ring is navy rather than orange: orange
+     against paper is 2.29:1, short of the 3:1 WCAG asks of a focus
+     indicator. */
+
+  /* Grounds */
+  --color-ink: #0d2350;
+  --color-ink-raised: #16305f;
+  --color-paper: #f4f6fa;
   --color-white: #ffffff;
 
   /* Text */
-  --color-graphite: #16233d;
+  --color-graphite: #0d2350;
   --color-muted: #5b6675;
-  /* Clears 4.5:1 on paper at 12px; the lighter greys in the logo do not. */
+  /* Clears 4.5:1 on paper at 12px, which the logo's own grey does not. */
   --color-faint: #616d84;
-  --color-on-ink: #e6ecf5;
-  --color-on-ink-muted: #9fb0c9;
+  --color-on-ink: #e7ecf4;
+  --color-on-ink-muted: #9aabc4;
 
-  /* Accents.
-     Two, with different jobs — the previous site worked the same way.
-
-     `signal` (blue) is the functional accent: links, hover states, metadata.
-     It carries text, so it has to clear 4.5:1, and it does at 4.78:1 on paper.
-
-     `accent` (orange) is the brand accent, and it is deliberately NOT used for
-     small text: #ea580c measures 3.31:1 on paper, which fails AA below 24px.
-     It marks things instead — the rail nodes, the logo bar, rules. Used the
-     way the previous site used it, which was sparingly. */
-  --color-signal: #016ecc;
-  /* The previous site's --blue-dk, used for the pressed/hover state. */
-  --color-signal-deep: #0159a6;
-  --color-signal-bright: #19d2fe;
-  --color-accent: #ea580c;
-  --color-accent-bright: #fb923c;
-  /* The exact navy in the logo mark, so the lockup matches the asset. */
-  --color-brand-navy: #0d2350;
+  /* The one accent. */
+  --color-accent: #f97316;
 
   /* Hairlines. --color-rule is the logo tile's own stroke colour. */
   --color-rule: #d7dce5;
   --color-rule-strong: #bcc6d6;
-  --color-rule-ink: rgb(255 255 255 / 0.14);
-  --color-rule-ink-strong: rgb(255 255 255 / 0.26);
+  --color-rule-ink: rgb(255 255 255 / 0.16);
+  --color-rule-ink-strong: rgb(255 255 255 / 0.3);
 
   /* Type */
   --font-sans: var(--font-archivo), ui-sans-serif, system-ui, -apple-system,
@@ -106,17 +108,17 @@
   /* One visible focus treatment for the whole site. Never removed, only
      restyled — a keyboard user must always be able to see where they are. */
   :focus-visible {
-    outline: 2px solid var(--color-signal);
+    outline: 2px solid var(--color-ink);
     outline-offset: 3px;
     border-radius: 2px;
   }
 
   .on-ink :focus-visible {
-    outline-color: var(--color-signal-bright);
+    outline-color: var(--color-accent);
   }
 
   ::selection {
-    background-color: color-mix(in oklab, var(--color-signal) 22%, transparent);
+    background-color: color-mix(in oklab, var(--color-accent) 30%, transparent);
   }
 
   /* Headings inherit the display face; sizes are applied per use, not here. */
@@ -239,7 +241,7 @@
   }
 
   .media-card:hover .media-frame {
-    border-color: var(--color-rule-strong);
+    border-color: var(--color-accent);
   }
 }
 

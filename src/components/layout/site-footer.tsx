@@ -30,7 +30,7 @@ export function SiteFooter() {
             <p className="mt-6 text-[0.9375rem]">
               <a
                 href={`mailto:${site.email}`}
-                className="break-words text-on-ink underline decoration-rule-ink-strong underline-offset-4 transition-colors hover:text-signal-bright hover:decoration-signal-bright"
+                className="break-words text-on-ink underline decoration-rule-ink-strong underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
               >
                 {site.email}
               </a>
@@ -49,7 +49,7 @@ export function SiteFooter() {
                 <li key={s.slug}>
                   <Link
                     href={`/services/${s.slug}`}
-                    className="text-[0.9375rem] text-on-ink-muted transition-colors hover:text-signal-bright"
+                    className="text-[0.9375rem] text-on-ink-muted transition-colors hover:text-accent"
                   >
                     {s.title}
                   </Link>
@@ -76,7 +76,7 @@ export function SiteFooter() {
                 <li key={l.href}>
                   <Link
                     href={l.href}
-                    className="text-[0.9375rem] text-on-ink-muted transition-colors hover:text-signal-bright"
+                    className="text-[0.9375rem] text-on-ink-muted transition-colors hover:text-accent"
                   >
                     {l.label}
                   </Link>
@@ -93,7 +93,7 @@ export function SiteFooter() {
               <li>
                 <a
                   href={site.social.linkedin}
-                  className="text-[0.9375rem] text-on-ink-muted transition-colors hover:text-signal-bright"
+                  className="text-[0.9375rem] text-on-ink-muted transition-colors hover:text-accent"
                 >
                   LinkedIn
                 </a>
@@ -101,7 +101,7 @@ export function SiteFooter() {
               <li>
                 <a
                   href={site.social.github}
-                  className="text-[0.9375rem] text-on-ink-muted transition-colors hover:text-signal-bright"
+                  className="text-[0.9375rem] text-on-ink-muted transition-colors hover:text-accent"
                 >
                   GitHub
                 </a>
@@ -109,7 +109,7 @@ export function SiteFooter() {
               <li>
                 <a
                   href={partner.url}
-                  className="text-[0.9375rem] text-on-ink-muted transition-colors hover:text-signal-bright"
+                  className="text-[0.9375rem] text-on-ink-muted transition-colors hover:text-accent"
                 >
                   {partner.name}
                 </a>

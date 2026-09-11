@@ -33,7 +33,7 @@ export function ServicesOverview() {
               <span className="font-mono text-micro text-faint md:col-span-1">
                 {service.number}
               </span>
-              <h3 className="text-subtitle font-semibold text-graphite transition-colors group-hover:text-signal md:col-span-5">
+              <h3 className="text-subtitle font-semibold text-graphite transition-colors group-hover:underline group-hover:decoration-accent group-hover:underline-offset-4 md:col-span-5">
                 {service.title}
               </h3>
               <p className="max-w-[58ch] text-[0.9375rem] leading-relaxed text-muted md:col-span-6">

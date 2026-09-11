@@ -52,7 +52,7 @@ export default function ServicesPage() {
                   <h3 className="mt-3 text-subtitle font-semibold text-graphite">
                     <Link
                       href={`/services/${service.slug}`}
-                      className="transition-colors hover:text-signal"
+                      className="transition-colors hover:text-graphite"
                     >
                       {service.title}
                     </Link>
@@ -62,7 +62,7 @@ export default function ServicesPage() {
                   </p>
                   <Link
                     href={`/services/${service.slug}`}
-                    className="mt-6 inline-block text-[0.9375rem] font-medium text-graphite underline decoration-rule-strong underline-offset-[6px] transition-colors hover:text-signal hover:decoration-signal"
+                    className="mt-6 inline-block text-[0.9375rem] font-medium text-graphite underline decoration-rule-strong underline-offset-[6px] transition-colors hover:text-graphite hover:decoration-accent"
                   >
                     {service.title} in detail
                   </Link>
@@ -89,7 +89,7 @@ export default function ServicesPage() {
                       <li key={p.slug}>
                         <Link
                           href={`/work/${p.slug}`}
-                          className="text-[0.9375rem] text-graphite underline decoration-rule-strong underline-offset-4 transition-colors hover:text-signal hover:decoration-signal"
+                          className="text-[0.9375rem] text-graphite underline decoration-rule-strong underline-offset-4 transition-colors hover:text-graphite hover:decoration-accent"
                         >
                           {p.title}
                         </Link>

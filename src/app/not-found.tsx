@@ -18,7 +18,7 @@ export default function NotFound() {
     <section className="on-ink bg-ink text-on-ink">
       <div className="shell">
         <div className="railed railed-inset py-24 md:py-36">
-          <p className="font-mono text-micro text-signal-bright">Error 404</p>
+          <p className="font-mono text-micro text-accent">Error 404</p>
           <h1 className="text-title mt-5 max-w-[18ch] font-semibold text-white">
             That page is not here
           </h1>
@@ -36,7 +36,7 @@ export default function NotFound() {
             ].map((l) => (
               <li key={l.href} className="border-t border-rule-ink pt-4">
                 <Link href={l.href} className="group block">
-                  <span className="block text-[1.0625rem] font-semibold text-white transition-colors group-hover:text-signal-bright">
+                  <span className="block text-[1.0625rem] font-semibold text-white transition-colors group-hover:text-accent">
                     {l.label}
                   </span>
                   <span className="mt-1 block text-[0.875rem] text-on-ink-muted">
@@ -51,7 +51,7 @@ export default function NotFound() {
             Looking for a specific service?{" "}
             <Link
               href={`/services/${services[0].slug}`}
-              className="text-on-ink underline decoration-rule-ink-strong underline-offset-4 transition-colors hover:text-signal-bright hover:decoration-signal-bright"
+              className="text-on-ink underline decoration-rule-ink-strong underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
             >
               Start here
             </Link>

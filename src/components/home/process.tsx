@@ -23,8 +23,8 @@ export function Process() {
 
       <ol className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
         {processSteps.map((step) => (
-          <li key={step.number} className="border-t border-graphite/80 pt-5">
-            <span className="font-mono text-micro text-signal">
+          <li key={step.number} className="border-t-2 border-accent pt-5">
+            <span className="font-mono text-micro text-graphite">
               {step.number}
             </span>
             <h3 className="mt-3 text-subtitle font-semibold text-graphite">

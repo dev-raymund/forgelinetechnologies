@@ -29,7 +29,7 @@ export function FeaturedWork() {
         aside={
           <Link
             href="/work"
-            className="shrink-0 self-start text-[0.9375rem] font-medium text-graphite underline decoration-rule-strong underline-offset-[6px] transition-colors hover:text-signal hover:decoration-signal md:self-end"
+            className="shrink-0 self-start text-[0.9375rem] font-medium text-graphite underline decoration-rule-strong underline-offset-[6px] transition-colors hover:text-graphite hover:decoration-accent md:self-end"
           >
             All {projects.length} projects
           </Link>
@@ -51,7 +51,7 @@ export function FeaturedWork() {
               </div>
 
               <div className="mt-5 flex items-center gap-3">
-                <span className="font-mono text-micro text-signal">
+                <span className="font-mono text-micro text-graphite">
                   {project.kind}
                 </span>
                 <span
@@ -63,7 +63,7 @@ export function FeaturedWork() {
                 </span>
               </div>
 
-              <h3 className="mt-2.5 text-subtitle font-semibold text-graphite transition-colors group-hover:text-signal">
+              <h3 className="mt-2.5 text-subtitle font-semibold text-graphite transition-colors group-hover:underline group-hover:decoration-accent group-hover:underline-offset-4">
                 {project.title}
               </h3>
               <p className="mt-2.5 max-w-[54ch] text-[0.9375rem] leading-relaxed text-muted">

@@ -28,7 +28,7 @@ export function Faq() {
             key={faq.question}
             className="group border-b border-rule [&_summary::-webkit-details-marker]:hidden"
           >
-            <summary className="flex cursor-pointer list-none items-start justify-between gap-6 py-5 text-[1.0625rem] font-medium text-graphite transition-colors hover:text-signal">
+            <summary className="flex cursor-pointer list-none items-start justify-between gap-6 py-5 text-[1.0625rem] font-medium text-graphite transition-colors hover:text-graphite">
               <span className="max-w-[52ch]">{faq.question}</span>
               <span
                 aria-hidden="true"

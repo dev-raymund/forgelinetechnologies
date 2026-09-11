@@ -24,7 +24,7 @@ export default function Image() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          background: "#0a1a33",
+          background: "#0d2350",
           padding: "72px 80px",
         }}
       >
@@ -58,7 +58,7 @@ export default function Image() {
           </span>
           <span
             style={{
-              color: "#9fb0c9",
+              color: "#9aabc4",
               fontSize: 34,
               marginTop: 20,
               letterSpacing: "-0.01em",
@@ -70,7 +70,7 @@ export default function Image() {
 
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
           <div style={{ width: 64, height: 3, background: "#f97316" }} />
-          <span style={{ color: "#9fb0c9", fontSize: 24 }}>
+          <span style={{ color: "#9aabc4", fontSize: 24 }}>
             forgelinetechnologies.com
           </span>
         </div>
