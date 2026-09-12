@@ -44,7 +44,9 @@ export function SiteHeader() {
   useEffect(() => {
     const el = sentinel.current;
     if (!el) return;
-    const io = new IntersectionObserver(([entry]) => setStuck(!entry.isIntersecting));
+    const io = new IntersectionObserver(([entry]) =>
+      setStuck(!entry.isIntersecting),
+    );
     io.observe(el);
     return () => io.disconnect();
   }, []);
@@ -64,7 +66,11 @@ export function SiteHeader() {
 
   return (
     <>
-      <div ref={sentinel} aria-hidden="true" className="absolute top-0 h-px w-px" />
+      <div
+        ref={sentinel}
+        aria-hidden="true"
+        className="absolute top-0 h-px w-px"
+      />
 
       <header
         data-stuck={stuck || undefined}
@@ -87,7 +93,8 @@ export function SiteHeader() {
               <ul className="flex items-center gap-7">
                 {nav.map((item) => {
                   const active =
-                    pathname === item.href || pathname.startsWith(`${item.href}/`);
+                    pathname === item.href ||
+                    pathname.startsWith(`${item.href}/`);
                   return (
                     <li key={item.href}>
                       <Link
@@ -131,12 +138,29 @@ export function SiteHeader() {
               aria-controls={panelId}
               className="-mr-2 inline-flex h-10 w-10 items-center justify-center rounded-sm text-white lg:hidden"
             >
-              <span className="sr-only">{open ? "Close menu" : "Open menu"}</span>
-              <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+              <span className="sr-only">
+                {open ? "Close menu" : "Open menu"}
+              </span>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                aria-hidden="true"
+              >
                 {open ? (
-                  <path d="M4 4l12 12M16 4L4 16" stroke="currentColor" strokeWidth="1.5" fill="none" />
+                  <path
+                    d="M4 4l12 12M16 4L4 16"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    fill="none"
+                  />
                 ) : (
-                  <path d="M2 6h16M2 13h16" stroke="currentColor" strokeWidth="1.5" fill="none" />
+                  <path
+                    d="M2 6h16M2 13h16"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    fill="none"
+                  />
                 )}
               </svg>
             </button>
@@ -151,8 +175,14 @@ export function SiteHeader() {
           <nav aria-label="Primary" className="shell py-6">
             <ul className="flex flex-col">
               {nav.map((item) => (
-                <li key={item.href} className="border-b border-rule-ink last:border-0">
-                  <Link href={item.href} className="block py-3.5 text-lg text-on-ink">
+                <li
+                  key={item.href}
+                  className="border-b border-rule-ink last:border-0"
+                >
+                  <Link
+                    href={item.href}
+                    className="block py-3.5 text-lg text-on-ink"
+                  >
                     {item.label}
                   </Link>
                 </li>

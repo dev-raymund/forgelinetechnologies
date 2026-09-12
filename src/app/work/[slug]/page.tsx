@@ -13,7 +13,7 @@ import {
   hasCaseStudy,
 } from "@/data/projects";
 import { site } from "@/lib/site";
-import { jsonLd } from "@/lib/structured-data";
+import { jsonLd, breadcrumbSchema } from "@/lib/structured-data";
 
 /** All seventeen are known at build time, so all seventeen are static. */
 export function generateStaticParams() {
@@ -54,6 +54,10 @@ export default async function ProjectPage({
   if (!project) notFound();
 
   const related = relatedProjects(slug);
+  const trail = [
+    { name: "Work", path: "/work" },
+    { name: project.title, path: `/work/${project.slug}` },
+  ];
   const detailed = hasCaseStudy(project);
 
   return (
@@ -77,7 +81,13 @@ export default async function ProjectPage({
         }}
       />
 
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbSchema(trail)) }}
+      />
+
       <PageHeader
+        trail={trail}
         meta={`${project.kind} / ${project.sector}`}
         title={project.title}
       >

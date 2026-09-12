@@ -4,12 +4,12 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/sections/page-header";
 import { ClosingCta } from "@/components/sections/cta-band";
 import { ProjectCard } from "@/components/work/project-card";
-import { Section } from "@/components/ui/section";
+import { Section, SectionHeading } from "@/components/ui/section";
 import { services, getService } from "@/data/services";
 import { getProject } from "@/data/projects";
 import { processSteps } from "@/data/process";
 import { site } from "@/lib/site";
-import { jsonLd } from "@/lib/structured-data";
+import { jsonLd, breadcrumbSchema } from "@/lib/structured-data";
 import { ServiceIcon } from "@/components/ui/service-icon";
 
 export function generateStaticParams() {
@@ -49,7 +49,16 @@ export default async function ServicePage({
   const evidence = service.evidence
     .map((s) => getProject(s))
     .filter((p) => p !== undefined);
-  const others = services.filter((s) => s.slug !== service.slug);
+  const related = service.related
+    .map((slug) => getService(slug))
+    .filter((x) => x !== undefined);
+  const trail = [
+    { name: "Services", path: "/services" },
+    { name: service.title, path: `/services/${service.slug}` },
+  ];
+  const others = services.filter(
+    (s) => s.slug !== service.slug && !service.related.includes(s.slug),
+  );
 
   return (
     <>
@@ -71,7 +80,13 @@ export default async function ServicePage({
         }}
       />
 
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbSchema(trail)) }}
+      />
+
       <PageHeader
+        trail={trail}
         meta={`Service ${service.number}`}
         title={service.title}
         dek={service.description}
@@ -158,12 +173,77 @@ export default async function ServicePage({
         </Link>
       </Section>
 
-      <Section ground="white" size="md" labelledBy="others-title">
+      {service.faqs?.length ? (
+        <Section ground="paper" size="md" labelledBy="service-faq-title">
+          <SectionHeading
+            id="service-faq-title"
+            title={`${service.title}, answered`}
+            dek="The questions buyers actually ask about this service, including the ones with uncomfortable answers."
+          />
+          <div className="border-t border-rule">
+            {service.faqs.map((faq) => (
+              <details
+                key={faq.question}
+                className="group border-b border-rule [&_summary::-webkit-details-marker]:hidden"
+              >
+                <summary className="flex cursor-pointer list-none items-start justify-between gap-6 py-5 text-[1.0625rem] font-medium text-graphite">
+                  <span className="max-w-[52ch]">{faq.question}</span>
+                  <span
+                    aria-hidden="true"
+                    className="relative mt-2 size-3 shrink-0"
+                  >
+                    <span className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-current" />
+                    <span className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-current transition-transform duration-200 group-open:scale-y-0" />
+                  </span>
+                </summary>
+                <p className="max-w-[68ch] pb-6 text-[0.9375rem] leading-relaxed text-muted">
+                  {faq.answer}
+                </p>
+              </details>
+            ))}
+          </div>
+        </Section>
+      ) : null}
+
+      {related.length ? (
+        <Section ground="white" size="md" labelledBy="related-services-title">
+          <SectionHeading
+            id="related-services-title"
+            title="Usually commissioned together"
+            dek="Not an upsell — these are the pieces that tend to be part of the same job, and are cheaper to do at the same time than to retrofit."
+          />
+          <ul className="grid gap-x-8 gap-y-8 md:grid-cols-2">
+            {related.map((r) => (
+              <li key={r.slug} className="border-t-2 border-accent pt-5">
+                <Link href={`/services/${r.slug}`} className="group block">
+                  <span className="flex items-center gap-3">
+                    <ServiceIcon
+                      icon={r.icon}
+                      className="mark size-5 text-accent"
+                    />
+                    <span className="font-mono text-micro text-faint">
+                      {r.number}
+                    </span>
+                  </span>
+                  <h3 className="mt-3 text-subtitle font-semibold text-graphite group-hover:underline group-hover:decoration-accent group-hover:underline-offset-4">
+                    {r.title}
+                  </h3>
+                  <p className="mt-2 max-w-[48ch] text-[0.9375rem] leading-relaxed text-muted">
+                    {r.summary}
+                  </p>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </Section>
+      ) : null}
+
+      <Section ground="paper" size="md" labelledBy="others-title">
         <h2
           id="others-title"
           className="text-subtitle font-semibold text-graphite"
         >
-          Other services
+          All services
         </h2>
         <ul className="mt-8 border-t border-rule">
           {others.map((s) => (

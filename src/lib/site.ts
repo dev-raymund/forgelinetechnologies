@@ -9,14 +9,35 @@
  * "Forgeline" — one capital. Earlier code used "ForgeLine"; the logo wins.
  */
 /**
- * Canonical origin. NEXT_PUBLIC_SITE_URL wins when set — preview deployments
- * need their own origin or every canonical tag on them points at production —
- * and the apex domain is the fallback so a missing variable degrades rather
- * than breaks. Any trailing slash is stripped so joins never double up.
+ * Canonical origin.
+ *
+ * Order matters, and getting it wrong is expensive: every canonical tag, the
+ * sitemap, robots.txt and the Open Graph image URL are built from this. Before
+ * this fallback existed the whole site advertised forgelinetechnologies.com
+ * while being served from vercel.app — so every canonical pointed at a URL
+ * that returned 404, the sitemap listed thirty dead addresses, and social
+ * shares resolved a broken image.
+ *
+ *   1. NEXT_PUBLIC_SITE_URL   explicit override, wins everywhere
+ *   2. VERCEL_PROJECT_PRODUCTION_URL   the project's real production domain,
+ *      injected by Vercel at build. Self-correcting: it returns the .vercel.app
+ *      host today and the custom domain the moment one is attached.
+ *   3. the apex domain, for local development
+ *
+ * Read only on the server — nothing in a client component touches `site.url`,
+ * so the non-public variable at step 2 is safe here.
  */
-const origin = (
-  process.env.NEXT_PUBLIC_SITE_URL || "https://forgelinetechnologies.com"
-).replace(/\/+$/, "");
+function resolveOrigin(): string {
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL;
+  if (explicit) return explicit.replace(/\/+$/, "");
+
+  const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  if (vercel) return `https://${vercel.replace(/\/+$/, "")}`;
+
+  return "https://forgelinetechnologies.com";
+}
+
+const origin = resolveOrigin();
 
 export const site = {
   name: "Forgeline Technologies",
@@ -25,7 +46,15 @@ export const site = {
   description:
     "Forgeline Technologies builds websites, web applications, e-commerce platforms and custom software — scoped at a fixed price and built by the developer you brief.",
   url: origin,
-  email: "raymundhermoso.dev@gmail.com",
+  /**
+   * The address shown publicly. Environment-driven so it can move to a branded
+   * mailbox without a code change — set NEXT_PUBLIC_CONTACT_EMAIL to
+   * hello@forgelinetechnologies.com once that mailbox exists and is verified
+   * in Resend. The fallback is the address that actually receives mail today;
+   * advertising a mailbox that does not exist is worse than a personal one.
+   */
+  email:
+    process.env.NEXT_PUBLIC_CONTACT_EMAIL || "raymundhermoso.dev@gmail.com",
   social: {
     github: "https://github.com/dev-raymund",
     linkedin: "https://www.linkedin.com/in/raymund-hermoso-b00586207/",
@@ -42,12 +71,16 @@ export const site = {
  * a literal `0` in the HTML, so every crawler and every no-JS visitor saw a
  * studio claiming six years of nothing. Animate from the rendered value or
  * do not animate at all.
+ *
+ * Three, not four. "100% code ownership" used to sit here and it is not a
+ * metric — it is a promise, and a promise in a row of measurements makes the
+ * measurements look like promises too. It still appears where it belongs, in
+ * the closing CTA and the FAQ. Symmetry is not worth a weaker signal.
  */
 export const stats = [
   { value: "6+", label: "Years building" },
   { value: "17", label: "Projects shipped" },
   { value: "4", label: "Countries served" },
-  { value: "100%", label: "Code ownership" },
 ] as const;
 
 /** Markets with delivered work behind the "4 countries" figure. */

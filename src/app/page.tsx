@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { site } from "@/lib/site";
-import { organizationSchema, faqSchema, jsonLd } from "@/lib/structured-data";
+import {
+  organizationSchema,
+  websiteSchema,
+  faqSchema,
+  jsonLd,
+} from "@/lib/structured-data";
 import { Hero } from "@/components/home/hero";
 import { ServicesOverview } from "@/components/home/services-overview";
 import { FeaturedWork } from "@/components/home/featured-work";
@@ -38,6 +43,10 @@ export default function HomePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd(organizationSchema()) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd(websiteSchema()) }}
       />
       <script
         type="application/ld+json"

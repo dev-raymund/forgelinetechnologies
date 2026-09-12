@@ -3,7 +3,7 @@ import Link from "next/link";
 import { PageHeader } from "@/components/sections/page-header";
 import { ClosingCta } from "@/components/sections/cta-band";
 import { Section, SectionHeading } from "@/components/ui/section";
-import { packages, addOns } from "@/data/pricing";
+import { packages, addOns, SCOPED } from "@/data/pricing";
 import { ArrowRight } from "@/components/ui/icon";
 import { Reveal } from "@/components/ui/reveal";
 
@@ -138,7 +138,13 @@ export default function PricingPage() {
               <h3 className="text-[1.125rem] font-semibold text-graphite">
                 {item.name}
               </h3>
-              <p className="mt-2 font-mono text-[1.125rem] font-medium text-graphite">
+              <p
+                className={
+                  item.price === SCOPED
+                    ? "mt-2 text-[1.0625rem] font-medium text-muted"
+                    : "mt-2 font-mono text-[1.125rem] font-medium text-graphite"
+                }
+              >
                 {item.price}
               </p>
               <p className="mt-3 max-w-[38ch] text-[0.9375rem] leading-relaxed text-muted">

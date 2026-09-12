@@ -127,7 +127,7 @@ export async function sendInquiryConfirmation(data: InquiryData): Promise<SendRe
     return { ok: false, skipped: true, error: "Email not configured" };
   }
 
-  const body = `<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">Thanks for getting in touch. Your enquiry has been received and you will get a reply within one business day.</p>
+  const body = `<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">Thanks for getting in touch. Your project details have been received and go straight to the developer who would build it.</p>
   ${messageBlock(data.message)}
   <p style="margin:20px 0 0;font-size:15px;line-height:1.65;">If anything has changed in the meantime, just reply to this email.</p>`;
 

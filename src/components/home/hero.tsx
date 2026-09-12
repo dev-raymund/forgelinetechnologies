@@ -98,7 +98,7 @@ export function Hero() {
       <div className="border-t border-rule-ink">
         <div className="shell">
           <div className="railed railed-inset py-8 md:py-10">
-            <dl className="grid grid-cols-2 gap-x-8 gap-y-7 md:grid-cols-4">
+            <dl className="grid grid-cols-3 gap-x-6 gap-y-7 sm:gap-x-8">
               {stats.map((stat) => (
                 <div key={stat.label}>
                   <dt className="sr-only">{stat.label}</dt>

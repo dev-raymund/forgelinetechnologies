@@ -70,7 +70,12 @@ export function ContactForm() {
   }
 
   return (
-    <form ref={formRef} action={action} noValidate className="flex flex-col gap-6">
+    <form
+      ref={formRef}
+      action={action}
+      noValidate
+      className="flex flex-col gap-6"
+    >
       {state.status === "error" ? (
         <div
           ref={statusRef}
@@ -236,7 +241,13 @@ function Label({
   );
 }
 
-function ErrorText({ id, children }: { id: string; children: React.ReactNode }) {
+function ErrorText({
+  id,
+  children,
+}: {
+  id: string;
+  children: React.ReactNode;
+}) {
   return (
     <p id={id} className="mt-2 text-[0.8125rem] font-medium text-graphite">
       {children}

@@ -4,9 +4,9 @@ import Link from "next/link";
 import { PageHeader } from "@/components/sections/page-header";
 import { ClosingCta } from "@/components/sections/cta-band";
 import { Section, SectionHeading } from "@/components/ui/section";
-import { Logo } from "@/components/ui/logo";
+import { PartnerGrid } from "@/components/ui/partner-grid";
 import { Technology } from "@/components/home/technology";
-import { site, founder, partner, stats, marketsSentence } from "@/lib/site";
+import { site, founder, stats, marketsSentence } from "@/lib/site";
 import { projects } from "@/data/projects";
 import { Counter } from "@/components/ui/counter";
 
@@ -134,7 +134,7 @@ export default function AboutPage() {
             </Link>
           }
         />
-        <dl className="grid grid-cols-2 gap-x-8 gap-y-8 md:grid-cols-4">
+        <dl className="grid grid-cols-3 gap-x-6 gap-y-8 sm:gap-x-8">
           {stats.map((stat) => (
             <div key={stat.label} className="border-t border-rule-ink pt-4">
               <dt className="sr-only">{stat.label}</dt>
@@ -194,48 +194,21 @@ export default function AboutPage() {
       </Section>
 
       <Section ground="white" size="md" labelledBy="partner-about-title">
-        <div className="grid gap-8 md:grid-cols-12 md:gap-10">
-          <div className="md:col-span-5">
+        <div className="flex flex-col gap-8 border-t border-rule pt-8 md:flex-row md:items-center md:justify-between md:gap-16">
+          <div className="max-w-[46ch]">
             <h2
               id="partner-about-title"
-              className="text-title max-w-[18ch] font-semibold text-graphite"
+              className="text-[1.0625rem] font-semibold text-graphite"
             >
-              Part of a wider technology ecosystem
+              Partners &amp; ecosystem
             </h2>
-            {/* The two marks together, which says "partnership" faster than
-                the paragraph beside them does. */}
-            <div className="mt-7 flex items-center gap-5 text-graphite">
-              <Logo />
-              <span aria-hidden="true" className="h-8 w-px bg-rule-strong" />
-              <Image
-                src={partner.logo}
-                alt=""
-                width={36}
-                height={36}
-                className="h-9 w-9 rounded-[6px]"
-              />
-            </div>
-          </div>
-          <div className="md:col-span-6 md:col-start-7">
-            <p className="max-w-[56ch] text-dek leading-relaxed text-muted">
-              Forgeline and{" "}
-              <a
-                href={partner.url}
-                className="text-graphite underline decoration-rule-strong underline-offset-4 transition-colors hover:text-graphite hover:decoration-accent"
-              >
-                {partner.name}
-              </a>{" "}
-              are partner companies with complementary focus. Forgeline handles
-              digital product and web engineering. {partner.name} covers the
-              broader business technology side: automation, CRM, infrastructure,
-              support and training.
-            </p>
-            <p className="mt-5 max-w-[56ch] text-[0.9375rem] leading-relaxed text-muted">
-              In practice it means a project that turns out to need capability
-              on both sides can get it, without you going and finding a second
-              supplier and managing the gap between them.
+            <p className="mt-2 text-[0.9375rem] leading-relaxed text-muted">
+              Forgeline is independent. Where a project needs capability beyond
+              web engineering, these are the companies we work alongside rather
+              than sending you to find a second supplier.
             </p>
           </div>
+          <PartnerGrid className="shrink-0" />
         </div>
       </Section>
 

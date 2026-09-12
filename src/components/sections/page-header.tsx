@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 
 /**
  * Inner-page header.
@@ -11,18 +12,22 @@ export function PageHeader({
   title,
   dek,
   meta,
+  trail,
   children,
 }: {
   title: string;
   dek?: string;
   /** Short factual line above the title, e.g. a count or a category. */
   meta?: string;
+  /** Breadcrumb trail, for nested routes. Rendered above everything else. */
+  trail?: { name: string; path: string }[];
   children?: ReactNode;
 }) {
   return (
     <section className="on-ink bg-ink text-on-ink" aria-labelledby="page-title">
       <div className="shell">
         <div className="railed railed-inset pt-16 pb-16 md:pt-24 md:pb-20">
+          {trail?.length ? <Breadcrumbs trail={trail} /> : null}
           {meta ? (
             <p className="mb-5 font-mono text-micro text-accent">{meta}</p>
           ) : null}
@@ -33,7 +38,9 @@ export function PageHeader({
             {title}
           </h1>
           {dek ? (
-            <p className="mt-6 max-w-[58ch] text-dek text-on-ink-muted">{dek}</p>
+            <p className="mt-6 max-w-[58ch] text-dek text-on-ink-muted">
+              {dek}
+            </p>
           ) : null}
           {children}
         </div>

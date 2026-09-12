@@ -140,3 +140,23 @@ export function Refresh(props: IconProps) {
     </Svg>
   );
 }
+
+export function Search(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <circle cx="7.25" cy="7.25" r="4.75" />
+      <path d="M10.75 10.75 13.75 13.75" />
+    </Svg>
+  );
+}
+
+export function Workflow(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <rect x="1.75" y="1.75" width="4.5" height="4" rx="1" />
+      <rect x="9.75" y="10.25" width="4.5" height="4" rx="1" />
+      <path d="M6.25 3.75h3.5a2 2 0 0 1 2 2v4.5" />
+      <path d="M4 5.75v6.5h3.5" />
+    </Svg>
+  );
+}

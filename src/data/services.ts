@@ -24,7 +24,27 @@ export type Service = {
   /** Project slugs that demonstrate this service. */
   evidence: string[];
   /** Key into the icon set — see components/ui/service-icon.tsx. */
-  icon: "window" | "dashboard" | "cart" | "code" | "plug" | "refresh";
+  icon:
+    | "window"
+    | "dashboard"
+    | "cart"
+    | "code"
+    | "plug"
+    | "refresh"
+    | "search"
+    | "workflow";
+  /**
+   * Services that genuinely tend to be commissioned alongside this one. Shown
+   * on the detail page so a visitor finds the rest of the job without being
+   * sold at — a new website usually needs SEO, an application usually needs
+   * integrations.
+   */
+  related: string[];
+  /**
+   * Questions specific to this service. Optional: only the lines where buyers
+   * reliably ask the same thing carry one.
+   */
+  faqs?: { question: string; answer: string }[];
 };
 
 export const services: Service[] = [
@@ -46,6 +66,7 @@ export const services: Service[] = [
       "Accessibility to WCAG principles",
     ],
     evidence: ["bh-sellers-advocate", "stickman-wealth", "kalinga-house"],
+    related: ["seo", "ongoing-development"],
   },
   {
     number: "02",
@@ -65,6 +86,7 @@ export const services: Service[] = [
       "SaaS product engineering",
     ],
     evidence: ["talk-global-study", "karratha-lock-service"],
+    related: ["apis-integrations", "automation"],
   },
   {
     number: "03",
@@ -84,6 +106,7 @@ export const services: Service[] = [
       "Migrations between platforms",
     ],
     evidence: ["mission-estate", "nutracraft", "leaft-blade", "multihull-central"],
+    related: ["seo", "apis-integrations"],
   },
   {
     number: "04",
@@ -103,6 +126,7 @@ export const services: Service[] = [
       "Legacy system replacement",
     ],
     evidence: ["talk-global-study", "marci-metzger-realty"],
+    related: ["apis-integrations", "automation"],
   },
   {
     number: "05",
@@ -122,9 +146,103 @@ export const services: Service[] = [
       "Scheduled syncs and webhooks",
     ],
     evidence: ["talk-global-study", "lisa-sherman-realty"],
+    related: ["automation", "web-applications"],
   },
   {
     number: "06",
+    title: "SEO",
+    slug: "seo",
+    icon: "search",
+    summary:
+      "Technical and on-page work that makes a site easier to find, and easier for search engines to read.",
+    description:
+      "For businesses whose site looks fine but is effectively invisible in search. You get the foundations put right — how pages are structured, labelled and linked, and how fast they load — so search engines can tell what you do and who you do it for. No ranking promises: nobody can honestly make those, and anyone who does is guessing.",
+    includes: [
+      "Technical SEO audit",
+      "Metadata and structured data",
+      "Sitemap and robots configuration",
+      "Internal linking structure",
+      "Core Web Vitals and page speed",
+      "On-page and content structure",
+      "Search Console and analytics setup",
+      "Local SEO where it applies",
+      "SEO-safe platform migrations",
+      "Ongoing improvements",
+    ],
+    // No project here is an SEO engagement, so nothing is claimed as one.
+    // The technical SEO work listed above ships inside every website build.
+    evidence: [],
+    related: ["websites", "ongoing-development"],
+    faqs: [
+      {
+        question: "Can you guarantee a first-page ranking?",
+        answer:
+          "No, and neither can anyone else — rankings depend on competitors, on your market and on search engines nobody controls. What can be guaranteed is that the technical side is correct: pages that load fast, are structured properly, and can actually be read and indexed. That is the part that is in anyone's hands.",
+      },
+      {
+        question: "How long before it shows any effect?",
+        answer:
+          "Technical fixes register within weeks; anything competitive takes months. If a site was previously blocking crawlers or shipping broken metadata, the change can be quicker, because the problem was a fault rather than competition.",
+      },
+      {
+        question: "Do you write the content as well?",
+        answer:
+          "We structure it — headings, internal links, metadata, the way pages relate. Writing the words is usually better done by you or a specialist who knows the subject. We will tell you plainly what is missing.",
+      },
+      {
+        question: "We are moving platforms. Will we lose our rankings?",
+        answer:
+          "That is the main risk in a migration and it is avoidable. URLs get mapped, redirects get put in place before launch, and metadata and structured data carry across. Most ranking losses in a replatform are a redirect map nobody wrote.",
+      },
+    ],
+  },
+  {
+    number: "07",
+    title: "Automation",
+    slug: "automation",
+    icon: "workflow",
+    summary:
+      "Connect the systems you already use and take the repetitive work out of the week.",
+    description:
+      "For businesses typing the same information into two systems, or doing by hand something that happens the same way every time. You get the connections and workflows that move data between your website, your CRM, your inbox and your internal tools — so something entered once is correct everywhere, and the work that never needed a person stops taking one.",
+    includes: [
+      "Form-to-CRM workflows",
+      "Lead routing and notifications",
+      "Email and onboarding sequences",
+      "Scheduled jobs and data syncing",
+      "Webhooks and API integrations",
+      "Payment and invoicing workflows",
+      "Reporting and exports",
+      "AI-assisted steps where they genuinely help",
+      "Automation audit of your current process",
+    ],
+    evidence: ["karratha-lock-service", "lisa-sherman-realty", "talk-global-study"],
+    related: ["apis-integrations", "web-applications"],
+    faqs: [
+      {
+        question: "Where is automation actually worth it?",
+        answer:
+          "Where a task happens often, the same way each time, and a person adds nothing by doing it — copying an enquiry into a CRM, chasing the same follow-up, re-keying an order. If a task needs judgement, leave it with the person who has the judgement.",
+      },
+      {
+        question: "Is this an AI product?",
+        answer:
+          "No. Most useful automation is plumbing — one system telling another what happened. AI gets used where it earns its place, like sorting or summarising free text, and left out where a rule is more reliable and cheaper to run.",
+      },
+      {
+        question: "Will it work with the tools we already have?",
+        answer:
+          "Usually. Most business software exposes an API or webhooks, and where one does not there is normally a workable path. The audit establishes that before anything is quoted, so you are not paying to discover a dead end.",
+      },
+      {
+        question: "What happens when an automation breaks?",
+        answer:
+          "It should tell you rather than fail quietly, which is the difference between an automation and a liability. Failures notify someone, and anything that moves data keeps a record you can check.",
+      },
+    ],
+  },
+  {
+    number: "08",
     title: "Ongoing Development",
     slug: "ongoing-development",
     icon: "refresh",
@@ -141,6 +259,7 @@ export const services: Service[] = [
       "Month to month, cancel anytime",
     ],
     evidence: ["multihull-central", "perfect-floors"],
+    related: ["seo", "automation"],
   },
 ];
 

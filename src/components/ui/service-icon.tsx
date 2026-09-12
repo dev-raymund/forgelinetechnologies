@@ -5,6 +5,8 @@ import {
   Code,
   Plug,
   Refresh,
+  Search,
+  Workflow,
 } from "@/components/ui/icon";
 import type { Service } from "@/data/services";
 
@@ -15,6 +17,8 @@ const marks = {
   code: Code,
   plug: Plug,
   refresh: Refresh,
+  search: Search,
+  workflow: Workflow,
 } as const;
 
 /**

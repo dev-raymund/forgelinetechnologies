@@ -29,9 +29,13 @@ export function ProjectCard({
         />
       </div>
       <div className="mt-4 flex items-center gap-3">
-        <span className="font-mono text-micro text-graphite">{project.kind}</span>
+        <span className="font-mono text-micro text-graphite">
+          {project.kind}
+        </span>
         <span aria-hidden="true" className="h-3 w-px bg-rule-strong" />
-        <span className="font-mono text-micro text-faint">{project.sector}</span>
+        <span className="font-mono text-micro text-faint">
+          {project.sector}
+        </span>
       </div>
       <h3 className="mt-2 text-[1.25rem] font-semibold text-graphite transition-colors group-hover:underline group-hover:decoration-accent group-hover:underline-offset-4">
         {project.title}

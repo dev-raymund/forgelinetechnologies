@@ -31,6 +31,44 @@ export function organizationSchema() {
   };
 }
 
+/**
+ * WebSite. Declares the site itself and its name, which is what search engines
+ * use for a sitelinks title.
+ *
+ * No SearchAction: that property tells Google a site has its own search
+ * endpoint, and this one does not. Declaring it would be describing a feature
+ * that is not there.
+ */
+export function websiteSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${site.url}/#website`,
+    url: site.url,
+    name: site.name,
+    description: site.description,
+    publisher: { "@id": `${site.url}/#organization` },
+    inLanguage: "en",
+  };
+}
+
+/**
+ * Breadcrumbs for nested routes. Mirrors the visible trail exactly — schema
+ * that disagrees with the page is worse than none.
+ */
+export function breadcrumbSchema(trail: { name: string; path: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: trail.map((crumb, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: crumb.name,
+      item: `${site.url}${crumb.path}`,
+    })),
+  };
+}
+
 export function faqSchema() {
   return {
     "@context": "https://schema.org",

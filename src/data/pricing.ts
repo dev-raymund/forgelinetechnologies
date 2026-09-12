@@ -85,6 +85,13 @@ export type AddOn = {
   summary: string;
 };
 
+/**
+ * Anything quoted per project rather than from a published figure says so.
+ * Inventing a number to fill the gap would undo the one thing this page has
+ * going for it — that every figure on it is real.
+ */
+export const SCOPED = "Scoped to the project";
+
 export const addOns: AddOn[] = [
   {
     name: "Online Store",
@@ -100,5 +107,29 @@ export const addOns: AddOn[] = [
     name: "Migration & Redesign",
     price: "from $600",
     summary: "Move platforms or refresh an old site — without losing data or rankings.",
+  },
+  {
+    name: "SEO Audit",
+    price: SCOPED,
+    summary:
+      "A technical review of what is stopping search engines reading your site, and what to fix first.",
+  },
+  {
+    name: "Ongoing SEO",
+    price: SCOPED,
+    summary:
+      "Continuous technical and on-page work, reported against Search Console rather than against promises.",
+  },
+  {
+    name: "Automation Audit",
+    price: SCOPED,
+    summary:
+      "A look at what your team repeats every week and which of it is genuinely worth automating.",
+  },
+  {
+    name: "Workflow Automation",
+    price: SCOPED,
+    summary:
+      "Building the connections and workflows the audit identified — CRM, notifications, data syncing.",
   },
 ];
