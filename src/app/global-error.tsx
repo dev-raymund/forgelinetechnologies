@@ -61,14 +61,11 @@ export default function GlobalError({
             }}
           >
             The site failed to load. Trying again usually works. If it keeps
-            happening, email{" "}
-            <a
-              href="mailto:hello@forgelinetechnologies.com"
-              style={{ color: "#fff" }}
-            >
-              hello@forgelinetechnologies.com
-            </a>
-            .
+            happening, the contact form at{" "}
+            <a href="/contact" style={{ color: "#fff" }}>
+              /contact
+            </a>{" "}
+            reaches us another way.
           </p>
           <button
             type="button"

@@ -47,14 +47,19 @@ export const site = {
     "Forgeline Technologies builds websites, web applications, e-commerce platforms and custom software — scoped at a fixed price and built by the developer you brief.",
   url: origin,
   /**
-   * The address shown publicly. Environment-driven so it can move to a branded
-   * mailbox without a code change — set NEXT_PUBLIC_CONTACT_EMAIL to
-   * hello@forgelinetechnologies.com once that mailbox exists and is verified
-   * in Resend. The fallback is the address that actually receives mail today;
-   * advertising a mailbox that does not exist is worse than a personal one.
+   * The address shown publicly on the site, and nothing else.
+   *
+   * Deliberately separate from CONTACT_EMAIL, and deliberately with no
+   * fallback. CONTACT_EMAIL is where enquiry notifications are delivered — a
+   * personal mailbox is perfectly fine there because it is never displayed.
+   * This one is published, so it defaults to empty rather than to a personal
+   * address: the contact form is the route in, and an unset value simply
+   * means the site shows no mailbox at all.
+   *
+   * Set NEXT_PUBLIC_CONTACT_EMAIL only when there is an address you are happy
+   * for the public and every scraper to have.
    */
-  email:
-    process.env.NEXT_PUBLIC_CONTACT_EMAIL || "raymundhermoso.dev@gmail.com",
+  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "",
   social: {
     github: "https://github.com/dev-raymund",
     linkedin: "https://www.linkedin.com/in/raymund-hermoso-b00586207/",
@@ -84,7 +89,12 @@ export const stats = [
 ] as const;
 
 /** Markets with delivered work behind the "4 countries" figure. */
-export const markets = ["Australia", "New Zealand", "United States", "Philippines"] as const;
+export const markets = [
+  "Australia",
+  "New Zealand",
+  "United States",
+  "Philippines",
+] as const;
 
 /**
  * The same four in running prose. Two of them take a definite article, which
@@ -98,7 +108,8 @@ export const founder = {
   name: "Raymund Hermoso",
   role: "Founder & Lead Developer",
   photo: "/assets/raymund-hermoso-photo.png",
-  photoAlt: "Raymund Hermoso, founder and lead developer of Forgeline Technologies",
+  photoAlt:
+    "Raymund Hermoso, founder and lead developer of Forgeline Technologies",
 } as const;
 
 /**

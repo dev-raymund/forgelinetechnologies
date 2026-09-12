@@ -19,11 +19,16 @@ function isTransient(err: unknown): boolean {
   const cause = (err as { cause?: unknown }).cause;
   const source = (err as { sourceError?: unknown }).sourceError;
   return TRANSIENT.test(
-    [err.message, err.name, String(cause ?? ""), String(source ?? "")].join(" "),
+    [err.message, err.name, String(cause ?? ""), String(source ?? "")].join(
+      " ",
+    ),
   );
 }
 
-export async function withRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
+export async function withRetry<T>(
+  fn: () => Promise<T>,
+  attempts = 3,
+): Promise<T> {
   let last: unknown;
   for (let i = 0; i < attempts; i++) {
     try {
@@ -50,7 +55,9 @@ export async function getPublishedProjects(): Promise<Project[]> {
   );
 }
 
-export async function getProjectBySlug(slug: string): Promise<Project | undefined> {
+export async function getProjectBySlug(
+  slug: string,
+): Promise<Project | undefined> {
   const rows = await withRetry(() =>
     db
       .select()

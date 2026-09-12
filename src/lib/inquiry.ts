@@ -3,7 +3,11 @@
 import { headers } from "next/headers";
 import { db, inquiries } from "@/db";
 import { countRecentInquiriesByIp } from "@/lib/queries";
-import { inquirySchema, formatIssues, type FieldErrors } from "@/lib/validation";
+import {
+  inquirySchema,
+  formatIssues,
+  type FieldErrors,
+} from "@/lib/validation";
 import { sendInquiryNotification, sendInquiryConfirmation } from "@/lib/email";
 
 /**
@@ -126,7 +130,8 @@ export async function submitInquiry(
     console.error("[inquiry] database write failed", err);
     return {
       status: "error",
-      message: "Something went wrong saving your enquiry. Please email us directly.",
+      message:
+        "Something went wrong saving your enquiry. Please email us directly.",
     };
   }
 

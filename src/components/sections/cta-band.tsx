@@ -45,13 +45,15 @@ export function ClosingCta() {
                 >
                   Start a project
                 </ButtonLink>
-                <a
-                  href={`mailto:${site.email}`}
-                  className="inline-flex items-center justify-center gap-2 rounded-sm border border-rule-ink-strong px-5 py-3 text-[0.9375rem] font-medium text-on-ink transition-colors hover:border-white hover:bg-white/5"
-                >
-                  Email directly
-                  <Mail />
-                </a>
+                {site.email ? (
+                  <a
+                    href={`mailto:${site.email}`}
+                    className="inline-flex items-center justify-center gap-2 rounded-sm border border-rule-ink-strong px-5 py-3 text-[0.9375rem] font-medium text-on-ink transition-colors hover:border-white hover:bg-white/5"
+                  >
+                    Email directly
+                    <Mail />
+                  </a>
+                ) : null}
               </div>
             </div>
 

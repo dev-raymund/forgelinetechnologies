@@ -19,11 +19,44 @@ import type { InquiryData } from "@/lib/validation";
 export type SendResult = { ok: boolean; skipped?: boolean; error?: string };
 
 function config() {
+  const to = process.env.CONTACT_EMAIL ?? "";
   return {
     key: process.env.RESEND_API_KEY ?? "",
-    to: process.env.CONTACT_EMAIL ?? "",
+    /** Where enquiry notifications land. A personal mailbox is fine here — it
+     *  is never shown to anyone, it only receives. */
+    to,
+    /** The verified sending identity, e.g.
+     *  "Forgeline Technologies <notifications@forgelinetechnologies.com>".
+     *  The domain must be verified in Resend; the address behind it does not
+     *  need a mailbox, because nothing is ever delivered to it. */
     from: process.env.RESEND_FROM ?? "",
+    /** Where a visitor's reply to their own confirmation should go. Defaults
+     *  to CONTACT_EMAIL so replies are never lost. Set it explicitly once a
+     *  forwarded branded address exists, to keep a personal address off the
+     *  reply-to header a visitor can see. */
+    replyTo: process.env.REPLY_TO || to,
   };
+}
+
+/**
+ * Resend rejects a send from an unverified domain, and on the free tier it
+ * also refuses any recipient other than the account owner. Both are
+ * configuration faults rather than outages, so they are worth naming in the
+ * logs — a retry will never fix either, and the message Resend returns is not
+ * obvious about what to do next.
+ */
+function explain(message: string): string {
+  const m = message.toLowerCase();
+  if (
+    m.includes("domain") &&
+    (m.includes("verif") || m.includes("not found"))
+  ) {
+    return `${message} — the domain in RESEND_FROM is not verified in Resend. Add it under Domains, complete the DNS records, and wait for it to show as Verified.`;
+  }
+  if (m.includes("testing emails") || m.includes("own email address")) {
+    return `${message} — Resend is still in test mode for this account, so it will only deliver to the address that owns the Resend account. Verify a sending domain to lift this.`;
+  }
+  return message;
 }
 
 /** Everything interpolated below is attacker-controlled and lands in HTML. */
@@ -103,14 +136,18 @@ export async function sendInquiryNotification(
       subject: `New enquiry — ${data.name}${data.company ? ` (${data.company})` : ""}`,
       html: shell(
         "New project enquiry",
-        [data.projectType, data.budget, data.timeline].filter(Boolean).join(" · ") ||
-        "No category given",
+        [data.projectType, data.budget, data.timeline]
+          .filter(Boolean)
+          .join(" · ") || "No category given",
         details,
       ),
     });
-    return error ? { ok: false, error: error.message } : { ok: true };
+    return error ? { ok: false, error: explain(error.message) } : { ok: true };
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : "Send failed" };
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "Send failed",
+    };
   }
 }
 
@@ -121,8 +158,10 @@ export async function sendInquiryNotification(
  * only the API key: a confirmation is still worth sending even if the
  * studio inbox is not configured.
  */
-export async function sendInquiryConfirmation(data: InquiryData): Promise<SendResult> {
-  const { key, to, from } = config();
+export async function sendInquiryConfirmation(
+  data: InquiryData,
+): Promise<SendResult> {
+  const { key, from, replyTo } = config();
   if (!key || !from) {
     return { ok: false, skipped: true, error: "Email not configured" };
   }
@@ -135,16 +174,19 @@ export async function sendInquiryConfirmation(data: InquiryData): Promise<SendRe
     const { error } = await new Resend(key).emails.send({
       from,
       to: data.email,
-      ...(to ? { replyTo: to } : {}),
+      ...(replyTo ? { replyTo } : {}),
       subject: `We received your enquiry — ${site.name}`,
       html: shell(
         `Thanks, ${data.name.split(" ")[0]}`,
-        "We will be in touch within one business day.",
+        "Your project details are in. They go straight to the developer who would build it.",
         body,
       ),
     });
-    return error ? { ok: false, error: error.message } : { ok: true };
+    return error ? { ok: false, error: explain(error.message) } : { ok: true };
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : "Send failed" };
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "Send failed",
+    };
   }
 }

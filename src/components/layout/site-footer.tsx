@@ -28,12 +28,21 @@ export function SiteFooter() {
               developer you brief.
             </p>
             <p className="mt-6 text-[0.9375rem]">
-              <a
-                href={`mailto:${site.email}`}
-                className="break-words text-on-ink underline decoration-rule-ink-strong underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
-              >
-                {site.email}
-              </a>
+              {site.email ? (
+                <a
+                  href={`mailto:${site.email}`}
+                  className="break-words text-on-ink underline decoration-rule-ink-strong underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
+                >
+                  {site.email}
+                </a>
+              ) : (
+                <Link
+                  href="/contact"
+                  className="text-on-ink underline decoration-rule-ink-strong underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
+                >
+                  Start a project
+                </Link>
+              )}
             </p>
           </div>
 

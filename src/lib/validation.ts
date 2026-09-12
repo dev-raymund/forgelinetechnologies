@@ -32,25 +32,40 @@ export const TIMELINES = [
 const trimmed = z.string().trim();
 
 export const inquirySchema = z.object({
-  name: trimmed.min(2, "Please enter your name.").max(150, "That name is too long."),
+  name: trimmed
+    .min(2, "Please enter your name.")
+    .max(150, "That name is too long."),
   email: trimmed
     .max(255, "That email is too long.")
     .pipe(z.email("Enter a valid email address.")),
-  company: trimmed.max(200, "That company name is too long.").optional().default(""),
+  company: trimmed
+    .max(200, "That company name is too long.")
+    .optional()
+    .default(""),
   // Accepts a bare domain as well as a full URL — people type both.
   website: trimmed
     .max(300, "That URL is too long.")
-    .refine((v) => v === "" || /^([a-z][a-z0-9+.-]*:\/\/)?[^\s.]+\.[^\s]{2,}$/i.test(v), {
-      message: "Enter a valid website address.",
-    })
+    .refine(
+      (v) =>
+        v === "" || /^([a-z][a-z0-9+.-]*:\/\/)?[^\s.]+\.[^\s]{2,}$/i.test(v),
+      {
+        message: "Enter a valid website address.",
+      },
+    )
     .optional()
     .default(""),
   projectType: z
     .union([z.enum(PROJECT_TYPES), z.literal("")])
     .optional()
     .default(""),
-  budget: z.union([z.enum(BUDGETS), z.literal("")]).optional().default(""),
-  timeline: z.union([z.enum(TIMELINES), z.literal("")]).optional().default(""),
+  budget: z
+    .union([z.enum(BUDGETS), z.literal("")])
+    .optional()
+    .default(""),
+  timeline: z
+    .union([z.enum(TIMELINES), z.literal("")])
+    .optional()
+    .default(""),
   message: trimmed
     .min(20, "A sentence or two about the project, please.")
     .max(5000, "That message is too long."),

@@ -18,7 +18,7 @@ export function organizationSchema() {
     "@id": `${site.url}/#organization`,
     name: site.name,
     url: site.url,
-    email: site.email,
+    ...(site.email ? { email: site.email } : {}),
     description: site.description,
     founder: {
       "@type": "Person",

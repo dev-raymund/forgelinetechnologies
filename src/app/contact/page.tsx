@@ -94,17 +94,21 @@ export default function ContactPage() {
             </ol>
 
             <div className="mt-10">
-              <h3 className="text-[1.0625rem] font-semibold text-graphite">
-                Rather just email?
-              </h3>
-              <p className="mt-2 text-[0.9375rem] leading-relaxed text-muted">
-                <a
-                  href={`mailto:${site.email}`}
-                  className="break-words text-graphite underline decoration-rule-strong underline-offset-4 transition-colors hover:text-graphite hover:decoration-accent"
-                >
-                  {site.email}
-                </a>
-              </p>
+              {site.email ? (
+                <>
+                  <h3 className="text-[1.0625rem] font-semibold text-graphite">
+                    Rather just email?
+                  </h3>
+                  <p className="mt-2 text-[0.9375rem] leading-relaxed text-muted">
+                    <a
+                      href={`mailto:${site.email}`}
+                      className="break-words text-graphite underline decoration-rule-strong underline-offset-4 transition-colors hover:text-graphite hover:decoration-accent"
+                    >
+                      {site.email}
+                    </a>
+                  </p>
+                </>
+              ) : null}
               <p className="mt-5 text-[0.9375rem] leading-relaxed text-muted">
                 Working with businesses in {marketsSentence}.
               </p>
