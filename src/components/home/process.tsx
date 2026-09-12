@@ -1,5 +1,5 @@
 import { Section, SectionHeading } from "@/components/ui/section";
-import { processSteps } from "@/data/process";
+import { processSteps, METHOD_NAME } from "@/data/process";
 import { Reveal } from "@/components/ui/reveal";
 
 /**
@@ -18,8 +18,8 @@ export function Process() {
     <Section id="process" ground="white" size="lg" labelledBy="process-title">
       <SectionHeading
         id="process-title"
-        title="No black box"
-        dek="Four steps, and you know the price and the plan before any code is written. At every point you can see what is happening, what is being built, and what comes next."
+        title={METHOD_NAME}
+        dek="Four steps, and no black box. The first one is a diagnosis rather than a quote — because building the wrong thing correctly is the most expensive mistake in this industry."
       />
 
       <ol className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">

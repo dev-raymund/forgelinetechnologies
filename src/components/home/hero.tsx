@@ -1,7 +1,7 @@
 import { ButtonLink } from "@/components/ui/button";
 import { stats, marketsSentence } from "@/lib/site";
 import { HeroVisual } from "@/components/home/hero-visual";
-import { ArrowRight, Grid } from "@/components/ui/icon";
+import { ArrowRight, Search } from "@/components/ui/icon";
 import { Counter } from "@/components/ui/counter";
 
 /**
@@ -53,10 +53,10 @@ export function Hero() {
                 style={{ animationDelay: "340ms" }}
               >
                 <p className="text-dek text-on-ink-muted">
-                  A web engineering studio. You get a fixed scope, a fixed price
-                  and direct access to the person writing the code — from the
-                  first call to the day it goes live, and you own everything at
-                  the end of it.
+                  A web engineering studio. We build, improve, connect and
+                  automate the systems a business runs on — with a fixed scope,
+                  a fixed price, and direct access to the person writing the
+                  code.
                 </p>
               </div>
 
@@ -72,13 +72,16 @@ export function Hero() {
                 >
                   Start a project
                 </ButtonLink>
+                {/* Two entry points, deliberately. Half the market knows what it
+                  wants built; the other half knows something is wrong and
+                  cannot specify it. "Start a project" only serves the first. */}
                 <ButtonLink
-                  href="/work"
+                  href="/build-audit"
                   ground="ink"
                   variant="outline"
-                  icon={<Grid />}
+                  icon={<Search />}
                 >
-                  View our work
+                  Not sure yet? Book a Build Audit
                 </ButtonLink>
               </div>
             </div>

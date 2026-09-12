@@ -5,6 +5,7 @@ import { z } from "zod";
  * can never drift apart. Exported for the contact UI, which is a later phase.
  */
 export const PROJECT_TYPES = [
+  "Build Audit — not sure yet",
   "Website",
   "Web application",
   "E-commerce",

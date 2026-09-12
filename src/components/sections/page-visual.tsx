@@ -14,7 +14,13 @@
  * directly beside the drawing.
  */
 type Variant =
-  "work" | "services" | "pricing" | "process" | "about" | "contact";
+  | "audit"
+  | "work"
+  | "services"
+  | "pricing"
+  | "process"
+  | "about"
+  | "contact";
 
 const grid = (id: string) => (
   <defs>
@@ -51,6 +57,42 @@ export function PageVisual({ variant }: { variant: Variant }) {
 
 function render(v: Variant) {
   switch (v) {
+    /* A system under examination: the parts are inspected, three are marked. */
+    case "audit":
+      return (
+        <>
+          <rect
+            x="40" y="34" width="250" height="210" rx="6"
+            fill="none" stroke={line} strokeOpacity="0.22" strokeWidth="1"
+            className="hv-draw" pathLength={1} style={{ animationDelay: "150ms" }}
+          />
+          {[0, 1, 2, 3].map((i) => {
+            const flagged = i === 1 || i === 3;
+            return (
+              <g key={i} className="hv-in" style={{ animationDelay: `${440 + i * 90}ms` }}>
+                <rect
+                  x="60" y={58 + i * 48} width="210" height="32" rx="4"
+                  fill="none" stroke={flagged ? accent : line}
+                  strokeOpacity={flagged ? 0.85 : 0.16} strokeWidth="1"
+                />
+                <rect
+                  x="74" y={70 + i * 48} width={flagged ? 64 : 96} height="7" rx="3.5"
+                  fill={flagged ? accent : line} fillOpacity={flagged ? 0.85 : 0.18}
+                />
+              </g>
+            );
+          })}
+          {/* The lens. Drawn last, because the findings come before the report. */}
+          <g className="hv-in" style={{ animationDelay: "900ms" }}>
+            <circle
+              cx="300" cy="176" r="46"
+              fill="none" stroke={accent} strokeOpacity="0.55" strokeWidth="1.5"
+            />
+            <path d="M333 209 L368 244" stroke={accent} strokeOpacity="0.55" strokeWidth="1.5" />
+          </g>
+        </>
+      );
+
     /* Seventeen builds, shown as a contact sheet rather than one hero image. */
     case "work":
       return (

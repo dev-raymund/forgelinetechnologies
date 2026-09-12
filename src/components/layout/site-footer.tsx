@@ -77,8 +77,9 @@ export function SiteFooter() {
             <ul className="mt-4 flex flex-col gap-2.5">
               {[
                 { href: "/work", label: "Work" },
+                { href: "/build-audit", label: "Build Audit" },
                 { href: "/pricing", label: "Pricing" },
-                { href: "/process", label: "Process" },
+                { href: "/process", label: "How we work" },
                 { href: "/about", label: "About" },
                 { href: "/contact", label: "Contact" },
               ].map((l) => (

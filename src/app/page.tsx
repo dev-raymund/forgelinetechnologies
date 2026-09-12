@@ -7,6 +7,7 @@ import {
   jsonLd,
 } from "@/lib/structured-data";
 import { Hero } from "@/components/home/hero";
+import { Problem } from "@/components/home/problem";
 import { ServicesOverview } from "@/components/home/services-overview";
 import { FeaturedWork } from "@/components/home/featured-work";
 import { WhyForgeline } from "@/components/home/why-forgeline";
@@ -59,6 +60,7 @@ export default function HomePage() {
       />
 
       <Hero />
+      <Problem />
       <ServicesOverview />
       <WhyForgeline />
       <Promise />

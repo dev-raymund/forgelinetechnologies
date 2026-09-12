@@ -23,6 +23,18 @@ export type Service = {
   includes: string[];
   /** Project slugs that demonstrate this service. */
   evidence: string[];
+  /**
+   * Which of the four client needs this answers. The grouping is how a visitor
+   * navigates eight services without reading eight descriptions: most arrive
+   * knowing whether they need something built, improved, connected or
+   * automated, even when they cannot name the service.
+   */
+  group: "Build" | "Improve" | "Connect" | "Automate";
+  /**
+   * The situation in the client's words. Leads the entry, because a service
+   * name only means something to someone who has already diagnosed themselves.
+   */
+  problem: string;
   /** Key into the icon set — see components/ui/service-icon.tsx. */
   icon:
     | "window"
@@ -52,6 +64,9 @@ export const services: Service[] = [
     number: "01",
     title: "Websites & Digital Experiences",
     slug: "websites",
+    group: "Build",
+    problem:
+      "Your site looks dated, reads badly on a phone, or nobody can find it.",
     icon: "window",
     summary:
       "Marketing and corporate sites that load fast, get found, and your own team can keep current.",
@@ -72,6 +87,9 @@ export const services: Service[] = [
     number: "02",
     title: "Web Applications",
     slug: "web-applications",
+    group: "Build",
+    problem:
+      "A spreadsheet is doing a job it was never built to do.",
     icon: "dashboard",
     summary:
       "Portals, dashboards, booking systems and internal tools — for when a spreadsheet has stopped coping.",
@@ -92,6 +110,9 @@ export const services: Service[] = [
     number: "03",
     title: "E-commerce",
     slug: "ecommerce",
+    group: "Build",
+    problem:
+      "The store cannot do what you now need it to sell.",
     icon: "cart",
     summary:
       "Shopify, WooCommerce and custom storefronts — built to sell, and to still be maintainable next year.",
@@ -112,6 +133,9 @@ export const services: Service[] = [
     number: "04",
     title: "Custom Software",
     slug: "custom-software",
+    group: "Build",
+    problem:
+      "Nothing off the shelf fits the way the business actually runs.",
     icon: "code",
     summary:
       "Software shaped around how your business actually works, not how a template assumed it would.",
@@ -132,6 +156,9 @@ export const services: Service[] = [
     number: "05",
     title: "APIs & Integrations",
     slug: "apis-integrations",
+    group: "Connect",
+    problem:
+      "Two systems hold the same information and neither knows about the other.",
     icon: "plug",
     summary:
       "Connect your site or app to the systems you already use — payments, CRMs, databases and third-party services.",
@@ -152,6 +179,9 @@ export const services: Service[] = [
     number: "06",
     title: "SEO",
     slug: "seo",
+    group: "Improve",
+    problem:
+      "The site is fine to look at, but search engines cannot make sense of it.",
     icon: "search",
     summary:
       "Technical and on-page work that makes a site easier to find, and easier for search engines to read.",
@@ -200,6 +230,9 @@ export const services: Service[] = [
     number: "07",
     title: "Automation",
     slug: "automation",
+    group: "Automate",
+    problem:
+      "Someone repeats the same task every week, and it never needed a person.",
     icon: "workflow",
     summary:
       "Connect the systems you already use and take the repetitive work out of the week.",
@@ -245,6 +278,9 @@ export const services: Service[] = [
     number: "08",
     title: "Ongoing Development",
     slug: "ongoing-development",
+    group: "Improve",
+    problem:
+      "It launched, and then there was nobody left to keep improving it.",
     icon: "refresh",
     summary:
       "A developer on hand month to month for the features, fixes and maintenance that come after launch.",

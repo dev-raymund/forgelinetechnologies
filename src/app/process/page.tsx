@@ -4,11 +4,11 @@ import { PageHeader } from "@/components/sections/page-header";
 import { PageVisual } from "@/components/sections/page-visual";
 import { ClosingCta } from "@/components/sections/cta-band";
 import { Section, SectionHeading } from "@/components/ui/section";
-import { processSteps } from "@/data/process";
+import { processSteps, METHOD_NAME } from "@/data/process";
 import { ArrowRight } from "@/components/ui/icon";
 
 export const metadata: Metadata = {
-  title: "Process",
+  title: "How we work",
   description:
     "Four steps from first call to launch. Scope and price agreed before any code is written, weekly visible progress, and a clean handover you own outright.",
   alternates: { canonical: "/process" },
@@ -45,9 +45,9 @@ export default function ProcessPage() {
     <>
       <PageHeader
         visual={<PageVisual variant="process" />}
-        meta="Four steps"
-        title="No black box"
-        dek="Most projects go wrong quietly — the scope drifts, the budget moves, and nobody says anything until launch. This process exists to make that impossible to hide."
+        meta="How we work"
+        title={METHOD_NAME}
+        dek="Most projects go wrong quietly — the scope drifts, the budget moves, and nobody says anything until launch. Four steps, no black box, and a diagnosis before a quote."
       />
 
       <Section ground="paper" size="lg" labelledBy="steps-title">

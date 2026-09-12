@@ -19,7 +19,7 @@ export function Promise() {
       <SectionHeading
         id="promise-title"
         title="The Forgeline Promise"
-        dek="Five commitments, and every one of them is something we control. That is why none of them mentions rankings, traffic or revenue — those depend on your market. These depend on us."
+        dek="A method is only worth publishing if the people running it are held to something. These are the five commitments behind it — and every one is something we control, which is why none of them mentions rankings, traffic or revenue. Those depend on your market. These depend on us."
       />
 
       <ol className="flex flex-col">

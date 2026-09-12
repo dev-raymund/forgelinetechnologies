@@ -1,17 +1,23 @@
+import Link from "next/link";
 import { ButtonLink } from "@/components/ui/button";
+import { ArrowRight, Search, Mail } from "@/components/ui/icon";
 import { site } from "@/lib/site";
-import { ArrowRight, Mail } from "@/components/ui/icon";
 
 /**
- * Closing call to action.
+ * Closing call to action, with two doors.
  *
- * The previous site had one conversion path and it was at the very bottom of
- * a single long page. This one closes the argument rather than merely ending
- * the page: it says what the next step actually is, so nobody has to guess
- * what "get in touch" commits them to.
+ * The previous version offered one: "Start a project". That only serves people
+ * who have already decided what to build. A large share of enquiries come from
+ * the other half — someone knows the site is slow, or that the team is
+ * re-typing the same data every week, and cannot turn that into a brief.
+ * Asking them to "start a project" asks them to do the hardest part first.
  *
- * No response-time promise is printed here. None has been confirmed, and an
- * unmet one costs more trust than it buys.
+ * So: one path for people who know, one for people who do not. Both land in
+ * the same place; the difference is what the visitor has to have worked out
+ * before they feel allowed to click.
+ *
+ * No response-time promise. None has been confirmed, and an unmet one costs
+ * more than it buys.
  */
 export function ClosingCta() {
   return (
@@ -21,22 +27,27 @@ export function ClosingCta() {
     >
       <div className="shell">
         <div className="railed railed-inset py-24 md:py-32">
-          <div className="grid gap-10 md:grid-cols-12 md:gap-12">
-            <div className="md:col-span-7">
-              <h2
-                id="closing-title"
-                className="text-title max-w-[18ch] font-semibold text-white"
-              >
-                Tell us what you need built
-              </h2>
-              <p className="mt-6 max-w-[52ch] text-dek text-on-ink-muted">
-                Send the project details and they go straight to the developer
-                who would build it. No sales sequence and no qualification call
-                — the next conversation is about the actual project. If it is
-                not a fit, you will be told that instead.
-              </p>
+          <h2
+            id="closing-title"
+            className="text-title max-w-[20ch] font-semibold text-white"
+          >
+            Two ways to start
+          </h2>
 
-              <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="mt-12 grid gap-12 md:grid-cols-2 md:gap-10">
+            <div className="border-t-2 border-accent pt-6">
+              <p className="font-mono text-micro text-accent">
+                You know what you need
+              </p>
+              <h3 className="mt-3 text-subtitle font-semibold text-white">
+                Start a project
+              </h3>
+              <p className="mt-3 max-w-[44ch] text-[0.9375rem] leading-relaxed text-on-ink-muted">
+                Send the details and you get a reply from the developer who
+                would build it. If it is a fit, the next step is a call and a
+                fixed quote. If it is not, you will be told that instead.
+              </p>
+              <div className="mt-7">
                 <ButtonLink
                   href="/contact"
                   ground="ink"
@@ -45,38 +56,55 @@ export function ClosingCta() {
                 >
                   Start a project
                 </ButtonLink>
-                {site.email ? (
-                  <a
-                    href={`mailto:${site.email}`}
-                    className="inline-flex items-center justify-center gap-2 rounded-sm border border-rule-ink-strong px-5 py-3 text-[0.9375rem] font-medium text-on-ink transition-colors hover:border-white hover:bg-white/5"
-                  >
-                    Email directly
-                    <Mail />
-                  </a>
-                ) : null}
               </div>
             </div>
 
-            <dl className="grid gap-6 self-end sm:grid-cols-2 md:col-span-4 md:col-start-9">
-              <div className="border-t border-rule-ink pt-4">
-                <dt className="text-[0.9375rem] font-semibold text-white">
-                  Fixed price
-                </dt>
-                <dd className="mt-1.5 text-[0.875rem] leading-relaxed text-on-ink-muted">
-                  Agreed before work starts, and it does not move unless you
-                  change the scope.
-                </dd>
+            <div className="border-t border-rule-ink pt-6">
+              <p className="font-mono text-micro text-on-ink-muted">
+                You know something is wrong
+              </p>
+              <h3 className="mt-3 text-subtitle font-semibold text-white">
+                Book a Build Audit
+              </h3>
+              <p className="mt-3 max-w-[44ch] text-[0.9375rem] leading-relaxed text-on-ink-muted">
+                For when the problem is clear but the solution is not. We work
+                out what is actually wrong, what is worth keeping, and what to
+                do first — before anyone quotes you for a rebuild.
+              </p>
+              <div className="mt-7">
+                <ButtonLink
+                  href="/build-audit"
+                  ground="ink"
+                  variant="outline"
+                  icon={<Search />}
+                >
+                  How it works
+                </ButtonLink>
               </div>
-              <div className="border-t border-rule-ink pt-4">
-                <dt className="text-[0.9375rem] font-semibold text-white">
-                  You own it
-                </dt>
-                <dd className="mt-1.5 text-[0.875rem] leading-relaxed text-on-ink-muted">
-                  Code, accounts and documentation transfer to you on handover.
-                  No lock-in.
-                </dd>
-              </div>
-            </dl>
+            </div>
+          </div>
+
+          <div className="mt-14 flex flex-col gap-4 border-t border-rule-ink pt-7 sm:flex-row sm:items-center sm:justify-between">
+            <p className="max-w-[52ch] text-[0.9375rem] text-on-ink-muted">
+              Either way: a fixed price agreed before work starts, and you own
+              everything at the end of it.
+            </p>
+            {site.email ? (
+              <a
+                href={`mailto:${site.email}`}
+                className="inline-flex shrink-0 items-center gap-2 text-[0.9375rem] font-medium text-on-ink underline decoration-rule-ink-strong underline-offset-4 transition-colors hover:decoration-accent"
+              >
+                Email directly
+                <Mail />
+              </a>
+            ) : (
+              <Link
+                href="/pricing"
+                className="shrink-0 text-[0.9375rem] font-medium text-on-ink underline decoration-rule-ink-strong underline-offset-4 transition-colors hover:decoration-accent"
+              >
+                See what it costs
+              </Link>
+            )}
           </div>
         </div>
       </div>
