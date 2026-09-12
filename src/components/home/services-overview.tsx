@@ -69,12 +69,17 @@ export function ServicesOverview() {
                         </span>
 
                         <span className="md:col-span-5">
+                          {/* The situation leads, but the service name stays a
+                              real heading — regrouping these had quietly
+                              dropped all eight out of the heading outline,
+                              which costs screen-reader navigation and the
+                              weight those names carry on the page. */}
                           <span className="block max-w-[40ch] text-[1.0625rem] font-medium leading-snug text-graphite">
                             “{service.problem}”
                           </span>
-                          <span className="mt-2 block text-subtitle font-semibold text-graphite transition-colors group-hover:underline group-hover:decoration-accent group-hover:underline-offset-4">
+                          <h4 className="mt-2 text-subtitle font-semibold text-graphite transition-colors group-hover:underline group-hover:decoration-accent group-hover:underline-offset-4">
                             {service.title}
-                          </span>
+                          </h4>
                         </span>
 
                         <span className="block max-w-[58ch] text-[0.9375rem] leading-relaxed text-muted md:col-span-6">
