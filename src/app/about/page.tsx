@@ -6,6 +6,7 @@ import { PageVisual } from "@/components/sections/page-visual";
 import { ClosingCta } from "@/components/sections/cta-band";
 import { Section, SectionHeading } from "@/components/ui/section";
 import { Technology } from "@/components/home/technology";
+import { Team } from "@/components/sections/team";
 import { promises, promiseStatement } from "@/data/promise";
 import { site, founder, stats, marketsSentence } from "@/lib/site";
 import { projects } from "@/data/projects";
@@ -121,6 +122,8 @@ export default function AboutPage() {
           </div>
         </div>
       </Section>
+
+      <Team ground="white" />
 
       <Section ground="ink" size="md" labelledBy="experience-title">
         <SectionHeading
