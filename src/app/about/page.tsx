@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { PageHeader } from "@/components/sections/page-header";
 import { PageVisual } from "@/components/sections/page-visual";
 import { ClosingCta } from "@/components/sections/cta-band";
 import { Section, SectionHeading } from "@/components/ui/section";
 import { Technology } from "@/components/home/technology";
-import { Team } from "@/components/sections/team";
+import { People } from "@/components/sections/people";
 import { promises, promiseStatement } from "@/data/promise";
 import { site, founder, stats, marketsSentence } from "@/lib/site";
 import { projects } from "@/data/projects";
@@ -50,22 +49,54 @@ export default function AboutPage() {
 
       <Section ground="paper" size="lg" labelledBy="why-exists">
         <div className="grid gap-10 md:grid-cols-12 md:gap-12">
-          <div className="md:col-span-3">
-            <div className="relative aspect-[4/5] w-40 overflow-hidden border border-rule bg-white sm:w-48 md:w-full md:max-w-[15rem]">
-              <Image
-                src={founder.photo}
-                alt={founder.photoAlt}
-                fill
-                priority
-                sizes="(min-width: 768px) 15rem, 12rem"
-                className="object-cover"
-              />
+          <div className="md:col-span-4">
+            <h2
+              id="why-exists"
+              className="text-title max-w-[16ch] font-semibold text-graphite"
+            >
+              Why this studio exists
+            </h2>
+          </div>
+
+          <div className="md:col-span-7 md:col-start-6">
+            <div className="max-w-[64ch] space-y-5 text-dek leading-relaxed text-muted">
+              <p>
+                Over six years working with agencies and enterprise teams across
+                Australia and New Zealand, I kept watching the same projects
+                fail the same way. They ran over budget. They shipped something
+                that did not match what the business actually needed. Some never
+                launched at all. The ones that did were handed over badly enough
+                that nobody could maintain them afterwards.
+              </p>
+              <p>
+                Almost none of it was a technical problem. It was distance —
+                between the person who understood the requirement and the person
+                writing the code, with enough people in between that the brief
+                arrived unrecognisable.
+              </p>
+              <p>
+                Forgeline is the correction. Scope agreed before work starts. A
+                price you approve up front. Clean code, a clean handover, and a
+                product that actually goes live.
+              </p>
+              <p className="text-graphite">
+                That is also why the team stays small. Everyone on a project has
+                a name and a job you can point at — the moment it needs a layer
+                of management to run, the thing that makes it worth hiring is
+                gone.
+              </p>
             </div>
-            <p className="mt-4 text-[0.9375rem] font-semibold text-graphite">
+
+            {/* The story is written in the first person, so it needs an
+                author. The portrait that used to sit beside it is gone: he
+                appears in the row below with everyone else, and showing the
+                same face twice in one section made a three-person studio look
+                like a founder plus staff. */}
+            <p className="mt-7 text-[0.9375rem] font-semibold text-graphite">
               {founder.name}
             </p>
             <p className="font-mono text-micro text-faint">{founder.role}</p>
-            <ul className="mt-5 flex flex-col gap-1.5">
+            <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-1.5">
               <li>
                 <a
                   href={site.social.linkedin}
@@ -84,46 +115,10 @@ export default function AboutPage() {
               </li>
             </ul>
           </div>
-
-          <div className="md:col-span-8 md:col-start-5">
-            <h2
-              id="why-exists"
-              className="text-title max-w-[20ch] font-semibold text-graphite"
-            >
-              Why this studio exists
-            </h2>
-            <div className="mt-7 max-w-[64ch] space-y-5 text-dek leading-relaxed text-muted">
-              <p>
-                Over six years working with agencies and enterprise teams across
-                Australia and New Zealand, I kept watching the same projects
-                fail the same way. They ran over budget. They shipped something
-                that did not match what the business actually needed. Some never
-                launched at all. The ones that did were handed over badly enough
-                that nobody could maintain them afterwards.
-              </p>
-              <p>
-                Almost none of it was a technical problem. It was distance —
-                between the person who understood the requirement and the person
-                writing the code, with enough people in between that the brief
-                arrived unrecognisable.
-              </p>
-              <p>
-                Forgeline is the correction. Scope agreed before work starts. A
-                price you approve up front. The developer you brief is the
-                developer who builds it. Clean code, a clean handover, and a
-                product that actually goes live.
-              </p>
-              <p className="text-graphite">
-                That is also why the studio stays small. The moment it needs a
-                layer of management to run, the thing that makes it worth hiring
-                is gone.
-              </p>
-            </div>
-          </div>
         </div>
-      </Section>
 
-      <Team ground="white" />
+        <People />
+      </Section>
 
       <Section ground="ink" size="md" labelledBy="experience-title">
         <SectionHeading

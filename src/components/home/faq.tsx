@@ -15,7 +15,7 @@ import { faqs } from "@/data/faqs";
  */
 export function Faq() {
   return (
-    <Section id="faq" ground="white" size="lg" labelledBy="faq-title">
+    <Section id="faq" ground="paper" size="lg" labelledBy="faq-title">
       <SectionHeading
         id="faq-title"
         title="Questions worth asking"

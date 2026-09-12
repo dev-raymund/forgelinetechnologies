@@ -65,11 +65,20 @@ export function Founder() {
             </p>
           </div>
 
+          {/* One line, inside the section that already exists. The team does
+              not need a homepage section of its own; it needs to be findable
+              from the story that raises the question. */}
+          <p className="mt-7 max-w-[62ch] text-[0.9375rem] leading-relaxed text-muted">
+            Behind the build is a small team with clear responsibilities — a
+            project manager who handles the conversation, and a developer
+            building alongside me.
+          </p>
+
           <Link
             href="/about"
-            className="mt-8 inline-block text-[0.9375rem] font-medium text-graphite underline decoration-rule-strong underline-offset-[6px] transition-colors hover:text-graphite hover:decoration-accent"
+            className="mt-6 inline-block text-[0.9375rem] font-medium text-graphite underline decoration-rule-strong underline-offset-[6px] transition-colors hover:decoration-accent"
           >
-            More about the studio
+            Meet the people behind the build
           </Link>
         </div>
       </div>

@@ -15,7 +15,6 @@ import { Promise } from "@/components/home/promise";
 import { Technology } from "@/components/home/technology";
 import { Process } from "@/components/home/process";
 import { Founder } from "@/components/home/founder";
-import { Team } from "@/components/sections/team";
 import { Faq } from "@/components/home/faq";
 import { ClosingCta } from "@/components/sections/cta-band";
 
@@ -69,7 +68,6 @@ export default function HomePage() {
       <Process />
       <Technology ground="paper" />
       <Founder />
-      <Team compact />
       <Faq />
       <ClosingCta />
     </>

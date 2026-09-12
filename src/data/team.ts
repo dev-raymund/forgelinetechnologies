@@ -1,58 +1,64 @@
+import { founder } from "@/lib/site";
+
 /**
- * The people on a project.
+ * The three people on a project, in the order a client meets them.
  *
- * A careful piece of positioning. The entire site argues that fewer layers
- * between client and developer produce better work — so a client-facing role
- * has to be introduced as the thing that makes the conversation happen, not as
- * a layer standing in front of it. Romeo coordinates; he does not relay
- * technical decisions on someone else's behalf. That distinction is the whole
- * reason this section can exist without undermining the page above it.
+ * They live in one list rather than a founder plus a separate team, because
+ * the point being made is structural: you know who you talk to, who manages
+ * the work, and who builds it. Splitting that across two sections would say
+ * the opposite — that there is a leadership tier and then some staff.
  *
- * Nothing here is invented. Names and roles are exactly as supplied — no
- * years of experience, no previous employers, no technology lists, no
- * qualifications. Anything beyond a name and a role would be fiction.
+ * Nothing here is invented. Names and roles exactly as supplied; no years of
+ * experience, no employers, no qualifications, no technology lists. Raymund's
+ * name, role and photograph come from site.ts so there is one source for them
+ * and the structured data cannot drift from the page.
  */
 export type TeamMember = {
   name: string;
   role: string;
-  /** One line: what they do and what it means for the client. */
+  /** One line: what they are responsible for, in the client's terms. */
   summary: string;
-  /** Path under /public. Both sources are square; empty renders a framed
-   *  monogram instead of a broken image. */
   photo: string;
   photoAlt: string;
   /**
    * Optional crop zoom, applied from the top of the frame.
    *
-   * The two supplied photographs are framed very differently — one is a wider
-   * shot, the other head-and-shoulders — so at an identical crop one face
-   * renders roughly half the size of the other and they stop reading as the
-   * same set. This is ordinary photo cropping expressed as data, not a
-   * per-person hack, and it alters framing only. Nothing about either person
-   * is changed.
+   * The three photographs are framed very differently — a wider shot, a
+   * head-and-shoulders portrait, a half-length one — so at an identical crop
+   * the faces render at wildly different sizes and stop reading as one set.
+   * This adjusts framing only; nothing about any person is altered.
    *
-   * A number rather than a Tailwind class on purpose: Tailwind cannot generate
-   * a class from a runtime string, so `scale-[${zoom}]` would silently produce
-   * no CSS at all.
+   * A number rather than a Tailwind class deliberately: Tailwind cannot
+   * generate a class from a runtime string, so `scale-[${zoom}]` would
+   * silently produce no CSS at all.
    */
   zoom?: number;
 };
 
 export const team: TeamMember[] = [
   {
-    name: "Romeo D. Lobaton Jr.",
-    role: "Client & Project Communications",
+    name: founder.name,
+    role: founder.role,
     summary:
-      "The point of contact for project conversations — first enquiry, meetings, and the day-to-day communication while work is underway. He makes sure the conversation happens and stays clear; the technical answers still come from the person writing the code.",
+      "Started the studio and leads its technical direction. The reason it works the way it does is in the story above.",
+    photo: founder.photo,
+    photoAlt: `${founder.name} — ${founder.role}`,
+    zoom: 1.15,
+  },
+  {
+    name: "Romeo D. Lobaton Jr.",
+    role: "Project Manager",
+    summary:
+      "Your point of contact. Coordinates conversations, meetings and progress, and keeps requirements moving from a discussion into the build.",
     photo: "/assets/team/RomeoLobaton.webp",
-    photoAlt: "Romeo D. Lobaton Jr. — Client & Project Communications",
+    photoAlt: "Romeo D. Lobaton Jr. — Project Manager",
     zoom: 1.55,
   },
   {
     name: "Mark C. Balinario",
     role: "Web Developer",
     summary:
-      "Builds the web work — turning an agreed scope into something that runs in production, and keeping it maintainable once it is there.",
+      "Builds the web work — implementing the agreed requirements, and maintaining what ships once it is live.",
     photo: "/assets/team/MarkBalinario.webp",
     photoAlt: "Mark C. Balinario — Web Developer",
   },
