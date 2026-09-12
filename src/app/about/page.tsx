@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { PageHeader } from "@/components/sections/page-header";
+import { PageVisual } from "@/components/sections/page-visual";
 import { ClosingCta } from "@/components/sections/cta-band";
 import { Section, SectionHeading } from "@/components/ui/section";
 import { PartnerGrid } from "@/components/ui/partner-grid";
@@ -40,6 +41,7 @@ export default function AboutPage() {
   return (
     <>
       <PageHeader
+        visual={<PageVisual variant="about" />}
         meta="About the studio"
         title="A web engineering studio, deliberately small"
         dek="Forgeline builds websites, web applications, e-commerce and custom software for businesses that need the result to work — and keeps the distance between the brief and the build as short as it can be."

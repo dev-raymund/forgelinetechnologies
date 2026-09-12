@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/sections/page-header";
+import { PageVisual } from "@/components/sections/page-visual";
 import { ClosingCta } from "@/components/sections/cta-band";
 import { ProjectCard } from "@/components/work/project-card";
 import { Section, SectionHeading } from "@/components/ui/section";
@@ -86,12 +87,16 @@ export default async function ServicePage({
       />
 
       <PageHeader
+        visual={<PageVisual variant="services" />}
         trail={trail}
         meta={`Service ${service.number}`}
         title={service.title}
         dek={service.description}
       >
-        <ServiceIcon icon={service.icon} className="mt-8 size-9 text-accent" />
+        <ServiceIcon
+          icon={service.icon}
+          className="hv-in mt-8 size-9 text-accent"
+        />
       </PageHeader>
 
       <Section ground="paper" size="lg" labelledBy="includes-title">

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/sections/page-header";
+import { PageVisual } from "@/components/sections/page-visual";
 import { ClosingCta } from "@/components/sections/cta-band";
 import { ProjectCard } from "@/components/work/project-card";
 import { Section } from "@/components/ui/section";
@@ -87,6 +88,7 @@ export default async function ProjectPage({
       />
 
       <PageHeader
+        visual={<PageVisual variant="work" />}
         trail={trail}
         meta={`${project.kind} / ${project.sector}`}
         title={project.title}

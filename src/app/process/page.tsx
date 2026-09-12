@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/sections/page-header";
+import { PageVisual } from "@/components/sections/page-visual";
 import { ClosingCta } from "@/components/sections/cta-band";
 import { Section, SectionHeading } from "@/components/ui/section";
 import { processSteps } from "@/data/process";
@@ -43,6 +44,7 @@ export default function ProcessPage() {
   return (
     <>
       <PageHeader
+        visual={<PageVisual variant="process" />}
         meta="Four steps"
         title="No black box"
         dek="Most projects go wrong quietly — the scope drifts, the budget moves, and nobody says anything until launch. This process exists to make that impossible to hide."

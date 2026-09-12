@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/sections/page-header";
+import { PageVisual } from "@/components/sections/page-visual";
 import { ClosingCta } from "@/components/sections/cta-band";
 import { Section, SectionHeading } from "@/components/ui/section";
 import { packages, addOns, SCOPED } from "@/data/pricing";
@@ -29,6 +30,7 @@ export default function PricingPage() {
   return (
     <>
       <PageHeader
+        visual={<PageVisual variant="pricing" />}
         meta="Fixed scope, fixed price"
         title="What it costs, before you call"
         dek="Every engagement starts with a free scoping call and a fixed quote. These are the starting figures those quotes are built from — published, so you can decide whether a conversation is worth your time."

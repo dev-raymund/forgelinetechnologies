@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/sections/page-header";
+import { PageVisual } from "@/components/sections/page-visual";
 import { ClosingCta } from "@/components/sections/cta-band";
 import { Section } from "@/components/ui/section";
 import { services } from "@/data/services";
@@ -25,6 +26,7 @@ export default function ServicesPage() {
   return (
     <>
       <PageHeader
+        visual={<PageVisual variant="services" />}
         meta={`${services.length} services`}
         title="What we build, and what you get"
         dek="Six services, each one something a business commissions on its own rather than a bullet inside a bigger package. Every one of them has shipped work behind it."

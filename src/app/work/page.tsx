@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/sections/page-header";
+import { PageVisual } from "@/components/sections/page-visual";
 import { ClosingCta } from "@/components/sections/cta-band";
 import { ProjectCard } from "@/components/work/project-card";
 import { Section } from "@/components/ui/section";
@@ -37,6 +38,7 @@ export default async function WorkPage({
   return (
     <>
       <PageHeader
+        visual={<PageVisual variant="work" />}
         meta={`${projects.length} projects`}
         title="Work we have shipped"
         dek={`Live, verifiable builds for businesses in ${marketsSentence}. Every one of these is running in production — the links go to the real sites, not to screenshots.`}

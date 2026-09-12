@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/sections/page-header";
+import { PageVisual } from "@/components/sections/page-visual";
 import { Section } from "@/components/ui/section";
 import { ContactForm } from "@/components/forms/contact-form";
 import { site, marketsSentence } from "@/lib/site";
@@ -49,6 +50,7 @@ export default function ContactPage() {
   return (
     <>
       <PageHeader
+        visual={<PageVisual variant="contact" />}
         meta="Start a project"
         title="Tell us what you need built"
         dek="The more you can say about what the project has to do, the more useful the first reply will be. If you are still working that out, say so — scoping it is part of the job."

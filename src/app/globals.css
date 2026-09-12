@@ -424,6 +424,13 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+    /* Delays matter as much as durations here. The hero schematics stagger
+       their pieces up to ~1.2s, and collapsing only the duration left an
+       element with a 1s delay invisible for a full second — to a visitor who
+       asked for no motion, that reads as missing content rather than as
+       restraint. */
+    animation-delay: 0s !important;
+    transition-delay: 0s !important;
   }
 
   /* Collapsing the duration alone would leave the zoom and the lift snapping
