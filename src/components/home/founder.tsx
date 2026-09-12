@@ -1,15 +1,15 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Section } from "@/components/ui/section";
+import { People } from "@/components/sections/people";
 import { founder } from "@/lib/site";
 
 /**
- * Founder.
+ * Why the studio exists, and who is behind it.
  *
- * Editorial introduction, not a profile page. The portrait is held to a
- * narrow column: the brief is explicit that the story matters more than the
- * picture, and a large founder photograph on a homepage reads as vanity
- * rather than credibility.
+ * Editorial introduction, not a profile page. The large founder portrait that
+ * used to sit beside this story is gone: the same face appeared again in the
+ * row below, and a three-person studio showing one person big and two small
+ * reads as a founder plus staff rather than a team.
  *
  * Written in the first person because it is one person's account of why the
  * studio exists. Every claim here is one the previous site already made.
@@ -18,31 +18,17 @@ export function Founder() {
   return (
     <Section ground="white" size="lg" labelledBy="founder-title">
       <div className="grid gap-10 md:grid-cols-12 md:gap-12">
-        <div className="md:col-span-3">
-          <div className="relative aspect-[4/5] w-40 overflow-hidden border border-rule bg-paper sm:w-48 md:w-full md:max-w-[15rem]">
-            <Image
-              src={founder.photo}
-              alt={founder.photoAlt}
-              fill
-              sizes="(min-width: 768px) 15rem, 12rem"
-              className="object-cover"
-            />
-          </div>
-          <p className="mt-4 text-[0.9375rem] font-semibold text-graphite">
-            {founder.name}
-          </p>
-          <p className="font-mono text-micro text-faint">{founder.role}</p>
-        </div>
-
-        <div className="md:col-span-8 md:col-start-5">
+        <div className="md:col-span-4">
           <h2
             id="founder-title"
-            className="text-title max-w-[20ch] font-semibold text-graphite"
+            className="text-title max-w-[16ch] font-semibold text-graphite"
           >
             Why this studio exists
           </h2>
+        </div>
 
-          <div className="mt-7 max-w-[62ch] space-y-5 text-dek leading-relaxed text-muted">
+        <div className="md:col-span-7 md:col-start-6">
+          <div className="max-w-[62ch] space-y-5 text-dek leading-relaxed text-muted">
             <p>
               Over six years working with agencies and enterprise teams across
               Australia and New Zealand, I kept watching the same projects fail
@@ -65,23 +51,25 @@ export function Founder() {
             </p>
           </div>
 
-          {/* One line, inside the section that already exists. The team does
-              not need a homepage section of its own; it needs to be findable
-              from the story that raises the question. */}
-          <p className="mt-7 max-w-[62ch] text-[0.9375rem] leading-relaxed text-muted">
-            Behind the build is a small team with clear responsibilities — a
-            project manager who handles the conversation, and a developer
-            building alongside me.
+          {/* The story is first person, so it needs an author. */}
+          <p className="mt-7 text-[0.9375rem] font-semibold text-graphite">
+            {founder.name}
           </p>
-
-          <Link
-            href="/about"
-            className="mt-6 inline-block text-[0.9375rem] font-medium text-graphite underline decoration-rule-strong underline-offset-[6px] transition-colors hover:decoration-accent"
-          >
-            Meet the people behind the build
-          </Link>
+          <p className="font-mono text-micro text-faint">{founder.role}</p>
         </div>
       </div>
+
+      {/* The same three people as About, at homepage density — faces, names
+          and jobs. What each of them actually does is the thing About adds,
+          which is what the link below is for. */}
+      <People compact />
+
+      <Link
+        href="/about"
+        className="mt-9 inline-block text-[0.9375rem] font-medium text-graphite underline decoration-rule-strong underline-offset-[6px] transition-colors hover:decoration-accent"
+      >
+        More about the studio
+      </Link>
     </Section>
   );
 }
