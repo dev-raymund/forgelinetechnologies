@@ -121,7 +121,7 @@ export default function ProcessPage() {
           <div className="md:col-span-4 md:col-start-9">
             <Link
               href="/pricing"
-              className="inline-flex items-center justify-center rounded-sm bg-accent px-5 py-3 text-[0.9375rem] font-medium text-ink transition-colors hover:bg-accent/85"
+              className="inline-flex items-center justify-center rounded-sm bg-accent-deep px-5 py-3 text-[0.9375rem] font-medium text-white transition-colors hover:bg-accent-deeper"
             >
               See what it costs
             </Link>

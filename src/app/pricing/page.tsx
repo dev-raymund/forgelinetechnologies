@@ -109,7 +109,7 @@ export default function PricingPage() {
                   href="/contact"
                   className={`inline-flex items-center justify-center rounded-sm px-5 py-3 text-[0.9375rem] font-medium transition-colors ${
                     pkg.highlight
-                      ? "bg-white text-ink hover:bg-accent"
+                      ? "bg-white text-ink hover:bg-accent-deep hover:text-white"
                       : "border border-rule-strong text-graphite hover:border-graphite hover:bg-paper"
                   }`}
                 >

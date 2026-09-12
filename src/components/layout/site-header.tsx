@@ -91,7 +91,7 @@ export function SiteHeader() {
           <div className="hidden lg:block">
             <Link
               href="/contact"
-              className="rounded-sm bg-accent px-4 py-2.5 text-[0.9375rem] font-medium text-ink transition-colors hover:bg-accent/85"
+              className="rounded-sm bg-accent-deep px-4 py-2.5 text-[0.9375rem] font-medium text-white transition-colors hover:bg-accent-deeper"
             >
               Start a project
             </Link>
@@ -146,7 +146,7 @@ export function SiteHeader() {
           </ul>
           <Link
             href="/contact"
-            className="mt-6 block rounded-sm bg-accent px-4 py-3.5 text-center font-medium text-ink"
+            className="mt-6 block rounded-sm bg-accent-deep px-4 py-3.5 text-center font-medium text-white"
           >
             Start a project
           </Link>

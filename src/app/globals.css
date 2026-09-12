@@ -45,8 +45,16 @@
   --color-on-ink: #e7ecf4;
   --color-on-ink-muted: #9aabc4;
 
-  /* The one accent. */
+  /* The accent, and two deeper shades of the same hue used only where it has
+     to sit behind white text.
+
+     The logo orange cannot do that job: white on #f97316 is 2.80:1, well under
+     AA. #c2410c takes white to 5.19:1 and the hover shade to 7.30:1. They are
+     button fills only — the crossbar, the rail markers, the process rules and
+     everything else stay the exact logo colour. */
   --color-accent: #f97316;
+  --color-accent-deep: #c2410c;
+  --color-accent-deeper: #9a3412;
 
   /* Hairlines. --color-rule is the logo tile's own stroke colour. */
   --color-rule: #d7dce5;

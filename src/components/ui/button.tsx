@@ -19,12 +19,12 @@ const base =
 
 const styles: Record<Ground, Record<Variant, string>> = {
   paper: {
-    solid: "bg-accent text-ink hover:bg-accent/85",
+    solid: "bg-accent-deep text-white hover:bg-accent-deeper",
     outline:
       "border border-rule-strong text-graphite hover:border-graphite hover:bg-white",
   },
   ink: {
-    solid: "bg-white text-ink hover:bg-accent",
+    solid: "bg-white text-ink hover:bg-accent-deep hover:text-white",
     outline:
       "border border-rule-ink-strong text-on-ink hover:border-white hover:bg-white/5",
   },
