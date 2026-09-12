@@ -10,6 +10,7 @@ import { getProject } from "@/data/projects";
 import { processSteps } from "@/data/process";
 import { site } from "@/lib/site";
 import { jsonLd } from "@/lib/structured-data";
+import { ServiceIcon } from "@/components/ui/service-icon";
 
 export function generateStaticParams() {
   return services.map((s) => ({ slug: s.slug }));
@@ -74,7 +75,9 @@ export default async function ServicePage({
         meta={`Service ${service.number}`}
         title={service.title}
         dek={service.description}
-      />
+      >
+        <ServiceIcon icon={service.icon} className="mt-8 size-9 text-accent" />
+      </PageHeader>
 
       <Section ground="paper" size="lg" labelledBy="includes-title">
         <div className="grid gap-10 md:grid-cols-12 md:gap-12">

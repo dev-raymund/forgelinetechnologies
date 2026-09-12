@@ -58,8 +58,8 @@ export function Founder() {
               arrived unrecognisable.
             </p>
             <p className="text-graphite">
-              Forgeline is the correction. Scope agreed before work starts.
-              A price you approve up front. The developer you brief is the
+              Forgeline is the correction. Scope agreed before work starts. A
+              price you approve up front. The developer you brief is the
               developer who builds it. Clean code, a clean handover, and a
               product that actually goes live.
             </p>

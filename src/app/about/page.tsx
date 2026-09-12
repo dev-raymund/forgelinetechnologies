@@ -7,6 +7,7 @@ import { Section, SectionHeading } from "@/components/ui/section";
 import { Technology } from "@/components/home/technology";
 import { site, founder, partner, stats, marketsSentence } from "@/lib/site";
 import { projects } from "@/data/projects";
+import { Counter } from "@/components/ui/counter";
 
 export const metadata: Metadata = {
   title: "About",
@@ -138,7 +139,7 @@ export default function AboutPage() {
               <dt className="sr-only">{stat.label}</dt>
               <dd>
                 <span className="block font-mono text-[1.75rem] font-medium tracking-tight text-white">
-                  {stat.value}
+                  <Counter value={stat.value} />
                 </span>
                 <span className="mt-1.5 block text-[0.8125rem] text-on-ink-muted">
                   {stat.label}

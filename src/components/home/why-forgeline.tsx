@@ -1,4 +1,5 @@
 import { Section, SectionHeading } from "@/components/ui/section";
+import { Reveal } from "@/components/ui/reveal";
 
 /**
  * Why Forgeline.
@@ -61,7 +62,10 @@ function Chain({
       </p>
       <ol className="mt-5">
         {steps.map((step, i) => (
-          <li key={step} className="relative flex items-center gap-4 pb-7 last:pb-0">
+          <li
+            key={step}
+            className="relative flex items-center gap-4 pb-7 last:pb-0"
+          >
             {/* Connector. Drawn on every item but the last, so the chain reads
                 as continuous rather than as separate dots. */}
             {i < steps.length - 1 ? (
@@ -102,21 +106,25 @@ export function WhyForgeline() {
       />
 
       <div className="grid gap-12 md:grid-cols-12 md:gap-8">
-        <div className="grid grid-cols-2 gap-8 md:col-span-5">
-          <Chain label="A typical agency" steps={typicalChain} emphasis={false} />
+        <Reveal className="grid grid-cols-2 gap-8 md:col-span-5">
+          <Chain
+            label="A typical agency"
+            steps={typicalChain}
+            emphasis={false}
+          />
           <Chain label="Forgeline" steps={forgelineChain} emphasis />
-        </div>
+        </Reveal>
 
         <dl className="grid gap-x-8 gap-y-9 sm:grid-cols-2 md:col-span-6 md:col-start-7">
-          {consequences.map((item) => (
-            <div key={item.title}>
+          {consequences.map((item, i) => (
+            <Reveal key={item.title} delay={i * 60}>
               <dt className="text-[1.0625rem] font-semibold text-white">
                 {item.title}
               </dt>
               <dd className="mt-2 max-w-[44ch] text-[0.9375rem] leading-relaxed text-on-ink-muted">
                 {item.body}
               </dd>
-            </div>
+            </Reveal>
           ))}
         </dl>
       </div>

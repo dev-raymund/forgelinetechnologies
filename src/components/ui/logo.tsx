@@ -47,6 +47,7 @@ export function Logo({ className = "" }: { className?: string }) {
           height="4.6"
           rx="0.6"
           fill="var(--color-accent)"
+          className="logo-bar"
         />
       </g>
       <text

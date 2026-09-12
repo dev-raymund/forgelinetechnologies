@@ -6,6 +6,7 @@ import { ProjectCard } from "@/components/work/project-card";
 import { Section } from "@/components/ui/section";
 import { projects, projectKinds, type ProjectKind } from "@/data/projects";
 import { marketsSentence } from "@/lib/site";
+import { Reveal } from "@/components/ui/reveal";
 
 export const metadata: Metadata = {
   title: "Work",
@@ -29,7 +30,8 @@ export default async function WorkPage({
   searchParams: Promise<{ kind?: string }>;
 }) {
   const { kind } = await searchParams;
-  const active = projectKinds.find((k) => k === kind) as ProjectKind | undefined;
+  const active = projectKinds.find((k) => k === kind) as
+    ProjectKind | undefined;
   const shown = active ? projects.filter((p) => p.kind === active) : projects;
 
   return (
@@ -85,7 +87,9 @@ export default async function WorkPage({
         <ul className="grid gap-x-8 gap-y-12 md:grid-cols-2 lg:grid-cols-3 lg:gap-y-14">
           {shown.map((project, i) => (
             <li key={project.slug}>
-              <ProjectCard project={project} priority={i < 3} />
+              <Reveal delay={(i % 3) * 60}>
+                <ProjectCard project={project} priority={i < 3} />
+              </Reveal>
             </li>
           ))}
         </ul>

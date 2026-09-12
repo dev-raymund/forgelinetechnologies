@@ -71,6 +71,15 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${archivo.variable} ${jetbrains.variable}`}>
       <body className="min-h-dvh antialiased">
+        {/* Marks that scripts are running, so CSS can hide reveal targets
+            before their entrance. Without JS the class never lands and every
+            section renders visible. Inline and first in the body so it
+            executes during parse rather than after first paint. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "document.documentElement.classList.add('js')",
+          }}
+        />
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-sm focus:bg-ink focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white"

@@ -16,66 +16,64 @@ export const contentType = "image/png";
  */
 export default function Image() {
   return new ImageResponse(
-    (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          background: "#0d2350",
-          padding: "72px 80px",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <svg width="56" height="56" viewBox="0 0 40 40">
-            <path
-              fillRule="evenodd"
-              fill="#ffffff"
-              d="M10.5 0 H29.5 A10.5 10.5 0 0 1 40 10.5 V29.5 A10.5 10.5 0 0 1 29.5 40 H10.5 A10.5 10.5 0 0 1 0 29.5 V10.5 A10.5 10.5 0 0 1 10.5 0 Z
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        background: "#0d2350",
+        padding: "72px 80px",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+        <svg width="56" height="56" viewBox="0 0 40 40">
+          <path
+            fillRule="evenodd"
+            fill="#ffffff"
+            d="M10.5 0 H29.5 A10.5 10.5 0 0 1 40 10.5 V29.5 A10.5 10.5 0 0 1 29.5 40 H10.5 A10.5 10.5 0 0 1 0 29.5 V10.5 A10.5 10.5 0 0 1 10.5 0 Z
                  M12.5 10.5 H28.5 V15.5 H18 V29.5 H12.5 Z
                  M18 18.2 H26.4 V22.8 H18 Z"
-            />
-          </svg>
-          <span style={{ color: "#ffffff", fontSize: 34, fontWeight: 600 }}>
-            Forgeline
-          </span>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <span
-            style={{
-              color: "#ffffff",
-              fontSize: 66,
-              fontWeight: 700,
-              lineHeight: 1.05,
-              letterSpacing: "-0.03em",
-              maxWidth: 960,
-            }}
-          >
-            Websites, web applications and custom software.
-          </span>
-          <span
-            style={{
-              color: "#9aabc4",
-              fontSize: 34,
-              marginTop: 20,
-              letterSpacing: "-0.01em",
-            }}
-          >
-            Built by the developer you brief.
-          </span>
-        </div>
-
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <div style={{ width: 64, height: 3, background: "#f97316" }} />
-          <span style={{ color: "#9aabc4", fontSize: 24 }}>
-            forgelinetechnologies.com
-          </span>
-        </div>
+          />
+        </svg>
+        <span style={{ color: "#ffffff", fontSize: 34, fontWeight: 600 }}>
+          Forgeline
+        </span>
       </div>
-    ),
+
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <span
+          style={{
+            color: "#ffffff",
+            fontSize: 66,
+            fontWeight: 700,
+            lineHeight: 1.05,
+            letterSpacing: "-0.03em",
+            maxWidth: 960,
+          }}
+        >
+          Websites, web applications and custom software.
+        </span>
+        <span
+          style={{
+            color: "#9aabc4",
+            fontSize: 34,
+            marginTop: 20,
+            letterSpacing: "-0.01em",
+          }}
+        >
+          Built by the developer you brief.
+        </span>
+      </div>
+
+      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        <div style={{ width: 64, height: 3, background: "#f97316" }} />
+        <span style={{ color: "#9aabc4", fontSize: 24 }}>
+          forgelinetechnologies.com
+        </span>
+      </div>
+    </div>,
     size,
   );
 }

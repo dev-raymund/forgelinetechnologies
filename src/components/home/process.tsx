@@ -1,5 +1,6 @@
 import { Section, SectionHeading } from "@/components/ui/section";
 import { processSteps } from "@/data/process";
+import { Reveal } from "@/components/ui/reveal";
 
 /**
  * Process.
@@ -22,20 +23,22 @@ export function Process() {
       />
 
       <ol className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
-        {processSteps.map((step) => (
+        {processSteps.map((step, i) => (
           <li key={step.number} className="border-t-2 border-accent pt-5">
-            <span className="font-mono text-micro text-graphite">
-              {step.number}
-            </span>
-            <h3 className="mt-3 text-subtitle font-semibold text-graphite">
-              {step.title}
-            </h3>
-            <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted">
-              {step.summary}
-            </p>
-            <p className="mt-4 border-t border-rule pt-3 text-[0.875rem] leading-relaxed text-graphite">
-              {step.outcome}
-            </p>
+            <Reveal delay={i * 70}>
+              <span className="font-mono text-micro text-graphite">
+                {step.number}
+              </span>
+              <h3 className="mt-3 text-subtitle font-semibold text-graphite">
+                {step.title}
+              </h3>
+              <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted">
+                {step.summary}
+              </p>
+              <p className="mt-4 border-t border-rule pt-3 text-[0.875rem] leading-relaxed text-graphite">
+                {step.outcome}
+              </p>
+            </Reveal>
           </li>
         ))}
       </ol>

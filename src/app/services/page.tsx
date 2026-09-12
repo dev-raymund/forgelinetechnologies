@@ -5,6 +5,7 @@ import { ClosingCta } from "@/components/sections/cta-band";
 import { Section } from "@/components/ui/section";
 import { services } from "@/data/services";
 import { getProject } from "@/data/projects";
+import { ServiceIcon } from "@/components/ui/service-icon";
 
 export const metadata: Metadata = {
   title: "Services",
@@ -46,8 +47,14 @@ export default function ServicesPage() {
                 className="grid gap-8 border-t border-graphite/80 pt-8 md:grid-cols-12 md:gap-10"
               >
                 <div className="md:col-span-5">
-                  <span className="font-mono text-micro text-faint">
-                    {service.number}
+                  <span className="flex items-center gap-3">
+                    <ServiceIcon
+                      icon={service.icon}
+                      className="size-5 text-accent"
+                    />
+                    <span className="font-mono text-micro text-faint">
+                      {service.number}
+                    </span>
                   </span>
                   <h3 className="mt-3 text-subtitle font-semibold text-graphite">
                     <Link

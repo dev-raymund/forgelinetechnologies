@@ -1,5 +1,6 @@
 import { Section, SectionHeading } from "@/components/ui/section";
 import { techGroups } from "@/data/technologies";
+import { Reveal } from "@/components/ui/reveal";
 
 /**
  * Technology.
@@ -28,26 +29,28 @@ export function Technology({
       />
 
       <dl className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-        {techGroups.map((group) => (
+        {techGroups.map((group, i) => (
           <div key={group.title} className="border-t border-rule pt-5">
-            <dt className="text-[1.0625rem] font-semibold text-graphite">
-              {group.title}
-            </dt>
-            <dd>
-              <p className="mt-1.5 max-w-[36ch] text-[0.875rem] leading-relaxed text-muted">
-                {group.note}
-              </p>
-              <ul className="mt-4 flex flex-wrap gap-x-3 gap-y-2">
-                {group.items.map((item) => (
-                  <li
-                    key={item.name}
-                    className="font-mono text-[0.75rem] text-faint"
-                  >
-                    {item.name}
-                  </li>
-                ))}
-              </ul>
-            </dd>
+            <Reveal delay={i * 55}>
+              <dt className="text-[1.0625rem] font-semibold text-graphite">
+                {group.title}
+              </dt>
+              <dd>
+                <p className="mt-1.5 max-w-[36ch] text-[0.875rem] leading-relaxed text-muted">
+                  {group.note}
+                </p>
+                <ul className="mt-4 flex flex-wrap gap-x-3 gap-y-2">
+                  {group.items.map((item) => (
+                    <li
+                      key={item.name}
+                      className="font-mono text-[0.75rem] text-faint"
+                    >
+                      {item.name}
+                    </li>
+                  ))}
+                </ul>
+              </dd>
+            </Reveal>
           </div>
         ))}
       </dl>

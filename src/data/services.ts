@@ -23,6 +23,8 @@ export type Service = {
   includes: string[];
   /** Project slugs that demonstrate this service. */
   evidence: string[];
+  /** Key into the icon set — see components/ui/service-icon.tsx. */
+  icon: "window" | "dashboard" | "cart" | "code" | "plug" | "refresh";
 };
 
 export const services: Service[] = [
@@ -30,6 +32,7 @@ export const services: Service[] = [
     number: "01",
     title: "Websites & Digital Experiences",
     slug: "websites",
+    icon: "window",
     summary:
       "Marketing and corporate sites that load fast, get found, and your own team can keep current.",
     description:
@@ -48,6 +51,7 @@ export const services: Service[] = [
     number: "02",
     title: "Web Applications",
     slug: "web-applications",
+    icon: "dashboard",
     summary:
       "Portals, dashboards, booking systems and internal tools — for when a spreadsheet has stopped coping.",
     description:
@@ -66,6 +70,7 @@ export const services: Service[] = [
     number: "03",
     title: "E-commerce",
     slug: "ecommerce",
+    icon: "cart",
     summary:
       "Shopify, WooCommerce and custom storefronts — built to sell, and to still be maintainable next year.",
     description:
@@ -84,6 +89,7 @@ export const services: Service[] = [
     number: "04",
     title: "Custom Software",
     slug: "custom-software",
+    icon: "code",
     summary:
       "Software shaped around how your business actually works, not how a template assumed it would.",
     description:
@@ -102,6 +108,7 @@ export const services: Service[] = [
     number: "05",
     title: "APIs & Integrations",
     slug: "apis-integrations",
+    icon: "plug",
     summary:
       "Connect your site or app to the systems you already use — payments, CRMs, databases and third-party services.",
     description:
@@ -120,6 +127,7 @@ export const services: Service[] = [
     number: "06",
     title: "Ongoing Development",
     slug: "ongoing-development",
+    icon: "refresh",
     summary:
       "A developer on hand month to month for the features, fixes and maintenance that come after launch.",
     description:

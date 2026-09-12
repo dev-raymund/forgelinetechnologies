@@ -30,8 +30,8 @@ export function Partnership() {
               Forgeline and {partner.name} are partner companies covering
               different ground. Forgeline builds the digital product;{" "}
               {partner.name} handles the wider business technology around it.
-              Where a project needs both, you can draw on both without finding
-              a second supplier and then managing the gap between them.
+              Where a project needs both, you can draw on both without finding a
+              second supplier and then managing the gap between them.
             </p>
           </div>
 

@@ -5,6 +5,7 @@ import { ClosingCta } from "@/components/sections/cta-band";
 import { Section, SectionHeading } from "@/components/ui/section";
 import { packages, addOns } from "@/data/pricing";
 import { ArrowRight } from "@/components/ui/icon";
+import { Reveal } from "@/components/ui/reveal";
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -39,86 +40,88 @@ export default function PricingPage() {
         </h2>
 
         <div className="grid gap-x-8 gap-y-10 md:grid-cols-2">
-          {packages.map((pkg) => (
-            <article
-              key={pkg.name}
-              className={`flex flex-col p-7 md:p-8 ${
-                pkg.highlight
-                  ? "on-ink bg-ink text-on-ink"
-                  : "border border-rule bg-white"
-              }`}
-            >
-              <div className="flex items-baseline justify-between gap-4">
-                <h3
-                  className={`text-subtitle font-semibold ${
+          {packages.map((pkg, i) => (
+            <Reveal key={pkg.name} delay={(i % 2) * 70}>
+              <article
+                key={pkg.name}
+                className={`flex flex-col p-7 md:p-8 ${
+                  pkg.highlight
+                    ? "on-ink bg-ink text-on-ink"
+                    : "border border-rule bg-white"
+                }`}
+              >
+                <div className="flex items-baseline justify-between gap-4">
+                  <h3
+                    className={`text-subtitle font-semibold ${
+                      pkg.highlight ? "text-white" : "text-graphite"
+                    }`}
+                  >
+                    {pkg.name}
+                  </h3>
+                  <span
+                    className={`font-mono text-micro ${
+                      pkg.highlight ? "text-accent" : "text-faint"
+                    }`}
+                  >
+                    {pkg.audience}
+                  </span>
+                </div>
+
+                <p
+                  className={`mt-5 font-mono text-[1.75rem] font-medium tracking-tight ${
                     pkg.highlight ? "text-white" : "text-graphite"
                   }`}
                 >
-                  {pkg.name}
-                </h3>
-                <span
-                  className={`font-mono text-micro ${
-                    pkg.highlight ? "text-accent" : "text-faint"
-                  }`}
-                >
-                  {pkg.audience}
-                </span>
-              </div>
+                  {pkg.price}
+                  <span
+                    className={`ml-2 text-[0.875rem] font-normal ${
+                      pkg.highlight ? "text-on-ink-muted" : "text-muted"
+                    }`}
+                  >
+                    {pkg.unit}
+                  </span>
+                </p>
 
-              <p
-                className={`mt-5 font-mono text-[1.75rem] font-medium tracking-tight ${
-                  pkg.highlight ? "text-white" : "text-graphite"
-                }`}
-              >
-                {pkg.price}
-                <span
-                  className={`ml-2 text-[0.875rem] font-normal ${
+                <p
+                  className={`mt-4 max-w-[44ch] text-[0.9375rem] leading-relaxed ${
                     pkg.highlight ? "text-on-ink-muted" : "text-muted"
                   }`}
                 >
-                  {pkg.unit}
-                </span>
-              </p>
+                  {pkg.summary}
+                </p>
 
-              <p
-                className={`mt-4 max-w-[44ch] text-[0.9375rem] leading-relaxed ${
-                  pkg.highlight ? "text-on-ink-muted" : "text-muted"
-                }`}
-              >
-                {pkg.summary}
-              </p>
-
-              <ul
-                className={`mt-6 flex flex-col gap-2.5 border-t pt-5 ${
-                  pkg.highlight ? "border-rule-ink" : "border-rule"
-                }`}
-              >
-                {pkg.includes.map((item) => (
-                  <li
-                    key={item}
-                    className={`text-[0.9375rem] ${
-                      pkg.highlight ? "text-on-ink" : "text-graphite"
-                    }`}
-                  >
-                    {item}
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-8 pt-1">
-                <Link
-                  href="/contact"
-                  className={`inline-flex items-center justify-center gap-2 rounded-sm px-5 py-3 text-[0.9375rem] font-medium transition-colors ${
-                    pkg.highlight
-                      ? "bg-white text-ink hover:bg-accent hover:text-white"
-                      : "border border-rule-strong text-graphite hover:border-graphite hover:bg-paper"
+                <ul
+                  className={`mt-6 flex flex-col gap-2.5 border-t pt-5 ${
+                    pkg.highlight ? "border-rule-ink" : "border-rule"
                   }`}
                 >
-                  Start a project
-                  <ArrowRight />
-                </Link>
-              </div>
-            </article>
+                  {pkg.includes.map((item) => (
+                    <li
+                      key={item}
+                      className={`text-[0.9375rem] ${
+                        pkg.highlight ? "text-on-ink" : "text-graphite"
+                      }`}
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-8 pt-1">
+                  <Link
+                    href="/contact"
+                    className={`inline-flex items-center justify-center gap-2 rounded-sm px-5 py-3 text-[0.9375rem] font-medium transition-colors ${
+                      pkg.highlight
+                        ? "bg-white text-ink hover:bg-accent hover:text-white"
+                        : "border border-rule-strong text-graphite hover:border-graphite hover:bg-paper"
+                    }`}
+                  >
+                    Start a project
+                    <ArrowRight />
+                  </Link>
+                </div>
+              </article>
+            </Reveal>
           ))}
         </div>
       </Section>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Section, SectionHeading } from "@/components/ui/section";
 import { featuredProjects, projects } from "@/data/projects";
 import { marketsSentence } from "@/lib/site";
+import { Reveal } from "@/components/ui/reveal";
 
 /**
  * Featured work.
@@ -37,39 +38,44 @@ export function FeaturedWork() {
       />
 
       <ul className="grid gap-x-8 gap-y-12 md:grid-cols-2 md:gap-y-16">
-        {featuredProjects.map((project) => (
+        {featuredProjects.map((project, i) => (
           <li key={project.slug}>
-            <Link href={`/work/${project.slug}`} className="media-card group block">
-              <div className="media-frame relative aspect-[16/10] overflow-hidden border border-rule bg-white">
-                <Image
-                  src={project.image}
-                  alt={project.imageAlt}
-                  fill
-                  sizes="(min-width: 768px) 45vw, 92vw"
-                  className="media-zoom object-cover object-top"
-                />
-              </div>
+            <Reveal delay={(i % 2) * 70}>
+              <Link
+                href={`/work/${project.slug}`}
+                className="media-card group block"
+              >
+                <div className="media-frame relative aspect-[16/10] overflow-hidden border border-rule bg-white">
+                  <Image
+                    src={project.image}
+                    alt={project.imageAlt}
+                    fill
+                    sizes="(min-width: 768px) 45vw, 92vw"
+                    className="media-zoom object-cover object-top"
+                  />
+                </div>
 
-              <div className="mt-5 flex items-center gap-3">
-                <span className="font-mono text-micro text-graphite">
-                  {project.kind}
-                </span>
-                <span
-                  aria-hidden="true"
-                  className="h-3 w-px bg-rule-strong"
-                />
-                <span className="font-mono text-micro text-faint">
-                  {project.sector}
-                </span>
-              </div>
+                <div className="mt-5 flex items-center gap-3">
+                  <span className="font-mono text-micro text-graphite">
+                    {project.kind}
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className="h-3 w-px bg-rule-strong"
+                  />
+                  <span className="font-mono text-micro text-faint">
+                    {project.sector}
+                  </span>
+                </div>
 
-              <h3 className="mt-2.5 text-subtitle font-semibold text-graphite transition-colors group-hover:underline group-hover:decoration-accent group-hover:underline-offset-4">
-                {project.title}
-              </h3>
-              <p className="mt-2.5 max-w-[54ch] text-[0.9375rem] leading-relaxed text-muted">
-                {project.description}
-              </p>
-            </Link>
+                <h3 className="mt-2.5 text-subtitle font-semibold text-graphite transition-colors group-hover:underline group-hover:decoration-accent group-hover:underline-offset-4">
+                  {project.title}
+                </h3>
+                <p className="mt-2.5 max-w-[54ch] text-[0.9375rem] leading-relaxed text-muted">
+                  {project.description}
+                </p>
+              </Link>
+            </Reveal>
           </li>
         ))}
       </ul>

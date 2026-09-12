@@ -2,6 +2,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { stats, marketsSentence } from "@/lib/site";
 import { HeroVisual } from "@/components/home/hero-visual";
 import { ArrowRight, Grid } from "@/components/ui/icon";
+import { Counter } from "@/components/ui/counter";
 
 /**
  * Hero.
@@ -103,7 +104,7 @@ export function Hero() {
                   <dt className="sr-only">{stat.label}</dt>
                   <dd>
                     <span className="block font-mono text-[1.75rem] font-medium tracking-tight text-white md:text-[2rem]">
-                      {stat.value}
+                      <Counter value={stat.value} />
                     </span>
                     <span className="mt-1.5 block text-[0.8125rem] text-on-ink-muted">
                       {stat.label}

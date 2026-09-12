@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Section, SectionHeading } from "@/components/ui/section";
 import { services } from "@/data/services";
+import { ServiceIcon } from "@/components/ui/service-icon";
+import { Reveal } from "@/components/ui/reveal";
 
 /**
  * What the studio builds.
@@ -24,22 +26,30 @@ export function ServicesOverview() {
       />
 
       <ul className="border-t border-rule">
-        {services.map((service) => (
+        {services.map((service, i) => (
           <li key={service.slug} className="border-b border-rule">
-            <Link
-              href={`/services/${service.slug}`}
-              className="group grid grid-cols-1 gap-x-8 gap-y-3 py-7 transition-colors hover:bg-white md:grid-cols-12 md:items-baseline md:py-8"
-            >
-              <span className="font-mono text-micro text-faint md:col-span-1">
-                {service.number}
-              </span>
-              <h3 className="text-subtitle font-semibold text-graphite transition-colors group-hover:underline group-hover:decoration-accent group-hover:underline-offset-4 md:col-span-5">
-                {service.title}
-              </h3>
-              <p className="max-w-[58ch] text-[0.9375rem] leading-relaxed text-muted md:col-span-6">
-                {service.summary}
-              </p>
-            </Link>
+            <Reveal delay={i * 50}>
+              <Link
+                href={`/services/${service.slug}`}
+                className="group grid grid-cols-1 gap-x-8 gap-y-3 py-7 transition-colors hover:bg-white md:grid-cols-12 md:items-baseline md:py-8"
+              >
+                <span className="flex items-center gap-3 md:col-span-1">
+                  <ServiceIcon
+                    icon={service.icon}
+                    className="mark text-accent"
+                  />
+                  <span className="font-mono text-micro text-faint">
+                    {service.number}
+                  </span>
+                </span>
+                <h3 className="text-subtitle font-semibold text-graphite transition-colors group-hover:underline group-hover:decoration-accent group-hover:underline-offset-4 md:col-span-5">
+                  {service.title}
+                </h3>
+                <p className="max-w-[58ch] text-[0.9375rem] leading-relaxed text-muted md:col-span-6">
+                  {service.summary}
+                </p>
+              </Link>
+            </Reveal>
           </li>
         ))}
       </ul>

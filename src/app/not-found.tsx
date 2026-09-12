@@ -32,7 +32,11 @@ export default function NotFound() {
               { href: "/work", label: "The work", note: "17 shipped projects" },
               { href: "/services", label: "Services", note: "What we build" },
               { href: "/pricing", label: "Pricing", note: "Published figures" },
-              { href: "/contact", label: "Start a project", note: "Send the details" },
+              {
+                href: "/contact",
+                label: "Start a project",
+                note: "Send the details",
+              },
             ].map((l) => (
               <li key={l.href} className="border-t border-rule-ink pt-4">
                 <Link href={l.href} className="group block">

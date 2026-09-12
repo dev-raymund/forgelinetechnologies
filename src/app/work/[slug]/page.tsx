@@ -68,7 +68,11 @@ export default async function ProjectPage({
             description: project.description,
             url: `${site.url}/work/${project.slug}`,
             image: `${site.url}${project.image}`,
-            creator: { "@type": "Organization", name: site.name, url: site.url },
+            creator: {
+              "@type": "Organization",
+              name: site.name,
+              url: site.url,
+            },
           }),
         }}
       />
@@ -109,7 +113,9 @@ export default async function ProjectPage({
             />
           </div>
           <figcaption className="mt-4 flex flex-wrap items-center justify-between gap-3">
-            <span className="text-[0.875rem] text-muted">{project.imageAlt}</span>
+            <span className="text-[0.875rem] text-muted">
+              {project.imageAlt}
+            </span>
             <a
               href={project.liveUrl}
               rel="noopener noreferrer"
@@ -174,7 +180,9 @@ export default async function ProjectPage({
         <dl className="mt-14 grid gap-x-8 gap-y-8 border-t border-rule pt-8 sm:grid-cols-3">
           <div>
             <dt className="font-mono text-micro text-faint">Type</dt>
-            <dd className="mt-2 text-[1.0625rem] text-graphite">{project.kind}</dd>
+            <dd className="mt-2 text-[1.0625rem] text-graphite">
+              {project.kind}
+            </dd>
           </div>
           <div>
             <dt className="font-mono text-micro text-faint">Sector</dt>
