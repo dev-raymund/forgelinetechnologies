@@ -1,4 +1,6 @@
+import Image from "next/image";
 import { Section } from "@/components/ui/section";
+import { Logo } from "@/components/ui/logo";
 import { partner } from "@/lib/site";
 
 /**
@@ -37,7 +39,12 @@ export function Partnership() {
 
           <dl className="grid gap-6 sm:grid-cols-2 md:col-span-6 md:col-start-7">
             <div className="border-t border-graphite/80 pt-4">
-              <dt className="text-[0.9375rem] font-semibold text-graphite">
+              {/* Both marks set to the same height so they read as a pair,
+                  even though one is a lockup and the other is square. */}
+              <div className="flex h-9 items-center text-graphite">
+                <Logo />
+              </div>
+              <dt className="mt-3 text-[0.9375rem] font-semibold text-graphite">
                 Forgeline
               </dt>
               <dd className="mt-1.5 text-[0.875rem] leading-relaxed text-muted">
@@ -46,7 +53,16 @@ export function Partnership() {
               </dd>
             </div>
             <div className="border-t border-rule-strong pt-4">
-              <dt className="text-[0.9375rem] font-semibold text-graphite">
+              <div className="flex h-9 items-center">
+                <Image
+                  src={partner.logo}
+                  alt=""
+                  width={36}
+                  height={36}
+                  className="h-9 w-9 rounded-[6px]"
+                />
+              </div>
+              <dt className="mt-3 text-[0.9375rem] font-semibold text-graphite">
                 <a
                   href={partner.url}
                   className="underline decoration-rule-strong underline-offset-4 transition-colors hover:text-graphite hover:decoration-accent"

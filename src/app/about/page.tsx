@@ -4,6 +4,7 @@ import Link from "next/link";
 import { PageHeader } from "@/components/sections/page-header";
 import { ClosingCta } from "@/components/sections/cta-band";
 import { Section, SectionHeading } from "@/components/ui/section";
+import { Logo } from "@/components/ui/logo";
 import { Technology } from "@/components/home/technology";
 import { site, founder, partner, stats, marketsSentence } from "@/lib/site";
 import { projects } from "@/data/projects";
@@ -201,6 +202,19 @@ export default function AboutPage() {
             >
               Part of a wider technology ecosystem
             </h2>
+            {/* The two marks together, which says "partnership" faster than
+                the paragraph beside them does. */}
+            <div className="mt-7 flex items-center gap-5 text-graphite">
+              <Logo />
+              <span aria-hidden="true" className="h-8 w-px bg-rule-strong" />
+              <Image
+                src={partner.logo}
+                alt=""
+                width={36}
+                height={36}
+                className="h-9 w-9 rounded-[6px]"
+              />
+            </div>
           </div>
           <div className="md:col-span-6 md:col-start-7">
             <p className="max-w-[56ch] text-dek leading-relaxed text-muted">
