@@ -1,5 +1,7 @@
 import { ButtonLink } from "@/components/ui/button";
 import { stats, marketsSentence } from "@/lib/site";
+import { HeroVisual } from "@/components/home/hero-visual";
+import { ArrowRight, Grid } from "@/components/ui/icon";
 
 /**
  * Hero.
@@ -24,47 +26,68 @@ export function Hero() {
   return (
     <section className="on-ink bg-ink text-on-ink" aria-labelledby="hero-title">
       <div className="shell">
-        <div className="railed railed-inset pt-20 pb-14 md:pt-32 md:pb-20">
-          <h1
-            id="hero-title"
-            className="text-display max-w-[19ch] font-semibold text-white"
-          >
-            <span className="rise block" style={{ animationDelay: "60ms" }}>
-              Websites, web applications and custom software.
-            </span>
-            {/* Subordinate by size, not just by colour. Two sentences set at
+        <div className="railed railed-inset pt-20 pb-14 md:pt-28 md:pb-20">
+          <div className="grid items-center gap-14 lg:grid-cols-12 lg:gap-10">
+            <div className="lg:col-span-7">
+              <h1
+                id="hero-title"
+                className="text-display max-w-[19ch] font-semibold text-white"
+              >
+                <span className="rise block" style={{ animationDelay: "60ms" }}>
+                  Websites, web applications and custom software.
+                </span>
+                {/* Subordinate by size, not just by colour. Two sentences set at
                 the same scale compete; the differentiator reads better as the
                 answering clause than as a second shout. */}
-            <span
-              className="rise mt-[0.28em] block text-[0.62em] font-normal tracking-[-0.02em] text-on-ink-muted"
-              style={{ animationDelay: "200ms" }}
-            >
-              Built by the developer you brief.
-            </span>
-          </h1>
+                <span
+                  className="rise mt-[0.28em] block text-[0.62em] font-normal tracking-[-0.02em] text-on-ink-muted"
+                  style={{ animationDelay: "200ms" }}
+                >
+                  Built by the developer you brief.
+                </span>
+              </h1>
 
-          <div
-            className="rise mt-10 max-w-[56ch]"
-            style={{ animationDelay: "340ms" }}
-          >
-            <p className="text-dek text-on-ink-muted">
-              A web engineering studio. You get a fixed scope, a fixed price
-              and direct access to the person writing the code — from the
-              first call to the day it goes live, and you own everything at
-              the end of it.
-            </p>
-          </div>
+              <div
+                className="rise mt-10 max-w-[56ch]"
+                style={{ animationDelay: "340ms" }}
+              >
+                <p className="text-dek text-on-ink-muted">
+                  A web engineering studio. You get a fixed scope, a fixed price
+                  and direct access to the person writing the code — from the
+                  first call to the day it goes live, and you own everything at
+                  the end of it.
+                </p>
+              </div>
 
-          <div
-            className="rise mt-10 flex flex-col gap-3 sm:flex-row sm:items-center"
-            style={{ animationDelay: "440ms" }}
-          >
-            <ButtonLink href="/contact" ground="ink" variant="solid">
-              Start a project
-            </ButtonLink>
-            <ButtonLink href="/work" ground="ink" variant="outline">
-              View our work
-            </ButtonLink>
+              <div
+                className="rise mt-10 flex flex-col gap-3 sm:flex-row sm:items-center"
+                style={{ animationDelay: "440ms" }}
+              >
+                <ButtonLink
+                  href="/contact"
+                  ground="ink"
+                  variant="solid"
+                  icon={<ArrowRight />}
+                >
+                  Start a project
+                </ButtonLink>
+                <ButtonLink
+                  href="/work"
+                  ground="ink"
+                  variant="outline"
+                  icon={<Grid />}
+                >
+                  View our work
+                </ButtonLink>
+              </div>
+            </div>
+
+            {/* Hidden below lg. On a phone the hero should get to the point,
+                and a schematic this detailed would be unreadable at 390px
+                while pushing the actual proposition off the screen. */}
+            <div className="hidden text-white lg:col-span-5 lg:block">
+              <HeroVisual />
+            </div>
           </div>
         </div>
       </div>

@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useId, useRef } from "react";
 import { submitInquiry, type InquiryState } from "@/lib/inquiry";
 import { PROJECT_TYPES, BUDGETS, TIMELINES } from "@/lib/validation";
+import { Send } from "@/components/ui/icon";
 
 /**
  * Contact form.
@@ -193,9 +194,10 @@ export function ContactForm() {
         <button
           type="submit"
           disabled={pending}
-          className="inline-flex items-center justify-center rounded-sm bg-accent-deep px-6 py-3.5 text-[0.9375rem] font-medium text-white transition-colors hover:bg-accent-deeper disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex items-center justify-center gap-2 rounded-sm bg-accent px-6 py-3.5 text-[0.9375rem] font-medium text-white transition-colors hover:bg-accent-deep disabled:cursor-not-allowed disabled:opacity-60"
         >
           {pending ? "Sending…" : "Send project details"}
+          {pending ? null : <Send />}
         </button>
         <p className="text-[0.8125rem] text-muted">
           No mailing list, and your details are not passed to anyone.

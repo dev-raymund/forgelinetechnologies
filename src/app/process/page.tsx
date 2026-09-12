@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/sections/page-header";
 import { ClosingCta } from "@/components/sections/cta-band";
 import { Section, SectionHeading } from "@/components/ui/section";
 import { processSteps } from "@/data/process";
+import { ArrowRight } from "@/components/ui/icon";
 
 export const metadata: Metadata = {
   title: "Process",
@@ -121,9 +122,10 @@ export default function ProcessPage() {
           <div className="md:col-span-4 md:col-start-9">
             <Link
               href="/pricing"
-              className="inline-flex items-center justify-center rounded-sm bg-accent-deep px-5 py-3 text-[0.9375rem] font-medium text-white transition-colors hover:bg-accent-deeper"
+              className="inline-flex items-center justify-center gap-2 rounded-sm bg-accent px-5 py-3 text-[0.9375rem] font-medium text-white transition-colors hover:bg-accent-deep"
             >
               See what it costs
+              <ArrowRight />
             </Link>
           </div>
         </div>

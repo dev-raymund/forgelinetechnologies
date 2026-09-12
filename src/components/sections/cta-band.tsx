@@ -1,5 +1,6 @@
 import { ButtonLink } from "@/components/ui/button";
 import { site } from "@/lib/site";
+import { ArrowRight, Mail } from "@/components/ui/icon";
 
 /**
  * Closing call to action.
@@ -36,14 +37,20 @@ export function ClosingCta() {
               </p>
 
               <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <ButtonLink href="/contact" ground="ink" variant="solid">
+                <ButtonLink
+                  href="/contact"
+                  ground="ink"
+                  variant="solid"
+                  icon={<ArrowRight />}
+                >
                   Start a project
                 </ButtonLink>
                 <a
                   href={`mailto:${site.email}`}
-                  className="inline-flex items-center justify-center rounded-sm border border-rule-ink-strong px-5 py-3 text-[0.9375rem] font-medium text-on-ink transition-colors hover:border-white hover:bg-white/5"
+                  className="inline-flex items-center justify-center gap-2 rounded-sm border border-rule-ink-strong px-5 py-3 text-[0.9375rem] font-medium text-on-ink transition-colors hover:border-white hover:bg-white/5"
                 >
                   Email directly
+                  <Mail />
                 </a>
               </div>
             </div>

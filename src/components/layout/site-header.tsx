@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useState } from "react";
 import { Logo } from "@/components/ui/logo";
+import { ArrowRight } from "@/components/ui/icon";
 
 /**
  * Site header.
@@ -91,9 +92,10 @@ export function SiteHeader() {
           <div className="hidden lg:block">
             <Link
               href="/contact"
-              className="rounded-sm bg-accent-deep px-4 py-2.5 text-[0.9375rem] font-medium text-white transition-colors hover:bg-accent-deeper"
+              className="inline-flex items-center gap-2 rounded-sm bg-accent px-4 py-2.5 text-[0.9375rem] font-medium text-white transition-colors hover:bg-accent-deep"
             >
               Start a project
+              <ArrowRight />
             </Link>
           </div>
 
@@ -146,9 +148,10 @@ export function SiteHeader() {
           </ul>
           <Link
             href="/contact"
-            className="mt-6 block rounded-sm bg-accent-deep px-4 py-3.5 text-center font-medium text-white"
+            className="mt-6 flex items-center justify-center gap-2 rounded-sm bg-accent px-4 py-3.5 text-center font-medium text-white"
           >
             Start a project
+            <ArrowRight />
           </Link>
         </nav>
       </div>

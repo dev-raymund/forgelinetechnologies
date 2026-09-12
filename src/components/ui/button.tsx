@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 /**
  * Two button weights, and deliberately no third.
@@ -14,17 +14,17 @@ type Variant = "solid" | "outline";
 type Ground = "paper" | "ink";
 
 const base =
-  "inline-flex items-center justify-center rounded-sm px-5 py-3 text-[0.9375rem] font-medium " +
+  "inline-flex items-center justify-center gap-2 rounded-sm px-5 py-3 text-[0.9375rem] font-medium " +
   "transition-colors duration-200 ease-out";
 
 const styles: Record<Ground, Record<Variant, string>> = {
   paper: {
-    solid: "bg-accent-deep text-white hover:bg-accent-deeper",
+    solid: "bg-accent text-white hover:bg-accent-deep",
     outline:
       "border border-rule-strong text-graphite hover:border-graphite hover:bg-white",
   },
   ink: {
-    solid: "bg-white text-ink hover:bg-accent-deep hover:text-white",
+    solid: "bg-white text-ink hover:bg-accent hover:text-white",
     outline:
       "border border-rule-ink-strong text-on-ink hover:border-white hover:bg-white/5",
   },
@@ -34,12 +34,22 @@ export function ButtonLink({
   variant = "solid",
   ground = "paper",
   className = "",
+  icon,
+  children,
   ...props
-}: ComponentProps<typeof Link> & { variant?: Variant; ground?: Ground }) {
+}: ComponentProps<typeof Link> & {
+  variant?: Variant;
+  ground?: Ground;
+  /** Sits after the label. Decorative — the label carries the meaning. */
+  icon?: ReactNode;
+}) {
   return (
     <Link
       {...props}
       className={`${base} ${styles[ground][variant]} ${className}`}
-    />
+    >
+      {children}
+      {icon}
+    </Link>
   );
 }

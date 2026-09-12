@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/sections/page-header";
 import { ClosingCta } from "@/components/sections/cta-band";
 import { Section, SectionHeading } from "@/components/ui/section";
 import { packages, addOns } from "@/data/pricing";
+import { ArrowRight } from "@/components/ui/icon";
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -107,13 +108,14 @@ export default function PricingPage() {
               <div className="mt-8 pt-1">
                 <Link
                   href="/contact"
-                  className={`inline-flex items-center justify-center rounded-sm px-5 py-3 text-[0.9375rem] font-medium transition-colors ${
+                  className={`inline-flex items-center justify-center gap-2 rounded-sm px-5 py-3 text-[0.9375rem] font-medium transition-colors ${
                     pkg.highlight
-                      ? "bg-white text-ink hover:bg-accent-deep hover:text-white"
+                      ? "bg-white text-ink hover:bg-accent hover:text-white"
                       : "border border-rule-strong text-graphite hover:border-graphite hover:bg-paper"
                   }`}
                 >
                   Start a project
+                  <ArrowRight />
                 </Link>
               </div>
             </article>
