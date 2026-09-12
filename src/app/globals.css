@@ -326,6 +326,23 @@
     transform: none;
   }
 
+  /* Technology marks. The SVG is a mask, not an image, so the shape comes
+     from the file and the colour comes from the page — twenty vendor brand
+     colours would undo a palette built from two. */
+  .tech-mark {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+    background-color: currentColor;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+  }
+
   /* Icon marks lean into their label on hover. Transform only, so it never
      reflows the row it sits in. */
   .mark {

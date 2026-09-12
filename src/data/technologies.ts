@@ -11,7 +11,11 @@
 
 export type Technology = {
   name: string;
-  /** Filename in /assets/tech, without extension. */
+  /**
+   * Filename in /assets/tech, without extension. Optional: "REST APIs" is a
+   * technique rather than a product, so it has no brand mark and renders as a
+   * plain label. Better than borrowing someone else's logo for it.
+   */
   icon?: string;
 };
 
@@ -28,8 +32,8 @@ export const techGroups: TechGroup[] = [
     note: "What your customers actually touch. Built to stay fast on a phone, which is where most of them are.",
     items: [
       { name: "React", icon: "react" },
-      { name: "Next.js" },
-      { name: "TypeScript" },
+      { name: "Next.js", icon: "nextdotjs" },
+      { name: "TypeScript", icon: "typescript" },
       { name: "JavaScript", icon: "javascript" },
       { name: "Vue", icon: "vuedotjs" },
       { name: "Tailwind CSS", icon: "tailwindcss" },
@@ -59,7 +63,7 @@ export const techGroups: TechGroup[] = [
     title: "Data",
     note: "Your data is structured around how the business actually works, so the system stays maintainable as it grows.",
     items: [
-      { name: "PostgreSQL" },
+      { name: "PostgreSQL", icon: "postgresql" },
       { name: "MySQL", icon: "mysql" },
       { name: "MongoDB", icon: "mongodb" },
     ],
@@ -70,7 +74,7 @@ export const techGroups: TechGroup[] = [
     items: [
       { name: "Git", icon: "git" },
       { name: "Docker", icon: "docker" },
-      { name: "Vercel" },
+      { name: "Vercel", icon: "vercel" },
       { name: "Figma", icon: "figma" },
     ],
   },

@@ -1,5 +1,6 @@
 import { Section, SectionHeading } from "@/components/ui/section";
 import { techGroups } from "@/data/technologies";
+import { TechIcon } from "@/components/ui/tech-icon";
 import { Reveal } from "@/components/ui/reveal";
 
 /**
@@ -39,13 +40,21 @@ export function Technology({
                 <p className="mt-1.5 max-w-[36ch] text-[0.875rem] leading-relaxed text-muted">
                   {group.note}
                 </p>
-                <ul className="mt-4 flex flex-wrap gap-x-3 gap-y-2">
+                <ul className="mt-4 flex flex-wrap gap-1.5">
                   {group.items.map((item) => (
                     <li
                       key={item.name}
-                      className="font-mono text-[0.75rem] text-faint"
+                      className="group/chip inline-flex items-center gap-1.5 rounded-sm border border-rule bg-white px-2 py-1 transition-colors hover:border-rule-strong"
                     >
-                      {item.name}
+                      {item.icon ? (
+                        <TechIcon
+                          icon={item.icon}
+                          className="text-faint transition-colors group-hover/chip:text-accent"
+                        />
+                      ) : null}
+                      <span className="font-mono text-[0.75rem] text-muted">
+                        {item.name}
+                      </span>
                     </li>
                   ))}
                 </ul>
