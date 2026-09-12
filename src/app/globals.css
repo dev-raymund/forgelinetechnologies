@@ -326,6 +326,31 @@
     transform: none;
   }
 
+  /* The header separates from the page only once it has left the dark opening
+     it was merged with. Written here rather than as an arbitrary Tailwind
+     value: a two-part box-shadow in brackets collides with Tailwind's own
+     shadow-colour variables and resolves to transparent. */
+  .site-header {
+    transition: box-shadow 0.3s ease;
+  }
+
+  .site-header[data-stuck] {
+    box-shadow:
+      0 1px 0 0 var(--color-rule-ink),
+      0 14px 30px -20px rgb(0 0 0 / 0.85);
+  }
+
+  /* The header's engineering grid — the same 20px module as the hero
+     schematic, at a fraction of the opacity. Present enough to give a flat
+     navy bar some structure, faint enough that nobody consciously sees it. */
+  .header-grid {
+    background-image:
+      linear-gradient(to right, rgb(255 255 255 / 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+  }
+
   /* Technology marks. The SVG is a mask, not an image, so the shape comes
      from the file and the colour comes from the page — twenty vendor brand
      colours would undo a palette built from two. */
