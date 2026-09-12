@@ -111,19 +111,3 @@ export const founder = {
   photoAlt:
     "Raymund Hermoso, founder and lead developer of Forgeline Technologies",
 } as const;
-
-/**
- * Partner company. Complementary, not a parent and not a competitor.
- * Do not describe Forgeline as a sub-brand — that relationship has not been
- * stated and claiming it would be wrong.
- */
-export const partner = {
-  name: "TechZQuad",
-  url: "https://www.techzquad.com/",
-  /* Their own mark, shown in their own colours. Recolouring a partner's logo
-     to fit our palette is not ours to do, and a third-party mark reads as
-     someone else's brand rather than as site chrome. */
-  logo: "/assets/techzquad-logo.png",
-  summary:
-    "Broader business technology and IT — automation, CRM, infrastructure, support and training.",
-} as const;

@@ -18,7 +18,7 @@ import { Reveal } from "@/components/ui/reveal";
  */
 export function ServicesOverview() {
   return (
-    <Section id="services" ground="white" size="lg" labelledBy="services-title">
+    <Section id="services" ground="paper" size="lg" labelledBy="services-title">
       <SectionHeading
         id="services-title"
         title="What we build"

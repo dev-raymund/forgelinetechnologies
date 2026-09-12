@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { Logo } from "@/components/ui/logo";
-import { site, partner, markets } from "@/lib/site";
+import { site, markets } from "@/lib/site";
 import { services } from "@/data/services";
 
 /**
  * Site footer.
  *
  * Carries the real navigation a visitor might still want at the bottom of a
- * page, the markets the work was actually delivered in, and the partner link.
+ * page and the markets the work was actually delivered in.
  * No newsletter box: there is no newsletter, and a dead signup field is worse
  * than none.
  */
@@ -115,14 +115,7 @@ export function SiteFooter() {
                   GitHub
                 </a>
               </li>
-              <li>
-                <a
-                  href={partner.url}
-                  className="text-[0.9375rem] text-on-ink-muted transition-colors hover:text-accent"
-                >
-                  {partner.name}
-                </a>
-              </li>
+
             </ul>
           </div>
         </div>

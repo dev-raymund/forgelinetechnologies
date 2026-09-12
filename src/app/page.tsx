@@ -10,9 +10,9 @@ import { Hero } from "@/components/home/hero";
 import { ServicesOverview } from "@/components/home/services-overview";
 import { FeaturedWork } from "@/components/home/featured-work";
 import { WhyForgeline } from "@/components/home/why-forgeline";
+import { Promise } from "@/components/home/promise";
 import { Technology } from "@/components/home/technology";
 import { Process } from "@/components/home/process";
-import { Partnership } from "@/components/home/partnership";
 import { Founder } from "@/components/home/founder";
 import { Faq } from "@/components/home/faq";
 import { ClosingCta } from "@/components/sections/cta-band";
@@ -29,9 +29,14 @@ export const metadata: Metadata = {
 /**
  * Homepage.
  *
- * The order is an argument, not a list of sections: what we build, proof that
- * we have built it, why the arrangement is different, how the work runs, who
- * is behind it, and then the objections — before finally asking.
+ * The order is an argument, not a list of sections: what we build, why the
+ * arrangement is different, what we commit to, proof that we have built it,
+ * how the work runs, who is behind it, and then the objections — before
+ * finally asking.
+ *
+ * The Promise sits immediately after the differentiator because that is where
+ * a reader is most receptive to it: they have just been told why the model is
+ * unusual, and the next honest question is what it actually commits us to.
  *
  * Grounds alternate ink / white / paper so the page has peaks and valleys.
  * Sections carry their own weight via the `size` prop rather than everything
@@ -56,10 +61,10 @@ export default function HomePage() {
       <Hero />
       <ServicesOverview />
       <WhyForgeline />
+      <Promise />
       <FeaturedWork />
       <Process />
       <Technology ground="paper" />
-      <Partnership />
       <Founder />
       <Faq />
       <ClosingCta />

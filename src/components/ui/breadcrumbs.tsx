@@ -36,7 +36,7 @@ export function Breadcrumbs({
                   >
                     {crumb.name}
                   </Link>
-                  <span aria-hidden="true" className="text-on-ink-muted/50">
+                  <span aria-hidden="true" className="text-on-ink-muted">
                     /
                   </span>
                 </>

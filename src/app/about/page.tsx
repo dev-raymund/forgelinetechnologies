@@ -5,8 +5,8 @@ import { PageHeader } from "@/components/sections/page-header";
 import { PageVisual } from "@/components/sections/page-visual";
 import { ClosingCta } from "@/components/sections/cta-band";
 import { Section, SectionHeading } from "@/components/ui/section";
-import { PartnerGrid } from "@/components/ui/partner-grid";
 import { Technology } from "@/components/home/technology";
+import { promises, promiseStatement } from "@/data/promise";
 import { site, founder, stats, marketsSentence } from "@/lib/site";
 import { projects } from "@/data/projects";
 import { Counter } from "@/components/ui/counter";
@@ -195,23 +195,34 @@ export default function AboutPage() {
         </div>
       </Section>
 
-      <Section ground="white" size="md" labelledBy="partner-about-title">
-        <div className="flex flex-col gap-8 border-t border-rule pt-8 md:flex-row md:items-center md:justify-between md:gap-16">
-          <div className="max-w-[46ch]">
-            <h2
-              id="partner-about-title"
-              className="text-[1.0625rem] font-semibold text-graphite"
-            >
-              Partners &amp; ecosystem
-            </h2>
-            <p className="mt-2 text-[0.9375rem] leading-relaxed text-muted">
-              Forgeline is independent. Where a project needs capability beyond
-              web engineering, these are the companies we work alongside rather
-              than sending you to find a second supplier.
-            </p>
-          </div>
-          <PartnerGrid className="shrink-0" />
-        </div>
+      {/* What clients can expect. The full Promise lives on the homepage;
+          this is the same five commitments in brief, so the About page answers
+          "what will working with you actually be like" without reprinting the
+          section verbatim. */}
+      <Section ground="white" size="md" labelledBy="expect-title">
+        <SectionHeading
+          id="expect-title"
+          title="What you can expect"
+          dek="Five commitments, all of them things we control. The full version, with what each one means in practice, is on the homepage."
+        />
+        <ol className="grid gap-x-10 gap-y-7 md:grid-cols-2">
+          {promises.map((item) => (
+            <li key={item.number} className="border-t border-graphite/80 pt-4">
+              <span className="font-mono text-micro text-faint">
+                {item.number}
+              </span>
+              <h3 className="mt-2.5 text-[1.0625rem] font-semibold text-graphite">
+                {item.title}
+              </h3>
+              <p className="mt-2 max-w-[44ch] text-[0.9375rem] leading-relaxed text-muted">
+                {item.claim}
+              </p>
+            </li>
+          ))}
+        </ol>
+        <p className="mt-10 text-subtitle font-semibold text-graphite">
+          {promiseStatement}
+        </p>
       </Section>
 
       <ClosingCta />
