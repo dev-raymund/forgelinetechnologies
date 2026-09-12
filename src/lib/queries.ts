@@ -1,6 +1,6 @@
 import "server-only";
 import { and, asc, desc, eq, gte, sql } from "drizzle-orm";
-import { db, projects, posts, inquiries, type Project, type Post } from "@/db";
+import { getDb, projects, posts, inquiries, type Project, type Post } from "@/db";
 
 /**
  * Neon's serverless tier suspends after inactivity, and the first query
@@ -47,7 +47,7 @@ export async function withRetry<T>(
 
 export async function getPublishedProjects(): Promise<Project[]> {
   return withRetry(() =>
-    db
+    getDb()
       .select()
       .from(projects)
       .where(eq(projects.published, true))
@@ -59,7 +59,7 @@ export async function getProjectBySlug(
   slug: string,
 ): Promise<Project | undefined> {
   const rows = await withRetry(() =>
-    db
+    getDb()
       .select()
       .from(projects)
       .where(and(eq(projects.slug, slug), eq(projects.published, true)))
@@ -72,7 +72,7 @@ export async function getProjectBySlug(
 
 export async function getPublishedPosts(): Promise<Post[]> {
   return withRetry(() =>
-    db
+    getDb()
       .select()
       .from(posts)
       .where(eq(posts.published, true))
@@ -82,7 +82,7 @@ export async function getPublishedPosts(): Promise<Post[]> {
 
 export async function getPostBySlug(slug: string): Promise<Post | undefined> {
   const rows = await withRetry(() =>
-    db
+    getDb()
       .select()
       .from(posts)
       .where(and(eq(posts.slug, slug), eq(posts.published, true)))
@@ -100,7 +100,7 @@ export async function countRecentInquiriesByIp(
 ): Promise<number> {
   const since = new Date(Date.now() - windowMs);
   const rows = await withRetry(() =>
-    db
+    getDb()
       .select({ n: sql<number>`count(*)::int` })
       .from(inquiries)
       .where(and(eq(inquiries.sourceIp, ip), gte(inquiries.createdAt, since))),

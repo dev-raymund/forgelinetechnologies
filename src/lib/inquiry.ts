@@ -1,7 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
-import { db, inquiries } from "@/db";
+import { getDb, inquiries } from "@/db";
 import { countRecentInquiriesByIp } from "@/lib/queries";
 import {
   inquirySchema,
@@ -9,6 +9,7 @@ import {
   type FieldErrors,
 } from "@/lib/validation";
 import { sendInquiryNotification, sendInquiryConfirmation } from "@/lib/email";
+import { site } from "@/lib/site";
 
 /**
  * Enquiry pipeline.
@@ -102,8 +103,9 @@ export async function submitInquiry(
       if (recent >= RATE_LIMIT) {
         return {
           status: "error",
-          message:
-            "That is a few enquiries in a short time. Email us directly and we will pick it up.",
+          message: site.email
+            ? `That is a few enquiries in a short time. Email ${site.email} directly and we will pick it up.`
+            : "That is a few enquiries in a short time. Try again a little later and it will go through.",
         };
       }
     } catch (err) {
@@ -114,7 +116,7 @@ export async function submitInquiry(
 
   // 4. store, before any email is attempted
   try {
-    await db.insert(inquiries).values({
+    await getDb().insert(inquiries).values({
       name: data.name,
       email: data.email,
       company: data.company,
@@ -130,8 +132,12 @@ export async function submitInquiry(
     console.error("[inquiry] database write failed", err);
     return {
       status: "error",
-      message:
-        "Something went wrong saving your enquiry. Please email us directly.",
+      // No dead ends: the site only publishes an address when one is
+      // configured, so telling someone to "email us directly" when none is
+      // shown sends them nowhere.
+      message: site.email
+        ? `Something went wrong saving your enquiry. Please try again, or email ${site.email} directly.`
+        : "Something went wrong saving your enquiry. Please try again in a moment — the fault is ours, and it is already in our logs.",
     };
   }
 
