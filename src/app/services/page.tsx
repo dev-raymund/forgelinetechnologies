@@ -27,9 +27,9 @@ export default function ServicesPage() {
     <>
       <PageHeader
         visual={<PageVisual variant="services" />}
-        meta={`${services.length} services`}
-        title="What we build, and what you get"
-        dek="Six services, each one something a business commissions on its own rather than a bullet inside a bigger package. Every one of them has shipped work behind it."
+        meta="Services"
+        title="What we do"
+        dek={`Digital solutions built around your business — ${services.length} services spanning websites, web applications, e-commerce, custom software, integrations, search and automation. Each one is something a business commissions on its own, not a bullet inside a bigger package.`}
       />
 
       <Section ground="paper" size="lg" labelledBy="services-list">

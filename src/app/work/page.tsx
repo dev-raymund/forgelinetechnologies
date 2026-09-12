@@ -11,7 +11,7 @@ import { Reveal } from "@/components/ui/reveal";
 
 export const metadata: Metadata = {
   title: "Work",
-  description: `Seventeen live builds — websites, web applications, e-commerce and custom software for businesses in ${marketsSentence}.`,
+  description: `Real websites, web applications, e-commerce and custom software delivered for businesses in ${marketsSentence}.`,
   alternates: { canonical: "/work" },
 };
 
@@ -40,8 +40,8 @@ export default async function WorkPage({
       <PageHeader
         visual={<PageVisual variant="work" />}
         meta={`${projects.length} projects`}
-        title="Work we have shipped"
-        dek={`Live, verifiable builds for businesses in ${marketsSentence}. Every one of these is running in production — the links go to the real sites, not to screenshots.`}
+        title="Our work"
+        dek={`Real websites, applications and digital products delivered for businesses in ${marketsSentence}. Every one of these is running in production — the links go to the live sites, not to screenshots.`}
       />
 
       <Section ground="paper" size="lg" labelledBy="work-filter-title">

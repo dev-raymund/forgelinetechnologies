@@ -29,7 +29,7 @@ export type TechGroup = {
 export const techGroups: TechGroup[] = [
   {
     title: "Front-end",
-    note: "What your customers actually touch. Built to stay fast on a phone, which is where most of them are.",
+    note: "What your customers see and use. Built to stay fast on a phone, which is where most of them are.",
     items: [
       { name: "React", icon: "react" },
       { name: "Next.js", icon: "nextdotjs" },
@@ -42,7 +42,7 @@ export const techGroups: TechGroup[] = [
   },
   {
     title: "Back-end",
-    note: "The part that has to be correct rather than merely pleasant — logins, business rules, money.",
+    note: "Where accuracy matters most — accounts and logins, business rules, and payments.",
     items: [
       { name: "PHP", icon: "php" },
       { name: "Laravel", icon: "laravel" },
@@ -70,7 +70,7 @@ export const techGroups: TechGroup[] = [
   },
   {
     title: "Tooling & Delivery",
-    note: "How a change reaches your live site without drama, and how it gets undone if it needs to be.",
+    note: "How changes reach your live site safely, and how they are reversed if something is wrong.",
     items: [
       { name: "Git", icon: "git" },
       { name: "Docker", icon: "docker" },

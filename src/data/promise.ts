@@ -35,9 +35,10 @@ export const promises: ClientPromise[] = [
   {
     number: "02",
     title: "Direct communication",
-    claim: "You work with the developer building your project, not a relay.",
+    claim:
+      "You work directly with the people building your project, not through a relay.",
     detail:
-      "Questions go to the person writing the code and are answered by them. Nobody is carrying a technical decision back and forth on behalf of someone who cannot make it, which is why answers take hours rather than a sprint.",
+      "Technical questions go to the people writing the code and are answered by them. Nobody is carrying a decision back and forth on behalf of someone who cannot make it, which is why answers take hours rather than a sprint.",
   },
   {
     number: "03",
@@ -63,4 +64,5 @@ export const promises: ClientPromise[] = [
 ];
 
 /** The promise in one line. Used to close the section. */
-export const promiseStatement = "Clear before it starts. Solid when it ships.";
+export const promiseStatement =
+  "Agreed before we start. Supported after we launch.";

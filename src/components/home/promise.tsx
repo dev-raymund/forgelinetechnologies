@@ -18,8 +18,9 @@ export function Promise() {
     <Section id="promise" ground="white" size="peak" labelledBy="promise-title">
       <SectionHeading
         id="promise-title"
-        title="The Forgeline Promise"
-        dek="A method is only worth publishing if the people running it are held to something. These are the five commitments behind it — and every one is something we control, which is why none of them mentions rankings, traffic or revenue. Those depend on your market. These depend on us."
+        eyebrow="The Forgeline Promise"
+        title="Our commitment to every project"
+        dek="Five commitments that apply to every project we take on. Each one is something within our control, which is why none of them mentions rankings, traffic or revenue — those depend on your market. These depend on us."
       />
 
       <ol className="flex flex-col">

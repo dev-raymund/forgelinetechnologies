@@ -44,7 +44,7 @@ export const site = {
   shortName: "Forgeline",
   tagline: "Web development and digital product engineering",
   description:
-    "Forgeline Technologies builds websites, web applications, e-commerce platforms and custom software — scoped at a fixed price and built by the developer you brief.",
+    "Forgeline Technologies designs, develops and supports websites, web applications, e-commerce and custom software for businesses that need reliable technology — scoped and priced before work starts, and built by the people you brief.",
   url: origin,
   /**
    * The address shown publicly on the site, and nothing else.

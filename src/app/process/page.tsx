@@ -45,9 +45,9 @@ export default function ProcessPage() {
     <>
       <PageHeader
         visual={<PageVisual variant="process" />}
-        meta="How we work"
-        title={METHOD_NAME}
-        dek="Most projects go wrong quietly — the scope drifts, the budget moves, and nobody says anything until launch. Four steps, no black box, and a diagnosis before a quote."
+        meta={METHOD_NAME}
+        title="How we work"
+        dek="A clear process from first conversation to launch, with agreed scope, visible progress and direct communication throughout. Most projects go wrong quietly — the scope drifts, the budget moves, and nobody says anything until launch. Four steps, no stage you cannot see into, and a diagnosis before a quote."
       />
 
       <Section ground="paper" size="lg" labelledBy="steps-title">
@@ -90,6 +90,7 @@ export default function ProcessPage() {
       <Section ground="ink" size="lg" labelledBy="commitments-title">
         <SectionHeading
           id="commitments-title"
+          eyebrow="Accountability"
           title="What this commits us to"
           dek="A process is only worth publishing if it constrains the people running it. These are the parts you can hold us to."
         />
@@ -114,11 +115,11 @@ export default function ProcessPage() {
               id="pricing-link-title"
               className="text-title max-w-[22ch] font-semibold text-graphite"
             >
-              The price is published, not quoted on request
+              Our pricing is published
             </h2>
             <p className="mt-5 max-w-[54ch] text-dek leading-relaxed text-muted">
-              You can see what a build costs before you speak to anyone. Most
-              studios will not tell you until they have your phone number.
+              You can see what a build costs before you speak to anyone, so you
+              can decide whether a conversation is worth your time.
             </p>
           </div>
           <div className="md:col-span-4 md:col-start-9">
@@ -126,7 +127,7 @@ export default function ProcessPage() {
               href="/pricing"
               className="inline-flex items-center justify-center gap-2 rounded-sm bg-accent px-5 py-3 text-[0.9375rem] font-medium text-white transition-colors hover:bg-accent-deep"
             >
-              See what it costs
+              View pricing
               <ArrowRight />
             </Link>
           </div>

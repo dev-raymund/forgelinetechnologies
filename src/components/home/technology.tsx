@@ -25,8 +25,9 @@ export function Technology({
     <Section id="technology" ground={ground} size="md" labelledBy="tech-title">
       <SectionHeading
         id="tech-title"
-        title="Chosen for the problem, not the résumé"
-        dek="No stack is right for every project, so the recommendation depends on what you are building and who has to maintain it. WordPress is the correct answer more often than developers like to admit — and the wrong one when a business needs software rather than pages."
+        eyebrow="Technology"
+        title="Technology that fits the job"
+        dek="We do not force every project into the same stack. The recommendation follows the requirements — what the system has to do, what it must connect to, how it needs to perform, and who will maintain it after launch. WordPress is the right answer more often than developers like to admit, and the wrong one when a business needs software rather than pages."
       />
 
       <dl className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">

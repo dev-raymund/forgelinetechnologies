@@ -53,10 +53,11 @@ export function Hero() {
                 style={{ animationDelay: "340ms" }}
               >
                 <p className="text-dek text-on-ink-muted">
-                  A web engineering studio. We build, improve, connect and
-                  automate the systems a business runs on — with a fixed scope,
-                  a fixed price, and direct access to the person writing the
-                  code.
+                  Forgeline Technologies builds and supports websites, web
+                  applications, e-commerce and custom software for businesses
+                  that need technology to work properly — with the scope and
+                  the price agreed before development starts, and direct
+                  access to the people building it.
                 </p>
               </div>
 
@@ -81,7 +82,7 @@ export function Hero() {
                   variant="outline"
                   icon={<Search />}
                 >
-                  Not sure yet? Book a Build Audit
+                  Book a Build Audit
                 </ButtonLink>
               </div>
             </div>

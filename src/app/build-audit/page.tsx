@@ -41,9 +41,9 @@ export default function BuildAuditPage() {
 
       <PageHeader
         visual={<PageVisual variant="audit" />}
-        meta="Start here if you are not sure"
-        title="Work out what to build, before building it"
-        dek="Anyone can quote you for a website. Working out whether a website is the answer is the part that saves money. A Build Audit looks at what you already have and tells you what is actually worth doing."
+        meta="Build Audit"
+        title="Know what to build, before you build it"
+        dek="Anyone can quote you for a website. Establishing whether a website is the answer is the part that saves money. A Build Audit reviews what you already have and sets out what is actually worth doing, and in what order."
       >
         <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
           <ButtonLink
@@ -60,8 +60,9 @@ export default function BuildAuditPage() {
       <Section ground="paper" size="lg" labelledBy="covers-title">
         <SectionHeading
           id="covers-title"
-          title="What gets looked at"
-          dek="Six things, in the order they usually matter. Measured where they can be measured, rather than described."
+          eyebrow="The review"
+          title="What we look at"
+          dek="Six areas, in the order they usually matter. Measured where they can be measured, rather than described."
         />
         <dl className="grid gap-x-10 gap-y-9 md:grid-cols-2">
           {auditAreas.map((area) => (
@@ -84,7 +85,7 @@ export default function BuildAuditPage() {
               id="outcome-title"
               className="text-title max-w-[18ch] font-semibold text-graphite"
             >
-              What you end up with
+              What you receive
             </h2>
             <p className="mt-5 max-w-[44ch] text-dek leading-relaxed text-muted">
               A recommendation you could hand to any developer — not a sales
@@ -140,7 +141,8 @@ export default function BuildAuditPage() {
       <Section ground="white" size="md" labelledBy="then-title">
         <SectionHeading
           id="then-title"
-          title="Then the normal process"
+          eyebrow="After the audit"
+          title="What happens next"
           dek="The audit is the diagnosis. Everything after it runs the way every Forgeline project runs."
         />
         <ol className="grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">

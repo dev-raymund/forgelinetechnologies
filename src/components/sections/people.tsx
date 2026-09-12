@@ -64,8 +64,9 @@ export function People({ compact = false }: { compact?: boolean }) {
     return (
       <div className="mt-12 border-t border-rule pt-8">
         <p className="max-w-[58ch] text-[0.9375rem] leading-relaxed text-muted">
-          Small team, clear responsibility. You know who you are talking to,
-          who is managing the project, and who is building it.
+          Clear roles, clear communication and direct responsibility. You know
+          who you are talking to, who is managing the project, and who is
+          building it.
         </p>
 
         <ul className="mt-8 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -97,9 +98,10 @@ export function People({ compact = false }: { compact?: boolean }) {
       <h3 className="text-subtitle font-semibold text-graphite">
         The people behind the project
       </h3>
-      <p className="mt-2 max-w-[56ch] text-[0.9375rem] leading-relaxed text-muted">
-        Small team, clear responsibility. You know who you are talking to, who
-        is managing the project, and who is building it.
+      <p className="mt-2 max-w-[58ch] text-[0.9375rem] leading-relaxed text-muted">
+        Clear roles, clear communication and direct responsibility. You know
+        who you are talking to, who is managing the project, and who is
+        building it.
       </p>
 
       <ul className="mt-9 grid gap-x-10 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">

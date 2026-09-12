@@ -27,7 +27,7 @@ export const faqs: Faq[] = [
   {
     question: "Who actually builds my project?",
     answer:
-      "Raymund Hermoso, the founder. You talk to the developer building it, not an account manager relaying messages to one. That is the whole point of the studio, and it is why the client list is deliberately not enormous.",
+      "A focused team of three, and you know all of them by name. Raymund Hermoso, the founder, leads the technical direction and the build. Mark Balinario develops and implements the work. Romeo Lobaton coordinates the project and is your main point of contact. You speak with the people writing the code rather than an account manager relaying messages to them, which is why the client list is deliberately not enormous.",
   },
   {
     question: "What happens before development begins?",

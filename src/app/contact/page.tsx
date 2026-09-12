@@ -32,12 +32,12 @@ const whatHappens = [
   {
     step: "02",
     title: "You get a reply from the developer",
-    body: "Not a sales sequence, and not an account manager. If it is not a fit, you will be told that rather than sold to.",
+    body: "Not a sales sequence, and not an account manager. If it is not a fit, we will tell you rather than sell to you.",
   },
   {
     step: "03",
     title: "A free scoping call",
-    body: "We work out what the project actually has to do. No obligation and nothing to sign.",
+    body: "We establish what the project actually has to do. No obligation and nothing to sign.",
   },
   {
     step: "04",
@@ -52,8 +52,8 @@ export default function ContactPage() {
       <PageHeader
         visual={<PageVisual variant="contact" />}
         meta="Start a project"
-        title="Tell us what you need built"
-        dek="The more you can say about what the project has to do, the more useful the first reply will be. If you are still working that out, say so — scoping it is part of the job."
+        title="Tell us what you are trying to build"
+        dek="Whether you are building something new, improving what you have, or automating work your team should not have to repeat, send the details and we will work out the right next step. If you are still deciding what you need, say so — scoping it is part of the job."
       />
 
       <Section ground="paper" size="lg" labelledBy="form-title">

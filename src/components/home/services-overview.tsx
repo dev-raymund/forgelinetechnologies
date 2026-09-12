@@ -21,9 +21,9 @@ import { services, type Service } from "@/data/services";
  * hierarchy the grouping just created.
  */
 const groups: { name: Service["group"]; note: string }[] = [
-  { name: "Build", note: "Something new, or a replacement for something that has been outgrown." },
-  { name: "Improve", note: "You already have it. It needs to work better." },
-  { name: "Connect", note: "The systems exist. They need to talk to each other." },
+  { name: "Build", note: "Something new, or a replacement for a system your business has outgrown." },
+  { name: "Improve", note: "You already have it. It needs to perform better and be easier to find." },
+  { name: "Connect", note: "The systems exist. They need to share information reliably." },
   { name: "Automate", note: "The work happens the same way every time. It should not need a person." },
 ];
 
@@ -32,8 +32,9 @@ export function ServicesOverview() {
     <Section id="services" ground="paper" size="lg" labelledBy="services-title">
       <SectionHeading
         id="services-title"
-        title="Build, improve, connect, automate"
-        dek="Eight services, grouped by what you are actually trying to do. Most projects start in one group and touch a second — a new site that also needs its systems connected, or an application that needs the repetitive part taken out."
+        eyebrow="What we do"
+        title="Digital solutions built around your business"
+        dek="Websites, web applications, e-commerce, custom software, integrations, search and automation — grouped by what you are trying to achieve rather than by the technology behind it. Most projects begin in one group and touch a second."
       />
 
       <div className="flex flex-col gap-14 md:gap-16">

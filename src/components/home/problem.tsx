@@ -19,8 +19,9 @@ export function Problem() {
     <Section id="problem" ground="white" size="lg" labelledBy="problem-title">
       <SectionHeading
         id="problem-title"
+        eyebrow="Where projects start"
         title="The website is rarely the whole problem"
-        dek="Most projects arrive described as a redesign and turn out to be something else — a system that cannot talk to another one, a process still running on a spreadsheet, or a site search engines cannot read. Working out which comes first."
+        dek="Most projects arrive described as a redesign and turn out to be something else — two systems that cannot talk to each other, a process still running on a spreadsheet, or a site search engines cannot read properly. Identifying which one you have is the first piece of work."
       />
 
       <ul className="grid gap-x-10 gap-y-8 md:grid-cols-2">
@@ -37,8 +38,8 @@ export function Problem() {
       </ul>
 
       <p className="mt-12 max-w-[62ch] text-dek leading-relaxed text-graphite">
-        If one of those is familiar, the first step is not a quote. It is
-        working out what actually needs to change —{" "}
+        If any of those sound familiar, the right first step is not a quote.
+        It is establishing what actually needs to change —{" "}
         <Link
           href="/build-audit"
           className="font-medium underline decoration-rule-strong underline-offset-[6px] transition-colors hover:decoration-accent"

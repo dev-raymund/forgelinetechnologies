@@ -18,7 +18,8 @@ export function Faq() {
     <Section id="faq" ground="paper" size="lg" labelledBy="faq-title">
       <SectionHeading
         id="faq-title"
-        title="Questions worth asking"
+        eyebrow="FAQ"
+        title="What clients usually want to know"
         dek="Including the ones that decide whether you hire someone: what it costs, who owns the result, and who is actually doing the work."
       />
 

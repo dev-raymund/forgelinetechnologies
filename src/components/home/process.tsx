@@ -18,8 +18,9 @@ export function Process() {
     <Section id="process" ground="white" size="lg" labelledBy="process-title">
       <SectionHeading
         id="process-title"
-        title={METHOD_NAME}
-        dek="Four steps, and no black box. The first one is a diagnosis rather than a quote — because building the wrong thing correctly is the most expensive mistake in this industry."
+        eyebrow={METHOD_NAME}
+        title="How we work"
+        dek="A clear process from first conversation to launch, with agreed scope, visible progress and direct communication at every stage. The first step is a diagnosis rather than a quote, because building the wrong thing correctly is the most expensive mistake in this industry."
       />
 
       <ol className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">

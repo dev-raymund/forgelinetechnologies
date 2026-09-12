@@ -31,9 +31,9 @@ export default function PricingPage() {
     <>
       <PageHeader
         visual={<PageVisual variant="pricing" />}
-        meta="Fixed scope, fixed price"
+        meta="Pricing"
         title="What it costs, before you call"
-        dek="Every engagement starts with a free scoping call and a fixed quote. These are the starting figures those quotes are built from — published, so you can decide whether a conversation is worth your time."
+        dek="Every engagement starts with a free scoping call and a fixed quote. These are the starting figures those quotes are built from, published so you can decide whether a conversation is worth your time."
       />
 
       <Section ground="paper" size="lg" labelledBy="packages-title">
@@ -131,7 +131,8 @@ export default function PricingPage() {
       <Section ground="white" size="md" labelledBy="addons-title">
         <SectionHeading
           id="addons-title"
-          title="Also available"
+          eyebrow="Add-ons"
+          title="Additional services"
           dek="Smaller pieces of work, priced the same way — fixed, and agreed up front."
         />
         <ul className="grid gap-x-8 gap-y-8 md:grid-cols-3">
@@ -160,7 +161,8 @@ export default function PricingPage() {
       <Section ground="paper" size="md" labelledBy="how-pricing-title">
         <SectionHeading
           id="how-pricing-title"
-          title="How fixed price actually works"
+          eyebrow="How pricing works"
+          title="What a fixed price commits us to"
           dek="Fixed price is only meaningful if both sides know what happens when something changes. This is that answer."
         />
         <dl className="grid gap-x-8 gap-y-9 md:grid-cols-3">

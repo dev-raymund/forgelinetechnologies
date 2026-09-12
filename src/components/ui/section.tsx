@@ -61,11 +61,19 @@ export function Section({
  */
 export function SectionHeading({
   id,
+  eyebrow,
   title,
   dek,
   aside,
 }: {
   id: string;
+  /**
+   * Short label above the heading — the same device the page headers already
+   * use for `meta`. It exists so a heading can be plain ("How we work") while
+   * the label still carries the named thing ("The Forgeline Build Method"),
+   * instead of the heading having to do both jobs at once.
+   */
+  eyebrow?: string;
   title: string;
   dek?: string;
   /** Optional right-hand counterweight, e.g. a link or a count. */
@@ -81,14 +89,18 @@ export function SectionHeading({
     <div className="relative mb-12 md:mb-16">
       <span className="rail-node hidden md:block" aria-hidden="true" />
       <div className="grid gap-6 md:grid-cols-12 md:items-end md:gap-10">
-        <h2
-          id={id}
-          className={`text-title font-semibold ${
-            hasAside ? "md:col-span-5" : "md:col-span-6"
-          }`}
-        >
-          {title}
-        </h2>
+        <div className={hasAside ? "md:col-span-5" : "md:col-span-6"}>
+          {eyebrow ? (
+            // Never `text-accent` on a light ground: orange on paper measures
+            // 2.80:1. On ink it is 5.42:1, so the accent is safe only there.
+            <p className="mb-4 font-mono text-micro text-faint [.on-ink_&]:text-accent">
+              {eyebrow}
+            </p>
+          ) : null}
+          <h2 id={id} className="text-title font-semibold">
+            {title}
+          </h2>
+        </div>
         {dek ? (
           <p
             className={`max-w-[52ch] text-dek text-muted [.on-ink_&]:text-on-ink-muted ${

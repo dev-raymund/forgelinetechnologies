@@ -13,7 +13,7 @@ import { Counter } from "@/components/ui/counter";
 
 export const metadata: Metadata = {
   title: "About",
-  description: `Forgeline Technologies is a web engineering studio founded by ${founder.name}. Fixed scope, fixed price, and the developer you brief is the developer who builds it.`,
+  description: `Forgeline Technologies is a focused technology studio founded by ${founder.name}. Agreed scope, an agreed price, and direct access to the people building your project.`,
   alternates: { canonical: "/about" },
 };
 
@@ -25,16 +25,16 @@ export const metadata: Metadata = {
  * time, and a buyer reads it as confidence rather than as a disclaimer.
  */
 const goodFit = [
-  "Businesses that need a website or application built properly and launched, not an ongoing design conversation.",
-  "Teams that want to talk to the person writing the code rather than through an account manager.",
-  "Anyone taking over a project that was left unfinished, or a site that has become impossible to maintain.",
-  "Agencies needing a developer who can take a service line and ship it.",
+  "Businesses that need a website or application built properly and launched, rather than an open-ended design conversation.",
+  "Teams that want to speak with the people writing the code rather than through an account manager.",
+  "Businesses inheriting a project that was left unfinished, or a site that has become impossible to maintain.",
+  "Agencies that need a development partner able to take a service line and deliver it.",
 ];
 
 const poorFit = [
-  "Projects that need a large team working in parallel on many workstreams at once.",
-  "Work where the scope genuinely cannot be pinned down before it starts — fixed price stops being honest there.",
-  "Anyone looking for the cheapest possible quote rather than something maintainable afterwards.",
+  "Programmes that need a large team working in parallel across many workstreams at once.",
+  "Work where the scope genuinely cannot be established before it starts — a fixed price stops being honest there.",
+  "Buyers looking for the cheapest possible quote rather than something maintainable afterwards.",
 ];
 
 export default function AboutPage() {
@@ -42,14 +42,15 @@ export default function AboutPage() {
     <>
       <PageHeader
         visual={<PageVisual variant="about" />}
-        meta="About the studio"
-        title="A web engineering studio, deliberately small"
-        dek="Forgeline builds websites, web applications, e-commerce and custom software for businesses that need the result to work — and keeps the distance between the brief and the build as short as it can be."
+        meta="About Forgeline"
+        title="Professional digital solutions, delivered directly"
+        dek="Forgeline Technologies designs, develops and supports websites, web applications, e-commerce and custom software for businesses that need reliable technology without unnecessary layers between the brief and the build."
       />
 
       <Section ground="paper" size="lg" labelledBy="why-exists">
         <div className="grid gap-10 md:grid-cols-12 md:gap-12">
           <div className="md:col-span-4">
+            <p className="mb-4 font-mono text-micro text-faint">Our story</p>
             <h2
               id="why-exists"
               className="text-title max-w-[16ch] font-semibold text-graphite"
@@ -80,10 +81,10 @@ export default function AboutPage() {
                 product that actually goes live.
               </p>
               <p className="text-graphite">
-                That is also why the team stays small. Everyone on a project has
-                a name and a job you can point at — the moment it needs a layer
-                of management to run, the thing that makes it worth hiring is
-                gone.
+                That is also why the team stays focused. Everyone on a project
+                has a name and a defined responsibility — the moment it needs a
+                layer of management to run, the thing that makes it worth
+                hiring is gone.
               </p>
             </div>
 
@@ -123,14 +124,15 @@ export default function AboutPage() {
       <Section ground="ink" size="md" labelledBy="experience-title">
         <SectionHeading
           id="experience-title"
-          title="The record so far"
+          eyebrow="Track record"
+          title="What we have delivered"
           dek={`${projects.length} projects delivered for businesses in ${marketsSentence}, across websites, web applications, e-commerce and custom software.`}
           aside={
             <Link
               href="/work"
               className="shrink-0 self-start text-[0.9375rem] font-medium text-on-ink underline decoration-rule-ink-strong underline-offset-[6px] transition-colors hover:text-accent hover:decoration-accent md:self-end"
             >
-              See the work
+              View our work
             </Link>
           }
         />
@@ -156,8 +158,9 @@ export default function AboutPage() {
       <Section ground="paper" size="lg" labelledBy="fit-title">
         <SectionHeading
           id="fit-title"
-          title="Who this works for"
-          dek="And who it does not. Saying so up front saves a call that was never going to go anywhere."
+          eyebrow="Working together"
+          title="Who we work best with"
+          dek="And who we are not the right fit for. Saying so up front saves a conversation that was never going to go anywhere."
         />
         <div className="grid gap-10 md:grid-cols-2 md:gap-12">
           <div>
@@ -200,8 +203,9 @@ export default function AboutPage() {
       <Section ground="white" size="md" labelledBy="expect-title">
         <SectionHeading
           id="expect-title"
-          title="What you can expect"
-          dek="Five commitments, all of them things we control. The full version, with what each one means in practice, is on the homepage."
+          eyebrow="The Forgeline Promise"
+          title="What you can expect from us"
+          dek="Five commitments that apply to every project, all of them things within our control. The full version, with what each one means in practice, is on the homepage."
         />
         <ol className="grid gap-x-10 gap-y-7 md:grid-cols-2">
           {promises.map((item) => (

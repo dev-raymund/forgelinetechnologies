@@ -67,9 +67,9 @@ export function ClosingCta() {
                 Book a Build Audit
               </h3>
               <p className="mt-3 max-w-[44ch] text-[0.9375rem] leading-relaxed text-on-ink-muted">
-                For when the problem is clear but the solution is not. We work
-                out what is actually wrong, what is worth keeping, and what to
-                do first — before anyone quotes you for a rebuild.
+                For when the problem is clear but the right solution is not. We
+                establish what is actually wrong, what is worth keeping and
+                what to do first — before anyone quotes you for a rebuild.
               </p>
               <div className="mt-7">
                 <ButtonLink
@@ -78,7 +78,7 @@ export function ClosingCta() {
                   variant="outline"
                   icon={<Search />}
                 >
-                  How it works
+                  Book a Build Audit
                 </ButtonLink>
               </div>
             </div>
@@ -102,7 +102,7 @@ export function ClosingCta() {
                 href="/pricing"
                 className="shrink-0 text-[0.9375rem] font-medium text-on-ink underline decoration-rule-ink-strong underline-offset-4 transition-colors hover:decoration-accent"
               >
-                See what it costs
+                View pricing
               </Link>
             )}
           </div>

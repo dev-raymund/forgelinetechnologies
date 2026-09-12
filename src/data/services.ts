@@ -1,9 +1,9 @@
 /**
  * Service lines.
  *
- * Six, deliberately. The previous site listed capabilities as a flat wall of
- * words; a buyer could not tell which one to ask for. Each entry here has to
- * earn its place by being something a client would actually commission on
+ * Eight, deliberately. The previous site listed capabilities as a flat wall
+ * of words; a buyer could not tell which one to ask for. Each entry here has
+ * to earn its place by being something a client would actually commission on
  * its own.
  *
  * `evidence` points at real project slugs. A service claim next to a live
@@ -69,9 +69,9 @@ export const services: Service[] = [
       "Your site looks dated, reads badly on a phone, or nobody can find it.",
     icon: "window",
     summary:
-      "Marketing and corporate sites that load fast, get found, and your own team can keep current.",
+      "Marketing and corporate websites built for performance, search visibility and easy updating by your own team.",
     description:
-      "For businesses whose current site is slow, awkward to edit, or was built by someone who has since disappeared. You get a site that works properly on any device, that search engines can actually read, and that your team can update without raising a ticket for every wording change.",
+      "For businesses whose current site is slow, awkward to edit, or was built by someone who is no longer available. You get a website that works properly on every device, that search engines can read and index, and that your team can update without raising a ticket for every wording change.",
     includes: [
       "Marketing and corporate websites",
       "Landing pages and campaign sites",
@@ -92,9 +92,9 @@ export const services: Service[] = [
       "A spreadsheet is doing a job it was never built to do.",
     icon: "dashboard",
     summary:
-      "Portals, dashboards, booking systems and internal tools — for when a spreadsheet has stopped coping.",
+      "Custom portals, dashboards, booking systems and internal applications built to replace fragmented or manual processes.",
     description:
-      "For businesses running important work through spreadsheets, email threads and software that almost fits. You get a system built around the process you actually follow, with proper logins and permissions, data you can rely on, and an interface your team will use without being made to.",
+      "For businesses running important work through spreadsheets, email threads and software that almost fits. You get a system built around the process you actually follow, with proper accounts and permissions, data you can rely on, and an interface your team will use without being made to.",
     includes: [
       "Customer and client portals",
       "Dashboards and reporting interfaces",
@@ -115,9 +115,9 @@ export const services: Service[] = [
       "The store cannot do what you now need it to sell.",
     icon: "cart",
     summary:
-      "Shopify, WooCommerce and custom storefronts — built to sell, and to still be maintainable next year.",
+      "Shopify, WooCommerce and custom commerce platforms designed for performance, usability and long-term maintainability.",
     description:
-      "For businesses selling online where the storefront has to handle real products, real payments and real shipping rules. You get a store on whichever platform genuinely suits your catalogue and your margins — and one where adding a product next year does not mean hiring a developer.",
+      "For businesses selling online where the storefront has to handle real products, real payments and real shipping rules. You get a store on whichever platform genuinely suits your catalogue and your margins, and one where adding a product next year does not mean hiring a developer.",
     includes: [
       "Shopify and WooCommerce builds",
       "Custom commerce and checkout",
@@ -138,7 +138,7 @@ export const services: Service[] = [
       "Nothing off the shelf fits the way the business actually runs.",
     icon: "code",
     summary:
-      "Software shaped around how your business actually works, not how a template assumed it would.",
+      "Business systems and workflow tools built around your processes, for the work no off-the-shelf product supports.",
     description:
       "For businesses with a process no off-the-shelf product supports — the quoting rule, the approval chain, the way stock gets counted. It is worth building at the point where the workaround costs more every month than the build would cost once. You get software that fits the business, instead of a business bent to fit the software.",
     includes: [
@@ -154,39 +154,16 @@ export const services: Service[] = [
   },
   {
     number: "05",
-    title: "APIs & Integrations",
-    slug: "apis-integrations",
-    group: "Connect",
-    problem:
-      "Two systems hold the same information and neither knows about the other.",
-    icon: "plug",
-    summary:
-      "Connect your site or app to the systems you already use — payments, CRMs, databases and third-party services.",
-    description:
-      "For businesses entering the same information twice because two systems do not talk to each other. You get the connections that move data between your website, your CRM, your payment provider and your internal tools — so something is entered once and is then correct everywhere it appears.",
-    includes: [
-      "REST API design and build",
-      "Third-party service integration",
-      "CRM and payment provider connections",
-      "Listing and data feed integration",
-      "Authentication between systems",
-      "Scheduled syncs and webhooks",
-    ],
-    evidence: ["talk-global-study", "lisa-sherman-realty"],
-    related: ["automation", "web-applications"],
-  },
-  {
-    number: "06",
-    title: "SEO",
+    title: "Search & SEO",
     slug: "seo",
     group: "Improve",
     problem:
       "The site is fine to look at, but search engines cannot make sense of it.",
     icon: "search",
     summary:
-      "Technical and on-page work that makes a site easier to find, and easier for search engines to read.",
+      "Technical and on-page optimisation that makes your site easier to find, and easier for search engines to read.",
     description:
-      "For businesses whose site looks fine but is effectively invisible in search. You get the foundations put right — how pages are structured, labelled and linked, and how fast they load — so search engines can tell what you do and who you do it for. No ranking promises: nobody can honestly make those, and anyone who does is guessing.",
+      "For businesses whose site looks fine but is effectively invisible in search. You get the foundations put right — site architecture, page structure, metadata, structured data, internal linking and load speed — so search engines can tell what you do and who you do it for. No ranking promises: nobody can honestly make those, and anyone who does is guessing.",
     includes: [
       "Technical SEO audit",
       "Metadata and structured data",
@@ -227,7 +204,53 @@ export const services: Service[] = [
     ],
   },
   {
+    number: "06",
+    title: "Ongoing Development",
+    slug: "ongoing-development",
+    group: "Improve",
+    problem:
+      "It launched, and then there was nobody left to keep improving it.",
+    icon: "refresh",
+    summary:
+      "Month-to-month development support for the features, fixes and maintenance that follow a launch.",
+    description:
+      "For businesses that need development to continue but do not need a full-time hire. You get the features that were not in the original scope, the fixes you will inevitably want, and the hosting, updates and monitoring that keep a site healthy — month to month, and cancellable.",
+    includes: [
+      "New features and improvements",
+      "Bug fixes and technical support",
+      "Hosting, updates and backups",
+      "Uptime and performance monitoring",
+      "Security patching",
+      "Month to month, cancel anytime",
+    ],
+    evidence: ["multihull-central", "perfect-floors"],
+    related: ["seo", "automation"],
+  },
+  {
     number: "07",
+    title: "APIs & Integrations",
+    slug: "apis-integrations",
+    group: "Connect",
+    problem:
+      "Two systems hold the same information and neither knows about the other.",
+    icon: "plug",
+    summary:
+      "Connect your website or application to the systems you already use — CRMs, payment providers, databases and third-party services.",
+    description:
+      "For businesses entering the same information twice because two systems do not share it. You get the connections that move data between your website, your CRM, your payment provider and your internal tools, so information is entered once and is then correct everywhere it appears.",
+    includes: [
+      "REST API design and build",
+      "Third-party service integration",
+      "CRM and payment provider connections",
+      "Listing and data feed integration",
+      "Authentication between systems",
+      "Scheduled syncs and webhooks",
+    ],
+    evidence: ["talk-global-study", "lisa-sherman-realty"],
+    related: ["automation", "web-applications"],
+  },
+  {
+    number: "08",
     title: "Automation",
     slug: "automation",
     group: "Automate",
@@ -235,9 +258,9 @@ export const services: Service[] = [
       "Someone repeats the same task every week, and it never needed a person.",
     icon: "workflow",
     summary:
-      "Connect the systems you already use and take the repetitive work out of the week.",
+      "Workflow automation and integrations that take repetitive manual work out of your team’s week.",
     description:
-      "For businesses typing the same information into two systems, or doing by hand something that happens the same way every time. You get the connections and workflows that move data between your website, your CRM, your inbox and your internal tools — so something entered once is correct everywhere, and the work that never needed a person stops taking one.",
+      "For businesses typing the same information into two systems, or handling by hand something that happens the same way every time. You get the workflows and connections that move data between your website, your CRM, your inbox and your internal tools — so information entered once is correct everywhere, and the work that never needed a person stops taking one.",
     includes: [
       "Form-to-CRM workflows",
       "Lead routing and notifications",
@@ -273,29 +296,6 @@ export const services: Service[] = [
           "It should tell you rather than fail quietly, which is the difference between an automation and a liability. Failures notify someone, and anything that moves data keeps a record you can check.",
       },
     ],
-  },
-  {
-    number: "08",
-    title: "Ongoing Development",
-    slug: "ongoing-development",
-    group: "Improve",
-    problem:
-      "It launched, and then there was nobody left to keep improving it.",
-    icon: "refresh",
-    summary:
-      "A developer on hand month to month for the features, fixes and maintenance that come after launch.",
-    description:
-      "For businesses that need development to continue but do not need a full-time hire. You get the features that were not in the original scope, the fixes you will inevitably want, and the hosting, updates and monitoring that keep a site healthy — month to month, and cancellable.",
-    includes: [
-      "New features and improvements",
-      "Bug fixes and technical support",
-      "Hosting, updates and backups",
-      "Uptime and performance monitoring",
-      "Security patching",
-      "Month to month, cancel anytime",
-    ],
-    evidence: ["multihull-central", "perfect-floors"],
-    related: ["seo", "automation"],
   },
 ];
 

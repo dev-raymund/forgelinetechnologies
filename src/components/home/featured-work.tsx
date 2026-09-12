@@ -25,8 +25,9 @@ export function FeaturedWork() {
     <Section id="work" ground="paper" size="peak" labelledBy="work-title">
       <SectionHeading
         id="work-title"
-        title="Selected work"
-        dek={`Live, verifiable builds for businesses in ${marketsSentence}.`}
+        eyebrow="Our work"
+        title="Projects we have delivered"
+        dek={`Websites, applications, online stores and custom software delivered for businesses in ${marketsSentence}.`}
         aside={
           <Link
             href="/work"

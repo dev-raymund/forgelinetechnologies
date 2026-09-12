@@ -21,24 +21,24 @@ const typicalChain = [
   "Your product",
 ];
 
-const forgelineChain = ["You", "The developer", "Your product"];
+const forgelineChain = ["You", "The team building it", "Your product"];
 
 const consequences = [
   {
     title: "Fewer misunderstandings",
-    body: "The person who hears what you need is the person who builds it. Nothing is summarised twice on its way to the code, so what ships matches what you actually asked for.",
+    body: "Your requirements go directly to the people responsible for implementing them. Nothing is re-interpreted on its way to the build, so what ships matches what you asked for.",
   },
   {
     title: "Faster decisions",
-    body: "Questions get answered on the call by someone who can genuinely answer them, rather than taken away and brought back next week.",
+    body: "Technical questions are answered on the call by the people responsible for the work, instead of being taken away and returned the following week.",
   },
   {
     title: "One point of accountability",
-    body: "If something is wrong there is no discussion about whose scope it was. It is the same person either way, which makes it quicker to put right.",
+    body: "One team is responsible for the result. If something is wrong there is no discussion about whose scope it was, which makes it faster to resolve.",
   },
   {
     title: "A handover you can act on",
-    body: "Code, accounts and documentation all transfer to you. You own the result outright and you are free to take it to anyone.",
+    body: "Code, accounts and documentation transfer to you on completion. You own the result outright and are free to take it to any developer.",
   },
 ];
 
@@ -101,8 +101,9 @@ export function WhyForgeline() {
     <Section id="why" ground="ink" size="lg" labelledBy="why-title">
       <SectionHeading
         id="why-title"
-        title="Fewer layers between you and the build"
-        dek="Bigger teams exist for good reasons, and on large programmes they are the right answer. But on a website or a web application, every handoff between people is somewhere the brief can drift — and that is where most projects go wrong, long before the code does."
+        eyebrow="Why Forgeline"
+        title="A simpler way to get digital work done"
+        dek="You work directly with the people responsible for your project. Layered teams earn their keep on large programmes; on a website or a web application, every handoff is a point where the brief can drift — and that is where most projects go wrong, long before the code does."
       />
 
       <div className="grid gap-12 md:grid-cols-12 md:gap-8">

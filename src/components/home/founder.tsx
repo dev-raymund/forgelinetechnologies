@@ -19,6 +19,7 @@ export function Founder() {
     <Section ground="white" size="lg" labelledBy="founder-title">
       <div className="grid gap-10 md:grid-cols-12 md:gap-12">
         <div className="md:col-span-4">
+          <p className="mb-4 font-mono text-micro text-faint">About Forgeline</p>
           <h2
             id="founder-title"
             className="text-title max-w-[16ch] font-semibold text-graphite"
@@ -45,9 +46,9 @@ export function Founder() {
             </p>
             <p className="text-graphite">
               Forgeline is the correction. Scope agreed before work starts. A
-              price you approve up front. The developer you brief is the
-              developer who builds it. Clean code, a clean handover, and a
-              product that actually goes live.
+              price you approve up front. The people you brief are the people
+              who build it. Clean code, a clean handover, and a product that
+              actually goes live.
             </p>
           </div>
 

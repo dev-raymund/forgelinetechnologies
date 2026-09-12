@@ -40,7 +40,7 @@ export const team: TeamMember[] = [
     name: founder.name,
     role: founder.role,
     summary:
-      "Started the studio and leads its technical direction. The reason it works the way it does is in the story above.",
+      "Founded the studio and leads its technical direction. Responsible for how work is scoped, built and delivered.",
     photo: founder.photo,
     photoAlt: `${founder.name} — ${founder.role}`,
     zoom: 1.15,
@@ -49,7 +49,7 @@ export const team: TeamMember[] = [
     name: "Romeo D. Lobaton Jr.",
     role: "Project Manager",
     summary:
-      "Your point of contact. Coordinates conversations, meetings and progress, and keeps requirements moving from a discussion into the build.",
+      "Your main point of contact. Handles client communication, meetings and project coordination, and keeps requirements moving from discussion into delivery.",
     photo: "/assets/team/RomeoLobaton.webp",
     photoAlt: "Romeo D. Lobaton Jr. — Project Manager",
     zoom: 1.55,
@@ -58,7 +58,7 @@ export const team: TeamMember[] = [
     name: "Mark C. Balinario",
     role: "Web Developer",
     summary:
-      "Builds the web work — implementing the agreed requirements, and maintaining what ships once it is live.",
+      "Web development and implementation. Builds the agreed requirements, and maintains what ships once it is live.",
     photo: "/assets/team/MarkBalinario.webp",
     photoAlt: "Mark C. Balinario — Web Developer",
   },

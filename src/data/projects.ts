@@ -105,7 +105,7 @@ export const projects: Project[] = [
     kind: "Website",
     sector: "Real Estate",
     description:
-      "An agent site that shows current listings without anyone re-entering them by hand. It reads the MLS/IDX feed directly and renders that external data in the site's own presentation layer.",
+      "An agent site that shows current listings without anyone re-entering them by hand. It reads the MLS/IDX feed directly, so listings appear in the site's own design and stay current on their own.",
     image: "/assets/projects/lisasherman.jpg",
     imageAlt: "Lisa Sherman Realty website with MLS listing integration",
     liveUrl: "https://lisashermanrealty.com/",
