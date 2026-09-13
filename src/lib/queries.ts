@@ -50,7 +50,7 @@ export async function getPublishedProjects(): Promise<Project[]> {
     getDb()
       .select()
       .from(projects)
-      .where(eq(projects.published, true))
+      .where(eq(projects.status, "published"))
       .orderBy(asc(projects.sortOrder), desc(projects.createdAt)),
   );
 }
@@ -62,7 +62,7 @@ export async function getProjectBySlug(
     getDb()
       .select()
       .from(projects)
-      .where(and(eq(projects.slug, slug), eq(projects.published, true)))
+      .where(and(eq(projects.slug, slug), eq(projects.status, "published")))
       .limit(1),
   );
   return rows[0];
@@ -75,7 +75,7 @@ export async function getPublishedPosts(): Promise<Post[]> {
     getDb()
       .select()
       .from(posts)
-      .where(eq(posts.published, true))
+      .where(eq(posts.status, "published"))
       .orderBy(desc(posts.publishedAt), desc(posts.createdAt)),
   );
 }
@@ -85,7 +85,7 @@ export async function getPostBySlug(slug: string): Promise<Post | undefined> {
     getDb()
       .select()
       .from(posts)
-      .where(and(eq(posts.slug, slug), eq(posts.published, true)))
+      .where(and(eq(posts.slug, slug), eq(posts.status, "published")))
       .limit(1),
   );
   return rows[0];

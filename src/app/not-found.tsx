@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { services } from "@/data/services";
+import { SiteHeader } from "@/components/layout/site-header";
+import { SiteFooter } from "@/components/layout/site-footer";
 
 export const metadata: Metadata = {
   title: "Page not found",
@@ -12,9 +14,17 @@ export const metadata: Metadata = {
  *
  * An empty-state screen is an invitation to act, so this offers the routes a
  * lost visitor most likely wanted rather than an apology and a dead end.
+ *
+ * Carries its own header and footer. Next resolves unmatched URLs against the
+ * root not-found, which sits outside the (site) route group and so does not
+ * inherit the public chrome — without these a 404 would arrive with no way to
+ * navigate anywhere, which is the one thing a 404 must not do.
  */
 export default function NotFound() {
   return (
+    <>
+      <SiteHeader />
+      <main id="main">
     <section className="on-ink bg-ink text-on-ink">
       <div className="shell">
         <div className="railed railed-inset py-24 md:py-36">
@@ -64,5 +74,8 @@ export default function NotFound() {
         </div>
       </div>
     </section>
+      </main>
+      <SiteFooter />
+    </>
   );
 }

@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Archivo, JetBrains_Mono } from "next/font/google";
 import { site, founder } from "@/lib/site";
-import { SiteHeader } from "@/components/layout/site-header";
-import { SiteFooter } from "@/components/layout/site-footer";
 import { Analytics } from "@/components/analytics";
 import "./globals.css";
 
@@ -69,6 +67,15 @@ export const metadata: Metadata = {
   // only advertises that the page was optimised by someone who did not know.
 };
 
+/**
+ * The document shell, and nothing more.
+ *
+ * The public header, footer and skip link moved to app/(site)/layout.tsx when
+ * /admin arrived: the dashboard must not wear the marketing chrome, and a
+ * signed-in admin page showing a "Start a project" button reads as the public
+ * site. Route groups change nothing about URLs — every public path is exactly
+ * where it was.
+ */
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -84,17 +91,7 @@ export default function RootLayout({
             __html: "document.documentElement.classList.add('js')",
           }}
         />
-        <a
-          href="#main"
-          // White on navy, not navy on navy: the header is now ink, and the old
-          // bg-ink skip link landed invisible on top of it.
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-sm focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-ink focus:shadow-lg"
-        >
-          Skip to content
-        </a>
-        <SiteHeader />
-        <main id="main">{children}</main>
-        <SiteFooter />
+        {children}
         <Analytics />
       </body>
     </html>
