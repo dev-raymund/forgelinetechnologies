@@ -35,12 +35,46 @@ and not in the structured data. It only receives.
 
 ## 1. Resend — verify the domain
 
-1. Resend → **Domains** → **Add Domain** → `forgelinetechnologies.com`
-2. Resend gives you DNS records — typically a `TXT` for DKIM and an `MX` plus
-   `TXT` for the return path. Add them wherever the domain's DNS lives.
-3. Wait for the domain to show **Verified**. Usually minutes; DNS can take
-   longer.
+DNS for this domain is at **Hostinger** (nameservers `apollo.dns-parking.com`
+and `athena.dns-parking.com`).
+
+1. Resend → **Domains** → **Add Domain** → `forgelinetechnologies.com`.
+   Pick a region and leave it alone — it decides the `feedback-smtp` hostname.
+2. Resend shows three records. Add them in Hostinger under
+   **Domains → forgelinetechnologies.com → DNS / Nameservers**:
+
+   | Type | Name | Value | Priority |
+   |---|---|---|---|
+   | `MX` | `send` | `feedback-smtp.<region>.amazonses.com` | `10` |
+   | `TXT` | `send` | `v=spf1 include:amazonses.com ~all` | — |
+   | `TXT` | `resend._domainkey` | the long `p=…` key | — |
+
+3. Wait for **Verified**. Usually minutes.
 4. **Do not create a mailbox.** There is nothing to create.
+
+### Two things that will break this
+
+**Hostinger's Name field is relative.** Enter `send`, not
+`send.forgelinetechnologies.com` — Hostinger appends the domain itself, and
+pasting the full name produces
+`send.forgelinetechnologies.com.forgelinetechnologies.com`, which resolves to
+nothing. Same for `resend._domainkey`.
+
+**Never put Resend's SPF on the root.** The root already carries
+`v=spf1 include:_spf.mail.hostinger.com ~all` and `MX` records for the
+Hostinger mailbox. A name may hold only one SPF record, so a second one at the
+root breaks SPF for both senders. Resend's SPF and MX belong on the `send`
+subdomain — that is exactly why the subdomain exists, and why none of this
+touches your existing mail.
+
+Check it yourself before clicking Verify:
+
+```
+dig +short TXT resend._domainkey.forgelinetechnologies.com
+dig +short MX  send.forgelinetechnologies.com
+dig +short TXT send.forgelinetechnologies.com
+dig +short TXT forgelinetechnologies.com     # must still be the Hostinger SPF, alone
+```
 
 Until the domain verifies, Resend refuses the send. That is handled: the
 enquiry is still stored, and the log line says the domain is unverified and
