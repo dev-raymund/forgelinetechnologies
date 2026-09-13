@@ -47,6 +47,19 @@ export default async function BlogIndex() {
             {posts.map((p) => (
               <li key={p.id}>
                 <article>
+                  {p.coverUrl ? (
+                    <Link href={`/blog/${p.slug}`} className="mb-5 block">
+                      <span className="relative block aspect-[16/9] overflow-hidden border border-rule bg-white">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={p.coverUrl}
+                          alt=""
+                          loading="lazy"
+                          className="size-full object-cover"
+                        />
+                      </span>
+                    </Link>
+                  ) : null}
                   <p className="font-mono text-micro text-faint">{when(p.publishedAt)}</p>
                   <h3 className="mt-2.5 text-subtitle font-semibold text-graphite">
                     <Link

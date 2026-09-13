@@ -106,6 +106,27 @@ export default async function PostPage({
         </h2>
         <div className="grid md:grid-cols-12">
           <div className="md:col-span-8 md:col-start-3">
+            {/*
+              A plain <img>, not next/image.
+              Cover URLs are typed into the admin and can point at any host.
+              next/image rejects a host that is not in remotePatterns and takes
+              the whole page down with it, so an editor pasting an Unsplash
+              link would 500 the post rather than show a picture. The
+              aspect-ratio box keeps layout shift at zero either way.
+            */}
+            {post.coverUrl ? (
+              <figure className="mb-10">
+                <div className="relative aspect-[16/9] overflow-hidden border border-rule bg-white">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={post.coverUrl}
+                    alt=""
+                    className="size-full object-cover"
+                  />
+                </div>
+              </figure>
+            ) : null}
+
             {/* The HTML comes from renderMarkdown, which escapes author text
                 before emitting any tag and only ever produces tags it chose.
                 Nothing here is author-supplied markup. */}

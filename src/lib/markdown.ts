@@ -43,8 +43,11 @@ function safeUrl(raw: string): string | null {
 function format(text: string): string {
   let out = text;
 
+  // The optional title in ![alt](url "Title") is matched and discarded — it
+  // renders as a tooltip nobody reads, but omitting it from the pattern made
+  // standard Markdown silently fail to produce an image at all.
   out = out.replace(
-    /!\[([^\]]*)\]\(([^)\s]+)\)/g,
+    /!\[([^\]]*)\]\(([^)\s]+)(?:\s+&quot;[^)]*&quot;)?\)/g,
     (m, alt: string, href: string) => {
       const url = safeUrl(href);
       return url ? `<img src="${url}" alt="${alt}" loading="lazy" />` : m;
@@ -52,7 +55,7 @@ function format(text: string): string {
   );
 
   out = out.replace(
-    /\[([^\]]+)\]\(([^)\s]+)\)/g,
+    /\[([^\]]+)\]\(([^)\s]+)(?:\s+&quot;[^)]*&quot;)?\)/g,
     (m, label: string, href: string) => {
       const url = safeUrl(href);
       if (!url) return m;
