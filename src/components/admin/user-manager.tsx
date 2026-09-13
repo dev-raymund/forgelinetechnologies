@@ -136,7 +136,7 @@ export function UserManager({
           <button
             type="button"
             onClick={() => setAdding(true)}
-            className="rounded-sm bg-ink px-4 py-2 text-[0.875rem] font-medium text-white"
+            className="rounded-sm bg-ink px-4 py-2 text-[0.875rem] font-medium text-on-ink"
           >
             New account
           </button>
@@ -194,7 +194,7 @@ export function UserManager({
                         <button
                           type="submit"
                           disabled={pending}
-                          className="rounded-sm bg-ink px-4 py-2 text-[0.875rem] font-medium text-white disabled:opacity-60"
+                          className="rounded-sm bg-ink px-4 py-2 text-[0.875rem] font-medium text-on-ink disabled:opacity-60"
                         >
                           Save
                         </button>
@@ -270,7 +270,7 @@ export function UserManager({
                   <td className="px-4 py-3">
                     <span
                       className={`rounded-sm px-2 py-0.5 font-mono text-micro ${
-                        u.active ? "bg-ink text-white" : "bg-black/[0.06] text-muted"
+                        u.active ? "bg-ink text-on-ink" : "bg-black/[0.06] text-muted"
                       }`}
                     >
                       {u.active ? "active" : "inactive"}

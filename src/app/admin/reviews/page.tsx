@@ -142,7 +142,7 @@ function Chip({
       href={href}
       aria-current={active ? "true" : undefined}
       className={`rounded-sm px-2.5 py-1 font-mono text-micro transition-colors ${
-        active ? "bg-ink text-white" : "bg-white text-muted hover:bg-black/[0.04]"
+        active ? "bg-ink text-on-ink" : "bg-white text-muted hover:bg-black/[0.04]"
       }`}
     >
       {children}

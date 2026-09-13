@@ -65,7 +65,7 @@ export function Card({
 const TONES: Record<string, string> = {
   new: "bg-accent/15 text-graphite",
   pending: "bg-accent/15 text-graphite",
-  published: "bg-ink text-white",
+  published: "bg-ink text-on-ink",
   approved: "bg-ink/10 text-graphite",
   draft: "bg-black/[0.06] text-muted",
   archived: "bg-black/[0.06] text-muted",

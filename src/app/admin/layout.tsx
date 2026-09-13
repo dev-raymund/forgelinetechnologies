@@ -20,6 +20,23 @@ export default async function AdminLayout({
   // Null on the login screen, which renders bare. Every other page calls
   // requireUser itself — this is for the chrome, not for access control.
   const user = await getSessionUser();
-  if (!user) return <>{children}</>;
-  return <AdminShell user={user}>{children}</AdminShell>;
+  return (
+    <>
+      {/*
+        Runs during parse, before anything is painted, so the dashboard never
+        flashes light before switching to dark. Reads the same key the toggle
+        writes, and falls back to the operating system preference.
+
+        Wrapped in try/catch because localStorage throws outright in a private
+        window with site data blocked, and a themeing preference is not worth
+        a blank page.
+      */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `try{var c=localStorage.getItem('forgeline-admin-theme');var d=c==='dark'||((c===null||c==='system')&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.adminTheme=d?'dark':'light'}catch(e){}`,
+        }}
+      />
+      {user ? <AdminShell user={user}>{children}</AdminShell> : children}
+    </>
+  );
 }

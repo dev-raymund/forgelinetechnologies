@@ -532,3 +532,57 @@
 .prose-admin hr { border: 0; border-top: 1px solid var(--color-rule); margin: 2.5em 0; }
 .prose-post img,
 .prose-admin img { max-width: 100%; height: auto; border: 1px solid var(--color-rule); }
+
+/* ---------------------------------------------------------------- admin theme
+   Dark mode for /admin only.
+
+   The overrides are scoped to `.admin-root`, not to :root, even though the
+   attribute that switches them sits on <html>. That combination is deliberate:
+   the attribute has to be on <html> so an inline script can set it before
+   first paint and avoid a flash of the wrong theme, but the token overrides
+   must not reach the public site — the marketing pages have a fixed two-colour
+   palette that is not the visitor's to change, and the attribute would
+   otherwise linger on <html> after navigating out of the dashboard.
+
+   Tailwind v4 compiles `bg-white` to `background-color: var(--color-white)`,
+   so redefining the tokens here re-skins every existing utility in the admin
+   without touching a single component class. */
+.admin-root {
+  --admin-canvas: #f6f7f9;
+  color-scheme: light;
+}
+
+[data-admin-theme="dark"] .admin-root {
+  color-scheme: dark;
+
+  --admin-canvas: #0c1016;
+
+  /* Surfaces. `white` is the card ground throughout the admin, so it becomes
+     the raised surface rather than actual white. */
+  --color-white: #151b23;
+  --color-paper: #1b222c;
+
+  /* Text. Muted and faint keep their relationship to each other so the
+     hierarchy survives the inversion. */
+  --color-graphite: #e4eaf1;
+  --color-muted: #a3b0bf;
+  --color-faint: #7f8c9b;
+
+  /* Hairlines, which carry most of the admin's structure. */
+  --color-rule: #242c37;
+  --color-rule-strong: #33404f;
+
+  /* `ink` is the active-nav and primary-button ground. On a dark canvas a
+     navy block disappears, so it lifts to a visible raised tone instead. */
+  --color-ink: #2b3a52;
+  --color-on-ink: #e4eaf1;
+  --color-on-ink-muted: #a3b0bf;
+}
+
+.admin-root {
+  background-color: var(--admin-canvas);
+}
+
+/* The orange accent is the one thing that does not move. It is the brand mark,
+   it clears AA on both grounds, and re-tinting it per theme would make two
+   different oranges depending on a setting. */

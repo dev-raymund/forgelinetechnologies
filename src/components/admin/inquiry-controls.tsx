@@ -70,7 +70,7 @@ export function InquiryControls({
           <button
             type="submit"
             disabled={pending}
-            className="mt-2 rounded-sm bg-ink px-4 py-2 text-[0.875rem] font-medium text-white disabled:opacity-60"
+            className="mt-2 rounded-sm bg-ink px-4 py-2 text-[0.875rem] font-medium text-on-ink disabled:opacity-60"
           >
             {pending ? "Saving…" : "Add note"}
           </button>
@@ -96,7 +96,7 @@ export function InquiryControls({
             }}
             className={`rounded-sm px-3 py-1.5 font-mono text-micro transition-colors ${
               s === status
-                ? "bg-ink text-white"
+                ? "bg-ink text-on-ink"
                 : "border border-rule-strong bg-white text-muted hover:bg-black/[0.04]"
             } disabled:cursor-default`}
           >

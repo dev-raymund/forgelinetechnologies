@@ -34,7 +34,7 @@ export default async function WorksPage() {
         action={
           <Link
             href="/admin/works/new"
-            className="rounded-sm bg-ink px-4 py-2 text-[0.875rem] font-medium text-white"
+            className="rounded-sm bg-ink px-4 py-2 text-[0.875rem] font-medium text-on-ink"
           >
             New project
           </Link>

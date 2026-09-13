@@ -42,7 +42,7 @@ export function AdminShell({
   const links = LINKS.filter((l) => roleHas(user.role, l.capability));
 
   return (
-    <div className="min-h-dvh bg-[#f6f7f9] text-graphite">
+    <div className="admin-root min-h-dvh text-graphite">
       <AdminNav links={links} user={user} logout={logout} />
       <div className="lg:pl-[15rem]">
         <main className="mx-auto max-w-[78rem] px-5 py-8 md:px-8 md:py-10">

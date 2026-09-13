@@ -36,7 +36,7 @@ export default async function BlogPage() {
         action={
           <Link
             href="/admin/blog/new"
-            className="rounded-sm bg-ink px-4 py-2 text-[0.875rem] font-medium text-white"
+            className="rounded-sm bg-ink px-4 py-2 text-[0.875rem] font-medium text-on-ink"
           >
             New post
           </Link>

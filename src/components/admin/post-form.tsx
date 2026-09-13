@@ -119,7 +119,7 @@ export function PostForm({
                 onClick={() => setTab(t)}
                 aria-pressed={tab === t}
                 className={`rounded-sm px-3 py-1.5 font-mono text-micro ${
-                  tab === t ? "bg-ink text-white" : "border border-rule-strong bg-white text-muted"
+                  tab === t ? "bg-ink text-on-ink" : "border border-rule-strong bg-white text-muted"
                 }`}
               >
                 {t}

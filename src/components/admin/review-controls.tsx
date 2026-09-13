@@ -102,7 +102,7 @@ export function ReviewControls({
             <button
               type="submit"
               disabled={pending}
-              className="rounded-sm bg-ink px-4 py-2 text-[0.875rem] font-medium text-white disabled:opacity-60"
+              className="rounded-sm bg-ink px-4 py-2 text-[0.875rem] font-medium text-on-ink disabled:opacity-60"
             >
               Save
             </button>

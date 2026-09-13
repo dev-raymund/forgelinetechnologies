@@ -4,6 +4,7 @@ import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import type { SessionUser } from "@/lib/auth/session";
+import { ThemeToggle } from "@/components/admin/theme-toggle";
 import {
   BriefcaseIcon,
   FileTextIcon,
@@ -78,7 +79,7 @@ export function AdminNav({
               onClick={() => setOpen(false)}
               aria-current={active ? "page" : undefined}
               className={`flex items-center gap-2.5 rounded-sm px-3 py-2 text-[0.9375rem] transition-colors ${
-                active ? "bg-ink text-white" : "text-graphite hover:bg-black/[0.05]"
+                active ? "bg-ink text-on-ink" : "text-graphite hover:bg-black/[0.05]"
               }`}
             >
               <Icon className={active ? "opacity-90" : "opacity-55"} />
@@ -93,6 +94,8 @@ export function AdminNav({
 
   const account = (
     <div className="border-t border-rule pt-4">
+      <ThemeToggle />
+      <div className="mt-4" />
       <p className="truncate text-[0.875rem] font-medium text-graphite">
         {user.name || user.email}
       </p>
