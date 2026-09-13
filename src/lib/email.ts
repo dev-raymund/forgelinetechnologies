@@ -2,6 +2,7 @@ import "server-only";
 import { Resend } from "resend";
 import { site } from "@/lib/site";
 import type { InquiryData } from "@/lib/validation";
+import type { ReviewData } from "@/lib/review-validation";
 
 /**
  * Email delivery for project enquiries.
@@ -180,6 +181,66 @@ export async function sendInquiryConfirmation(
         `Thanks, ${data.name.split(" ")[0]}`,
         "Your project details are in. They go straight to the developer who would build it.",
         body,
+      ),
+    });
+    return error ? { ok: false, error: explain(error.message) } : { ok: true };
+  } catch (err) {
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "Send failed",
+    };
+  }
+}
+
+/**
+ * Tells the studio a review arrived.
+ *
+ * The sender is always the verified domain identity — never the reviewer's
+ * address. Letting user-supplied input become the From header is how a contact
+ * form turns into an open relay and a domain's reputation into someone else's
+ * asset. The reviewer's address goes in Reply-To, where replying reaches them
+ * and nothing is claimed on their behalf.
+ *
+ * No confirmation is sent to the reviewer. They have just been told on screen
+ * that it arrived, and a second message implying it is live would be wrong —
+ * nothing is published until a person approves it.
+ */
+export async function sendReviewNotification(
+  data: ReviewData,
+  context: { id: number; projectTitle?: string },
+): Promise<SendResult> {
+  const { key, to, from } = config();
+  if (!key || !to || !from) {
+    return { ok: false, skipped: true, error: "Email not configured" };
+  }
+
+  const stars = "\u2605".repeat(data.rating) + "\u2606".repeat(5 - data.rating);
+  const details = `<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">
+    ${row("Name", data.name)}
+    ${row("Company", data.company)}
+    ${row("Email", data.email)}
+    ${row("Rating", `${stars}  (${data.rating}/5)`)}
+    ${row("Project", context.projectTitle ?? "Not specified")}
+    ${row("Permission to publish", data.permissionToPublish ? "Given" : "Not given")}
+    ${row("Received", new Date().toISOString())}
+  </table>
+  <p style="margin:20px 0 6px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#7b8494;">Review</p>
+  ${messageBlock(data.body)}
+  <p style="margin:20px 0 0;font-size:14px;line-height:1.6;color:#3c4453;">
+    Nothing is public yet. Approve or reject it in the dashboard under Reviews.
+  </p>`;
+
+  try {
+    const { error } = await new Resend(key).emails.send({
+      from,
+      to,
+      // The reviewer, so replying answers them directly.
+      replyTo: data.email,
+      subject: `New review \u2014 ${data.name}${data.company ? ` (${data.company})` : ""} \u00b7 ${data.rating}/5`,
+      html: shell(
+        "New client review",
+        `${data.rating} out of 5 \u00b7 awaiting moderation`,
+        details,
       ),
     });
     return error ? { ok: false, error: explain(error.message) } : { ok: true };

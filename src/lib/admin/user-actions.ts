@@ -8,7 +8,11 @@ import { getDb, users } from "@/db";
 import { authorise } from "@/lib/auth/guard";
 import { audit } from "@/lib/auth/audit";
 import { hashPassword } from "@/lib/auth/password";
-import { destroyUserSessions } from "@/lib/auth/session";
+import {
+  currentSessionId,
+  destroyOtherSessions,
+  destroyUserSessions,
+} from "@/lib/auth/session";
 
 /**
  * User administration.
@@ -246,9 +250,23 @@ export async function resetUserPassword(formData: FormData): Promise<UserResult>
     .set({ passwordHash: await hashPassword(password), updatedAt: new Date() })
     .where(eq(users.id, target.id));
 
-  // Every existing session ends: a password reset that leaves the old ones
-  // working has not actually taken anything away from whoever prompted it.
-  await destroyUserSessions(target.id);
+  /*
+   * Whose sessions end depends on whose password this is.
+   *
+   * Someone else's: all of them, immediately. A reset that leaves the old
+   * sessions working has not taken anything away from whoever prompted it.
+   *
+   * Your own: every session except this one. This request just proved it holds
+   * a valid session and performed the reset, so ending it achieves nothing
+   * except signing you out mid-task — and the new password is on screen at
+   * that moment, so the redirect took it away before it could be read. That
+   * was a real way to lock yourself out of your own dashboard.
+   */
+  if (target.id === auth.user.id) {
+    await destroyOtherSessions(target.id, await currentSessionId());
+  } else {
+    await destroyUserSessions(target.id);
+  }
 
   await audit({
     action: "user.update",

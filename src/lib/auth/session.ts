@@ -1,7 +1,7 @@
 import "server-only";
 import { randomBytes } from "node:crypto";
 import { cookies, headers } from "next/headers";
-import { and, eq, gt, lt } from "drizzle-orm";
+import { and, eq, gt, lt, ne } from "drizzle-orm";
 import { getDb, sessions, users, type User } from "@/db";
 import { withRetry } from "@/lib/queries";
 import { SESSION_COOKIE } from "@/lib/auth/cookie";
@@ -97,6 +97,31 @@ export async function destroySession(): Promise<void> {
     await getDb().delete(sessions).where(eq(sessions.id, id)).catch(() => {});
   }
   jar.delete(SESSION_COOKIE);
+}
+
+/** The id in this request's cookie, if any. */
+export async function currentSessionId(): Promise<string | null> {
+  const jar = await cookies();
+  return jar.get(SESSION_COOKIE)?.value ?? null;
+}
+
+/**
+ * Ends a user's sessions except the one given.
+ *
+ * For resetting your own password: everywhere else is signed out, while the
+ * session that performed the reset survives so you are not ejected mid-task.
+ */
+export async function destroyOtherSessions(
+  userId: number,
+  keepId: string | null,
+): Promise<void> {
+  await getDb()
+    .delete(sessions)
+    .where(
+      keepId
+        ? and(eq(sessions.userId, userId), ne(sessions.id, keepId))
+        : eq(sessions.userId, userId),
+    );
 }
 
 /** Ends every session for a user — used when deactivating or demoting one. */
