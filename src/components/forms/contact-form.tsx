@@ -37,6 +37,13 @@ export function ContactForm() {
   const errors = state.status === "error" ? (state.errors ?? {}) : {};
   const err = (n: keyof typeof errors) => errors[n];
 
+  // React resets an uncontrolled form once the action resolves, restoring
+  // each field to its current defaultValue. Feeding the submitted values
+  // back through defaultValue is what turns that reset into "keep what they
+  // typed" instead of "empty the form". On success it stays blank.
+  const sent = state.status === "error" ? state.values : undefined;
+  const val = (n: keyof NonNullable<typeof sent>) => sent?.[n] ?? "";
+
   // Move focus to the outcome so keyboard and screen-reader users are told
   // what happened instead of being left at the bottom of a form.
   useEffect(() => {
@@ -94,6 +101,7 @@ export function ContactForm() {
           label="Your name"
           required
           autoComplete="name"
+          defaultValue={val("name")}
           error={err("name")}
         />
         <Field
@@ -103,6 +111,7 @@ export function ContactForm() {
           label="Email"
           required
           autoComplete="email"
+          defaultValue={val("email")}
           error={err("email")}
         />
         <Field
@@ -111,6 +120,7 @@ export function ContactForm() {
           label="Company"
           optional
           autoComplete="organization"
+          defaultValue={val("company")}
           error={err("company")}
         />
         <Field
@@ -120,6 +130,7 @@ export function ContactForm() {
           optional
           placeholder="yourbusiness.com"
           autoComplete="url"
+          defaultValue={val("website")}
           error={err("website")}
         />
       </div>
@@ -131,6 +142,7 @@ export function ContactForm() {
           name="projectType"
           label="Project type"
           options={PROJECT_TYPES}
+          defaultValue={val("projectType")}
           error={err("projectType")}
         />
         <Select
@@ -138,6 +150,7 @@ export function ContactForm() {
           name="budget"
           label="Budget"
           options={BUDGETS}
+          defaultValue={val("budget")}
           error={err("budget")}
         />
         <Select
@@ -145,6 +158,7 @@ export function ContactForm() {
           name="timeline"
           label="Timeline"
           options={TIMELINES}
+          defaultValue={val("timeline")}
           error={err("timeline")}
         />
       </div>
@@ -158,6 +172,7 @@ export function ContactForm() {
           name="message"
           rows={6}
           required
+          defaultValue={val("message")}
           aria-invalid={err("message") ? true : undefined}
           aria-describedby={
             err("message") ? `${id("message")}-error` : `${id("message")}-hint`
@@ -264,6 +279,7 @@ function Field({
   optional,
   placeholder,
   autoComplete,
+  defaultValue,
   error,
 }: {
   id: string;
@@ -274,6 +290,7 @@ function Field({
   optional?: boolean;
   placeholder?: string;
   autoComplete?: string;
+  defaultValue?: string;
   error?: string;
 }) {
   return (
@@ -288,6 +305,7 @@ function Field({
         required={required}
         placeholder={placeholder}
         autoComplete={autoComplete}
+        defaultValue={defaultValue}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${id}-error` : undefined}
         className={`${field} mt-2 ${error ? "border-accent" : "border-rule-strong"}`}
@@ -302,12 +320,14 @@ function Select({
   name,
   label,
   options,
+  defaultValue,
   error,
 }: {
   id: string;
   name: string;
   label: string;
   options: readonly string[];
+  defaultValue?: string;
   error?: string;
 }) {
   return (
@@ -319,9 +339,15 @@ function Select({
         {label}
       </Label>
       <select
+        // Keyed on the default so the element remounts when it changes.
+        // React applies an input's defaultValue on every render but only
+        // marks a select's matching <option> as selected at mount, so
+        // without this the reset after a failed submit clears the choice
+        // while the text fields keep theirs.
+        key={defaultValue ?? ""}
         id={id}
         name={name}
-        defaultValue=""
+        defaultValue={defaultValue ?? ""}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${id}-error` : undefined}
         className={`${field} mt-2 appearance-none ${

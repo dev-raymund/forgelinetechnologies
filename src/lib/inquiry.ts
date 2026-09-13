@@ -23,9 +23,32 @@ import { site } from "@/lib/site";
  * No UI lives here — the contact page is a later phase.
  */
 
+/**
+ * What the visitor typed, echoed back on failure.
+ *
+ * React resets an uncontrolled form once its action resolves, so without this
+ * a single validation error emptied every field and the visitor retyped the
+ * whole enquiry. The honeypot is deliberately not echoed.
+ */
+export type SubmittedValues = {
+  name: string;
+  email: string;
+  company: string;
+  website: string;
+  projectType: string;
+  budget: string;
+  timeline: string;
+  message: string;
+};
+
 export type InquiryState =
   | { status: "idle" }
-  | { status: "error"; message: string; errors?: FieldErrors }
+  | {
+      status: "error";
+      message: string;
+      errors?: FieldErrors;
+      values?: SubmittedValues;
+    }
   | {
       status: "success";
       message: string;
@@ -62,8 +85,8 @@ export async function submitInquiry(
 ): Promise<InquiryState> {
   const field = (k: string) => String(formData.get(k) ?? "");
 
-  // 1. validate
-  const parsed = inquirySchema.safeParse({
+  // Kept as typed, so any failure below can hand the form back intact.
+  const values: SubmittedValues = {
     name: field("name"),
     email: field("email"),
     company: field("company"),
@@ -72,6 +95,11 @@ export async function submitInquiry(
     budget: field("budget"),
     timeline: field("timeline"),
     message: field("message"),
+  };
+
+  // 1. validate
+  const parsed = inquirySchema.safeParse({
+    ...values,
     companyWebsite: field("companyWebsite"),
   });
 
@@ -80,6 +108,7 @@ export async function submitInquiry(
       status: "error",
       message: "Please check the highlighted fields.",
       errors: formatIssues(parsed.error),
+      values,
     };
   }
 
@@ -106,6 +135,7 @@ export async function submitInquiry(
           message: site.email
             ? `That is a few enquiries in a short time. Email ${site.email} directly and we will pick it up.`
             : "That is a few enquiries in a short time. Try again a little later and it will go through.",
+          values,
         };
       }
     } catch (err) {
@@ -138,6 +168,7 @@ export async function submitInquiry(
       message: site.email
         ? `Something went wrong saving your enquiry. Please try again, or email ${site.email} directly.`
         : "Something went wrong saving your enquiry. Please try again in a moment — the fault is ours, and it is already in our logs.",
+      values,
     };
   }
 
