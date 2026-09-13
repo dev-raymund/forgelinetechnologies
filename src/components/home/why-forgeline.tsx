@@ -10,6 +10,13 @@ import { Reveal } from "@/components/ui/reveal";
  * why this is a diagram rather than another list of adjectives.
  *
  * The comparison is to a typical agency structure, not to a named competitor.
+ *
+ * The emphasised chain uses `accent`, not an `accent-bright` variant. That
+ * token never existed in the theme, so Tailwind generated no rule for it and
+ * the Forgeline column rendered with invisible dots, no connector and a label
+ * that fell back to inherited white. The palette is deliberately two colours;
+ * orange on ink measures 5.42:1, so the real token is both correct and legible
+ * here.
  */
 
 const typicalChain = [
@@ -55,7 +62,7 @@ function Chain({
     <div>
       <p
         className={`font-mono text-micro ${
-          emphasis ? "text-accent-bright" : "text-on-ink-muted"
+          emphasis ? "text-accent" : "text-on-ink-muted"
         }`}
       >
         {label}
@@ -72,14 +79,14 @@ function Chain({
               <span
                 aria-hidden="true"
                 className={`absolute left-[3px] top-[14px] h-full w-px ${
-                  emphasis ? "bg-accent-bright/45" : "bg-rule-ink"
+                  emphasis ? "bg-accent/45" : "bg-rule-ink"
                 }`}
               />
             ) : null}
             <span
               aria-hidden="true"
               className={`relative z-10 size-[7px] shrink-0 rounded-full ${
-                emphasis ? "bg-accent-bright" : "bg-on-ink-muted"
+                emphasis ? "bg-accent" : "bg-on-ink-muted"
               }`}
             />
             <span
