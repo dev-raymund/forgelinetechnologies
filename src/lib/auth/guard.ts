@@ -15,23 +15,8 @@ import { getSessionUser, type SessionUser } from "@/lib/auth/session";
  * So the rule is: middleware redirects the browser, these functions decide.
  */
 
-export type Role = "admin" | "editor";
-
-/** Capability -> the roles that hold it. Roles are compared, never trusted. */
-const CAPABILITIES = {
-  "users.manage": ["admin"],
-  "posts.manage": ["admin", "editor"],
-  "works.manage": ["admin", "editor"],
-  "reviews.manage": ["admin", "editor"],
-  "inquiries.manage": ["admin", "editor"],
-  "audit.read": ["admin"],
-} as const satisfies Record<string, readonly Role[]>;
-
-export type Capability = keyof typeof CAPABILITIES;
-
-export function roleHas(role: string, capability: Capability): boolean {
-  return (CAPABILITIES[capability] as readonly string[]).includes(role);
-}
+export { roleHas, type Role, type Capability } from "@/lib/auth/capabilities";
+import { roleHas, type Capability } from "@/lib/auth/capabilities";
 
 /** For pages: redirects to the login screen, preserving where they were going. */
 export async function requireUser(returnTo?: string): Promise<SessionUser> {
