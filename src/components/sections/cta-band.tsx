@@ -43,8 +43,8 @@ export function ClosingCta() {
                 Start a project
               </h3>
               <p className="mt-3 max-w-[44ch] text-[0.9375rem] leading-relaxed text-on-ink-muted">
-                Send the details and you get a reply from the developer who
-                would build it. If it is a fit, the next step is a call and a
+                Send the details and you get a reply from a developer who
+                would work on it. If it is a fit, the next step is a call and a
                 fixed quote. If it is not, you will be told that instead.
               </p>
               <div className="mt-7">

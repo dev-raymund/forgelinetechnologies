@@ -44,7 +44,7 @@ export function Hero() {
                   className="rise mt-[0.28em] block text-[0.62em] font-normal tracking-[-0.02em] text-on-ink-muted"
                   style={{ animationDelay: "200ms" }}
                 >
-                  Built by the developer you brief.
+                  Built by the people you brief.
                 </span>
               </h1>
 

@@ -69,7 +69,7 @@ const RATE_WINDOW_MS = 60 * 60 * 1000;
  * interaction costs more trust than the promise was ever worth.
  */
 const SUCCESS =
-  "Thanks — your project details are in, and they go straight to the developer who would build it.";
+  "Thanks — your project details are in, and they go straight to the people who would build it.";
 
 async function clientIp(): Promise<string> {
   const h = await headers();

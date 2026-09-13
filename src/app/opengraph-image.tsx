@@ -63,7 +63,7 @@ export default function Image() {
             letterSpacing: "-0.01em",
           }}
         >
-          Built by the developer you brief.
+          Built by the people you brief.
         </span>
       </div>
 

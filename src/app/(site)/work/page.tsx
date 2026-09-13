@@ -43,7 +43,7 @@ export default async function WorkPage({
         visual={<PageVisual variant="work" />}
         meta={`${projects.length} projects`}
         title="Our work"
-        dek={`Real websites, applications and digital products delivered for businesses in ${marketsSentence}. Every one of these is running in production — the links go to the live sites, not to screenshots.`}
+        dek={`${projects.length} projects delivered for businesses in ${marketsSentence} — real websites, applications and digital products. Where a client's site is still publicly reachable the link goes to it; a build can outlive the site it produced, and we say so rather than link to a dead domain.`}
       />
 
       <Section ground="paper" size="lg" labelledBy="work-filter-title">

@@ -25,7 +25,7 @@ export function SiteFooter() {
             <p className="mt-5 max-w-[38ch] text-[0.9375rem] leading-relaxed text-on-ink-muted">
               A web engineering studio building websites, applications and
               custom software — scoped at a fixed price and built by the
-              developer you brief.
+              people you brief.
             </p>
             <p className="mt-6 text-[0.9375rem]">
               {site.email ? (

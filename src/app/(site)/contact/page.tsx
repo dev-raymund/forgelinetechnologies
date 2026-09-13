@@ -9,7 +9,7 @@ import { site, marketsSentence } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Start a project",
   description:
-    "Send your project details and get a reply from the developer who would build it. Free scoping call, then a fixed scope and a fixed price before any code is written.",
+    "Send your project details and get a reply from a developer who would work on it. Free scoping call, then a fixed scope and a fixed price before any code is written.",
   alternates: { canonical: "/contact" },
 };
 
@@ -31,7 +31,7 @@ const whatHappens = [
   },
   {
     step: "02",
-    title: "You get a reply from the developer",
+    title: "You get a reply from a developer",
     body: "Not a sales sequence, and not an account manager. If it is not a fit, we will tell you rather than sell to you.",
   },
   {

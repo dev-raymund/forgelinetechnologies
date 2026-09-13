@@ -167,7 +167,7 @@ export async function sendInquiryConfirmation(
     return { ok: false, skipped: true, error: "Email not configured" };
   }
 
-  const body = `<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">Thanks for getting in touch. Your project details have been received and go straight to the developer who would build it.</p>
+  const body = `<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">Thanks for getting in touch. Your project details have been received and go straight to the people who would build it.</p>
   ${messageBlock(data.message)}
   <p style="margin:20px 0 0;font-size:15px;line-height:1.65;">If anything has changed in the meantime, just reply to this email.</p>`;
 
@@ -179,7 +179,7 @@ export async function sendInquiryConfirmation(
       subject: `We received your enquiry — ${site.name}`,
       html: shell(
         `Thanks, ${data.name.split(" ")[0]}`,
-        "Your project details are in. They go straight to the developer who would build it.",
+        "Your project details are in. They go straight to the people who would build it.",
         body,
       ),
     });
