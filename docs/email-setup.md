@@ -39,46 +39,63 @@ DNS for this domain is at **Hostinger** (nameservers `apollo.dns-parking.com`
 and `athena.dns-parking.com`).
 
 1. Resend → **Domains** → **Add Domain** → `forgelinetechnologies.com`.
-   Pick a region and leave it alone — it decides the `feedback-smtp` hostname.
-2. Resend shows three records. Add them in Hostinger under
-   **Domains → forgelinetechnologies.com → DNS / Nameservers**:
+2. **Copy the records from Resend's own screen.** Do not copy them from a
+   guide, this one included. Resend has changed its record shape over time and
+   the values are account- and region-specific: this domain sits in
+   `ap-northeast-1`, and its records are a DKIM `TXT` plus two `CNAME`s
+   pointing at `forge.rmta.net`, not the `MX`-plus-SPF-to-`amazonses.com` pair
+   that older guides describe.
+3. Add them in Hostinger under
+   **Domains → forgelinetechnologies.com → DNS / Nameservers**.
+4. Wait for **Verified**. Usually minutes.
+5. **Do not create a mailbox.** There is nothing to create.
 
-   | Type | Name | Value | Priority |
-   |---|---|---|---|
-   | `MX` | `send` | `feedback-smtp.<region>.amazonses.com` | `10` |
-   | `TXT` | `send` | `v=spf1 include:amazonses.com ~all` | — |
-   | `TXT` | `resend._domainkey` | the long `p=…` key | — |
-
-3. Wait for **Verified**. Usually minutes.
-4. **Do not create a mailbox.** There is nothing to create.
-
-### Two things that will break this
+### Three things that will break this
 
 **Hostinger's Name field is relative.** Enter `send`, not
 `send.forgelinetechnologies.com` — Hostinger appends the domain itself, and
 pasting the full name produces
 `send.forgelinetechnologies.com.forgelinetechnologies.com`, which resolves to
-nothing. Same for `resend._domainkey`.
+nothing. Same for `rsend` and `resend._domainkey`.
 
-**Never put Resend's SPF on the root.** The root already carries
+**A CNAME cannot share a name with any other record.** That is RFC 1034, and
+it is the failure worth knowing about here: if a stale `MX` or `TXT` is sitting
+on `send` from an earlier attempt, the `CNAME` Resend wants will either be
+refused by the panel or silently ignored by resolvers. Delete the old records
+at that name first, then add the CNAME.
+
+**Never put an SPF record on the root for Resend.** The root already carries
 `v=spf1 include:_spf.mail.hostinger.com ~all` and `MX` records for the
-Hostinger mailbox. A name may hold only one SPF record, so a second one at the
-root breaks SPF for both senders. Resend's SPF and MX belong on the `send`
-subdomain — that is exactly why the subdomain exists, and why none of this
-touches your existing mail.
+Hostinger mailbox. A name may hold only one SPF record, so a second one there
+breaks mail for both senders. Nothing in the Resend set touches the root except
+the `resend._domainkey` TXT, which is a different name and does not collide.
 
-Check it yourself before clicking Verify:
+### Checking it yourself
+
+The dashboard is not the only view. A send-only API key cannot list domains,
+but a full-access key can, and this is the fastest way to see exactly what
+Resend expects against what is actually published:
 
 ```
-dig +short TXT resend._domainkey.forgelinetechnologies.com
-dig +short MX  send.forgelinetechnologies.com
-dig +short TXT send.forgelinetechnologies.com
-dig +short TXT forgelinetechnologies.com     # must still be the Hostinger SPF, alone
+curl -s -H "Authorization: Bearer $RESEND_API_KEY" \
+  https://api.resend.com/domains/<domain-id>
 ```
 
-Until the domain verifies, Resend refuses the send. That is handled: the
-enquiry is still stored, and the log line says the domain is unverified and
-what to do, rather than a raw provider error.
+That returns every expected record with a per-record `status`, so you can see
+which one is holding verification up rather than guessing. Note that `curl`
+works and a bare Python client does not — Cloudflare fronts the API and blocks
+requests without a browser-like user agent, returning a raw `error code: 1010`
+that looks like a Resend error and is not one.
+
+Confirm the published side directly:
+
+```
+dig +short TXT   resend._domainkey.forgelinetechnologies.com
+dig +short CNAME send.forgelinetechnologies.com
+dig +short CNAME rsend.forgelinetechnologies.com
+dig +short TXT   forgelinetechnologies.com     # must still be Hostinger's SPF, alone
+dig +short MX    forgelinetechnologies.com     # must still be mx1/mx2.hostinger.com
+```
 
 ## 2. Resend — API key
 
