@@ -128,14 +128,23 @@ export default async function ProjectPage({
             <span className="text-[0.875rem] text-muted">
               {project.imageAlt}
             </span>
-            <a
-              href={project.liveUrl}
-              rel="noopener noreferrer"
-              target="_blank"
-              className="text-[0.9375rem] font-medium text-graphite underline decoration-rule-strong underline-offset-[6px] transition-colors hover:text-graphite hover:decoration-accent"
-            >
-              Visit the live site
-            </a>
+            {project.liveUrl ? (
+              <a
+                href={project.liveUrl}
+                rel="noopener noreferrer"
+                target="_blank"
+                className="text-[0.9375rem] font-medium text-graphite underline decoration-rule-strong underline-offset-[6px] transition-colors hover:text-graphite hover:decoration-accent"
+              >
+                Visit the live site
+              </a>
+            ) : (
+              // Stated plainly rather than left as a dead link or an absence
+              // the reader has to interpret. The work happened; the site is
+              // simply not reachable now.
+              <span className="text-[0.9375rem] text-faint">
+                Site no longer publicly available
+              </span>
+            )}
           </figcaption>
         </figure>
 

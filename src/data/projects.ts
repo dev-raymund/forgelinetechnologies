@@ -22,7 +22,12 @@ export type Project = {
   description: string;
   image: string;
   imageAlt: string;
-  liveUrl: string;
+  /**
+   * The client's live site. Optional: a build can outlive the site it
+   * produced. Omit it rather than pointing at a dead domain — a portfolio
+   * link that fails costs more credibility than the missing link does.
+   */
+  liveUrl?: string;
   /** Named technologies. Only what the build genuinely used. */
   stack: string[];
   /** Surfaced on the homepage. Curated, not the whole list. */
@@ -206,7 +211,12 @@ export const projects: Project[] = [
       "A mortgage and investment advisory site that has to present loan products clearly alongside the advice itself. Both are structured, so products stay comparable as their terms change.",
     image: "/assets/projects/fast_track_home_loans.jpg",
     imageAlt: "Fast Track Home Loans mortgage advisory website",
-    liveUrl: "https://fasttrackhomeloans.com.au/",
+    // No liveUrl. fasttrackhomeloans.com.au still resolves and still carries
+    // MX records, so the business has not gone away, but nothing answers on
+    // port 80 or 443 for either the apex or www. The .com is a parked
+    // aftermarket listing on NameBright nameservers, not the client, so there
+    // is no alternate official address to point at. Restore this the day the
+    // site is back up.
     stack: ["WordPress", "ACF", "PHP"],
   },
   {
