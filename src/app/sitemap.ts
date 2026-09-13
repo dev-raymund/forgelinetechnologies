@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { site } from "@/lib/site";
 import { getWorkSlugs } from "@/lib/works";
+import { getPublishedPosts } from "@/lib/queries";
 import { services } from "@/data/services";
 
 /**
@@ -15,9 +16,11 @@ import { services } from "@/data/services";
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const workSlugs = await getWorkSlugs();
+  const blogPosts = await getPublishedPosts();
   const now = new Date();
 
   const staticRoutes: MetadataRoute.Sitemap = [
+    { url: `${site.url}/blog`, changeFrequency: "weekly", priority: 0.6 },
     { url: site.url, changeFrequency: "monthly", priority: 1 },
     { url: `${site.url}/build-audit`, changeFrequency: "monthly", priority: 0.9 },
     { url: `${site.url}/work`, changeFrequency: "monthly", priority: 0.9 },
@@ -40,7 +43,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...staticRoutes, ...serviceRoutes, ...projectRoutes].map((r) => ({
+  /* Published posts only. `getPublishedPosts` filters on status, so a draft
+     can never reach the sitemap — which is the one place a mistake would
+     actively invite crawlers to a page that 404s. */
+  const postRoutes: MetadataRoute.Sitemap = blogPosts.map((p) => ({
+    url: `${site.url}/blog/${p.slug}`,
+    lastModified: p.updatedAt,
+    changeFrequency: "yearly",
+    priority: 0.5,
+  }));
+
+  return [...staticRoutes, ...serviceRoutes, ...projectRoutes, ...postRoutes].map((r) => ({
     ...r,
     lastModified: now,
   }));
