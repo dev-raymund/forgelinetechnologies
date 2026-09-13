@@ -138,15 +138,15 @@ export default function AboutPage() {
         />
         <dl className="grid grid-cols-3 gap-x-6 gap-y-8 sm:gap-x-8">
           {stats.map((stat) => (
-            <div key={stat.label} className="border-t border-rule-ink pt-4">
-              <dt className="sr-only">{stat.label}</dt>
-              <dd>
-                <span className="block font-mono text-[1.75rem] font-medium tracking-tight text-white">
-                  <Counter value={stat.value} />
-                </span>
-                <span className="mt-1.5 block text-[0.8125rem] text-on-ink-muted">
-                  {stat.label}
-                </span>
+            <div
+              key={stat.label}
+              className="flex flex-col-reverse border-t border-rule-ink pt-4"
+            >
+              <dt className="mt-1.5 text-[0.8125rem] text-on-ink-muted">
+                {stat.label}
+              </dt>
+              <dd className="font-mono text-[1.75rem] font-medium tracking-tight text-white">
+                <Counter value={stat.value} />
               </dd>
             </div>
           ))}
