@@ -68,7 +68,10 @@ export const inquirySchema = z.object({
     .optional()
     .default(""),
   message: trimmed
-    .min(20, "A sentence or two about the project, please.")
+    .min(
+      20,
+      "Please add a little more detail — at least 20 characters, so the reply is worth reading.",
+    )
     .max(5000, "That message is too long."),
   /**
    * Honeypot. Deliberately NOT rejected here — a validation error would tell

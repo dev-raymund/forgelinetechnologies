@@ -174,8 +174,8 @@ export function ContactForm() {
             id={`${id("message")}-hint`}
             className="mt-2 text-[0.8125rem] text-muted"
           >
-            A couple of sentences is plenty. Deadlines and existing systems are
-            the useful details.
+            A couple of sentences is plenty — 20 characters minimum. Deadlines
+            and existing systems are the useful details.
           </p>
         )}
       </div>
