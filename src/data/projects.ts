@@ -284,15 +284,27 @@ export function getProject(slug: string): Project | undefined {
   return projects.find((p) => p.slug === slug);
 }
 
-/** Projects sharing a kind, excluding one. Used for "related" on a detail page. */
-export function relatedProjects(slug: string, limit = 3): Project[] {
-  const current = getProject(slug);
+/**
+ * Projects sharing a kind, excluding one. Used for "related" on a detail page.
+ *
+ * Takes the list rather than closing over the module's own array, because the
+ * published set now comes from the database and this logic serves both.
+ */
+export function relatedFrom(
+  all: Project[],
+  slug: string,
+  limit = 3,
+): Project[] {
+  const current = all.find((p) => p.slug === slug);
   if (!current) return [];
-  const sameKind = projects.filter(
-    (p) => p.slug !== slug && p.kind === current.kind,
-  );
-  const rest = projects.filter((p) => p.slug !== slug && p.kind !== current.kind);
+  const sameKind = all.filter((p) => p.slug !== slug && p.kind === current.kind);
+  const rest = all.filter((p) => p.slug !== slug && p.kind !== current.kind);
   return [...sameKind, ...rest].slice(0, limit);
+}
+
+/** The seed-file equivalent, kept for anything still reading the file. */
+export function relatedProjects(slug: string, limit = 3): Project[] {
+  return relatedFrom(projects, slug, limit);
 }
 
 /** True when a project has enough written for a case-study layout. */

@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { site } from "@/lib/site";
-import { projects } from "@/data/projects";
+import { getWorkSlugs } from "@/lib/works";
 import { services } from "@/data/services";
 
 /**
@@ -13,7 +13,8 @@ import { services } from "@/data/services";
  * Filtered views of /work (?kind=…) are deliberately absent: they are the same
  * collection reordered, and listing them would compete with /work in search.
  */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const workSlugs = await getWorkSlugs();
   const now = new Date();
 
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -33,8 +34,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
-  const projectRoutes: MetadataRoute.Sitemap = projects.map((p) => ({
-    url: `${site.url}/work/${p.slug}`,
+  const projectRoutes: MetadataRoute.Sitemap = workSlugs.map((slug) => ({
+    url: `${site.url}/work/${slug}`,
     changeFrequency: "yearly",
     priority: 0.6,
   }));

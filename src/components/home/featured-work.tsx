@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Section, SectionHeading } from "@/components/ui/section";
-import { featuredProjects, projects } from "@/data/projects";
+import { getWorks } from "@/lib/works";
 import { marketsSentence } from "@/lib/site";
 import { Reveal } from "@/components/ui/reveal";
 
@@ -20,7 +20,11 @@ import { Reveal } from "@/components/ui/reveal";
  * Kind and sector are two separate elements divided by a rule, not a string
  * joined with middle dots — the divider is structure, the dots were decoration.
  */
-export function FeaturedWork() {
+export async function FeaturedWork() {
+  const projects = await getWorks();
+  // Curated on the project itself, so the homepage selection is an admin
+  // decision rather than "the first six".
+  const featuredProjects = projects.filter((p) => p.featured).slice(0, 6);
   return (
     <Section id="work" ground="paper" size="peak" labelledBy="work-title">
       <SectionHeading

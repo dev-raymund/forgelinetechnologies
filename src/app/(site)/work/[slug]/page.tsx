@@ -7,22 +7,29 @@ import { PageVisual } from "@/components/sections/page-visual";
 import { ClosingCta } from "@/components/sections/cta-band";
 import { ProjectCard } from "@/components/work/project-card";
 import { Section } from "@/components/ui/section";
-import {
-  projects,
-  getProject,
-  relatedProjects,
-  hasCaseStudy,
-} from "@/data/projects";
+import { relatedFrom, hasCaseStudy } from "@/data/projects";
+import { getWork, getWorks, getWorkSlugs } from "@/lib/works";
 import { site } from "@/lib/site";
 import { jsonLd, breadcrumbSchema } from "@/lib/structured-data";
 
-/** All seventeen are known at build time, so all seventeen are static. */
-export function generateStaticParams() {
-  return projects.map((p) => ({ slug: p.slug }));
+/**
+ * Every published project is static, exactly as before — the list is now read
+ * from the database at build time rather than from a file. Visitors never wait
+ * on a query, which is the property worth keeping from the file-based version.
+ */
+export async function generateStaticParams() {
+  return (await getWorkSlugs()).map((slug) => ({ slug }));
 }
 
-/** A slug outside the list is a 404, never a rendered empty page. */
+/**
+ * A slug outside the published set is a 404. `dynamicParams` stays false so an
+ * unpublished or deleted project cannot be reached by guessing its URL between
+ * rebuilds.
+ */
 export const dynamicParams = false;
+
+/** Admin edits reach the public page within the hour without a deploy. */
+export const revalidate = 3600;
 
 export async function generateMetadata({
   params,
@@ -30,7 +37,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const project = getProject(slug);
+  const project = await getWork(slug);
   if (!project) return {};
   return {
     title: `${project.title} — ${project.kind}`,
@@ -51,10 +58,11 @@ export default async function ProjectPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const project = getProject(slug);
+  const project = await getWork(slug);
   if (!project) notFound();
 
-  const related = relatedProjects(slug);
+  const all = await getWorks();
+  const related = relatedFrom(all, slug);
   const trail = [
     { name: "Work", path: "/work" },
     { name: project.title, path: `/work/${project.slug}` },
@@ -233,7 +241,7 @@ export default async function ProjectPage({
               href="/work"
               className="shrink-0 text-[0.9375rem] font-medium text-graphite underline decoration-rule-strong underline-offset-[6px] transition-colors hover:text-graphite hover:decoration-accent"
             >
-              All {projects.length} projects
+              All {all.length} projects
             </Link>
           </div>
           <ul className="grid gap-x-8 gap-y-12 md:grid-cols-3">

@@ -5,7 +5,8 @@ import { PageVisual } from "@/components/sections/page-visual";
 import { ClosingCta } from "@/components/sections/cta-band";
 import { ProjectCard } from "@/components/work/project-card";
 import { Section } from "@/components/ui/section";
-import { projects, projectKinds, type ProjectKind } from "@/data/projects";
+import { projectKinds, type ProjectKind } from "@/data/projects";
+import { getWorks } from "@/lib/works";
 import { marketsSentence } from "@/lib/site";
 import { Reveal } from "@/components/ui/reveal";
 
@@ -33,6 +34,7 @@ export default async function WorkPage({
   const { kind } = await searchParams;
   const active = projectKinds.find((k) => k === kind) as
     ProjectKind | undefined;
+  const projects = await getWorks();
   const shown = active ? projects.filter((p) => p.kind === active) : projects;
 
   return (
