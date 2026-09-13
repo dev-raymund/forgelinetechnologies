@@ -16,12 +16,17 @@ export default async function LoginPage({
   searchParams: Promise<{ next?: string }>;
 }) {
   const { next } = await searchParams;
-  if (await getSessionUser()) redirect("/admin");
 
-  /* Only same-origin paths are honoured. Reflecting an arbitrary `next` into a
-     redirect is an open redirect, and a login page is exactly where one gets
-     used. */
+  /* Only same-origin admin paths are honoured. Reflecting an arbitrary `next`
+     into a redirect is an open redirect, and a login page is exactly where one
+     gets used. Everything else falls back to the dashboard. */
   const target = next && /^\/admin(\/|$)/.test(next) ? next : "/admin";
+
+  /* Send an already-signed-in visitor to where they were going, not to the
+     dashboard. This redirect also fires on the refresh the form triggers after
+     a successful sign-in, so hard-coding "/admin" here overrode the form's own
+     navigation and every login landed on the dashboard regardless of `next`. */
+  if (await getSessionUser()) redirect(target);
 
   return (
     <div className="flex min-h-dvh items-center justify-center bg-ink px-5 py-16">
