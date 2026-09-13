@@ -76,22 +76,41 @@ export default async function PostPage({
 
   return (
     <>
-      {jsonLd([
-        {
-          "@context": "https://schema.org",
-          "@type": "BlogPosting",
-          headline: post.title,
-          description: post.excerpt || excerptFrom(post.body, 155),
-          datePublished: post.publishedAt?.toISOString(),
-          dateModified: post.updatedAt.toISOString(),
-          url: `${site.url}/blog/${post.slug}`,
-          publisher: { "@type": "Organization", name: site.name, url: site.url },
-        },
-        breadcrumbSchema([
-          { name: "Blog", path: "/blog" },
-          { name: post.title, path: `/blog/${post.slug}` },
-        ]),
-      ])}
+      {/* jsonLd() returns a string for dangerouslySetInnerHTML — it is not an
+          element. Rendering it directly into JSX printed the whole schema as
+          visible text on the page, between the header and the article. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd({
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            headline: post.title,
+            description: post.excerpt || excerptFrom(post.body, 155),
+            datePublished: post.publishedAt?.toISOString(),
+            dateModified: post.updatedAt.toISOString(),
+            url: `${site.url}/blog/${post.slug}`,
+            ...(post.coverUrl ? { image: post.coverUrl } : {}),
+            publisher: {
+              "@type": "Organization",
+              name: site.name,
+              url: site.url,
+            },
+          }),
+        }}
+      />
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd(
+            breadcrumbSchema([
+              { name: "Blog", path: "/blog" },
+              { name: post.title, path: `/blog/${post.slug}` },
+            ]),
+          ),
+        }}
+      />
 
       <PageHeader
         meta={when(post.publishedAt)}
