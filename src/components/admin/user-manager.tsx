@@ -205,20 +205,54 @@ export function UserManager({
                         >
                           Cancel
                         </button>
-                        <button
-                          type="button"
-                          disabled={pending}
-                          onClick={() => {
-                            const fd = new FormData();
-                            fd.set("id", String(u.id));
-                            run(resetUserPassword, fd, u.email);
-                          }}
-                          className="rounded-sm border border-rule-strong px-4 py-2 text-[0.875rem] font-medium"
-                        >
-                          Reset password
-                        </button>
                       </div>
                     </form>
+
+                    {/* A separate form, not a button on the one above: the
+                        action validates a password and the edit action does
+                        not, so sharing a form would submit whichever fields
+                        happened to be filled. */}
+                    <div className="mt-5 border-t border-rule pt-4">
+                      <p className="text-[0.875rem] font-medium text-graphite">
+                        Password
+                      </p>
+                      <form
+                        action={(fd) => {
+                          fd.set("id", String(u.id));
+                          run(resetUserPassword, fd, u.email);
+                        }}
+                        className="mt-2 flex flex-wrap items-end gap-2"
+                      >
+                        <div className="min-w-[16rem] flex-1">
+                          <label htmlFor={`pw-${u.id}`} className="sr-only">
+                            New password for {u.email}
+                          </label>
+                          <input
+                            id={`pw-${u.id}`}
+                            name="password"
+                            type="text"
+                            autoComplete="new-password"
+                            minLength={12}
+                            placeholder="Type a password, or leave empty to generate one"
+                            className={field}
+                          />
+                        </div>
+                        <button
+                          type="submit"
+                          disabled={pending}
+                          className="rounded-sm border border-rule-strong px-4 py-2 text-[0.875rem] font-medium disabled:opacity-60"
+                        >
+                          {pending ? "Setting…" : "Set password"}
+                        </button>
+                      </form>
+                      <p className="mt-2 max-w-[52ch] text-[0.8125rem] text-muted">
+                        At least 12 characters. Leave it empty and a strong one
+                        is generated and shown once.
+                        {isSelf
+                          ? " Changing your own signs you out everywhere else, but keeps you signed in here."
+                          : " This signs them out everywhere immediately."}
+                      </p>
+                    </div>
                   </td>
                 </tr>
               ) : (

@@ -6,6 +6,7 @@ import { ClosingCta } from "@/components/sections/cta-band";
 import { Section, SectionHeading } from "@/components/ui/section";
 import { Technology } from "@/components/home/technology";
 import { People } from "@/components/sections/people";
+import { Reviews } from "@/components/sections/reviews";
 import { promises, promiseStatement } from "@/data/promise";
 import { site, founder, stats, marketsSentence } from "@/lib/site";
 import { projects } from "@/data/projects";
@@ -226,6 +227,11 @@ export default function AboutPage() {
           {promiseStatement}
         </p>
       </Section>
+
+      {/* Published reviews sit after our own commitments, so the page reads
+          as "here is what we promise" followed by "here is what clients
+          said". Renders nothing until a review is published. */}
+      <Reviews />
 
       <ClosingCta />
     </>
