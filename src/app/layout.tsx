@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Archivo, JetBrains_Mono } from "next/font/google";
 import { site, founder } from "@/lib/site";
 import { Analytics } from "@/components/analytics";
+import { RouteProgress } from "@/components/ui/route-progress";
 import "./globals.css";
 
 /**
@@ -91,6 +92,7 @@ export default function RootLayout({
             __html: "document.documentElement.classList.add('js')",
           }}
         />
+        <RouteProgress />
         {children}
         <Analytics />
       </body>

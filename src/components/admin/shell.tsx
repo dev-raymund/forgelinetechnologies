@@ -16,13 +16,20 @@ import { AdminNav } from "@/components/admin/nav";
  * actually stops them.
  */
 
-const LINKS: { href: string; label: string; capability: Capability }[] = [
-  { href: "/admin", label: "Dashboard", capability: "inquiries.manage" },
-  { href: "/admin/inquiries", label: "Inquiries", capability: "inquiries.manage" },
-  { href: "/admin/reviews", label: "Reviews", capability: "reviews.manage" },
-  { href: "/admin/blog", label: "Blog posts", capability: "posts.manage" },
-  { href: "/admin/works", label: "Works", capability: "works.manage" },
-  { href: "/admin/users", label: "Users", capability: "users.manage" },
+/** `icon` is a key, not a component: the nav is a client component and a
+    function cannot cross that boundary as a prop. */
+const LINKS: {
+  href: string;
+  label: string;
+  capability: Capability;
+  icon: string;
+}[] = [
+  { href: "/admin", label: "Dashboard", capability: "inquiries.manage", icon: "gauge" },
+  { href: "/admin/inquiries", label: "Inquiries", capability: "inquiries.manage", icon: "inbox" },
+  { href: "/admin/reviews", label: "Reviews", capability: "reviews.manage", icon: "star" },
+  { href: "/admin/blog", label: "Blog posts", capability: "posts.manage", icon: "file" },
+  { href: "/admin/works", label: "Works", capability: "works.manage", icon: "briefcase" },
+  { href: "/admin/users", label: "Users", capability: "users.manage", icon: "users" },
 ];
 
 export function AdminShell({
