@@ -9,7 +9,7 @@ import { ProjectCard } from "@/components/work/project-card";
 import { Section } from "@/components/ui/section";
 import { relatedFrom, hasCaseStudy } from "@/data/projects";
 import { getWork, getWorks, getWorkSlugs } from "@/lib/works";
-import { site } from "@/lib/site";
+import { absoluteUrl, site } from "@/lib/site";
 import { jsonLd, breadcrumbSchema } from "@/lib/structured-data";
 
 /**
@@ -80,7 +80,7 @@ export default async function ProjectPage({
             name: project.title,
             description: project.description,
             url: `${site.url}/work/${project.slug}`,
-            image: `${site.url}${project.image}`,
+            image: absoluteUrl(project.image),
             creator: {
               "@type": "Organization",
               name: site.name,
