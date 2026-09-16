@@ -15,16 +15,31 @@ export function ImportForm() {
   const [preview, setPreview] = useState<Extract<ImportPreview, { status: "ready" }> | null>(null);
   const [result, setResult] = useState<Extract<ImportResult, { status: "imported" }> | null>(null);
   const [csv, setCsv] = useState("");
+  const [previewedCsv, setPreviewedCsv] = useState("");
   const [sourceUrl, setSourceUrl] = useState("");
+
+  /**
+   * Both the textarea and the file upload funnel through here so that
+   * editing OR re-uploading after a successful preview invalidates it: the
+   * stale table (and its "Import N" count) must disappear rather than let a
+   * later import silently ship text the reviewer never actually reviewed.
+   */
+  function applyCsvChange(next: string) {
+    setCsv(next);
+    if (preview && next !== previewedCsv) {
+      setPreview(null);
+    }
+  }
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    setCsv(await file.text());
+    applyCsvChange(await file.text());
   }
 
   function handleCheck(formData: FormData) {
-    formData.set("csv", csv);
+    const requestedCsv = csv;
+    formData.set("csv", requestedCsv);
     setSourceUrl(String(formData.get("sourceUrl") ?? "").trim());
     start(async () => {
       setError(null);
@@ -36,11 +51,12 @@ export function ImportForm() {
         return;
       }
       setPreview(outcome);
+      setPreviewedCsv(requestedCsv);
     });
   }
 
   function handleImport(formData: FormData) {
-    formData.set("csv", csv);
+    formData.set("csv", previewedCsv);
     start(async () => {
       setError(null);
       const outcome = await commitImport(formData);
@@ -114,7 +130,7 @@ export function ImportForm() {
           <textarea
             id="import-csv"
             value={csv}
-            onChange={(e) => setCsv(e.target.value)}
+            onChange={(e) => applyCsvChange(e.target.value)}
             rows={10}
             placeholder="company,website,industry,country,location,contact,contact_source"
             className={`${field} font-mono text-[0.8125rem]`}
