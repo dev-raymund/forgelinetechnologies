@@ -48,3 +48,7 @@ backups/
 
 # Digital-twin env kept only as a local key backup
 .env.digital-twin.bak
+
+# isolated worktrees and agent scratch — never committed
+/.worktrees/
+/.superpowers/
