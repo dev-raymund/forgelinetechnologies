@@ -46,6 +46,24 @@ export async function enqueueProspects(ids: number[], actorId: number): Promise<
   return targets.length;
 }
 
+/**
+ * True only for the two ways `transitionAudit` reports that this worker did not
+ * get the audit: the compare-and-swap matched no row because another worker
+ * moved it first, or the row is no longer at a status this claim can leave.
+ *
+ * Everything else — a dropped connection, a Neon outage, a query error — is a
+ * real failure. Treating those as a lost claim is what made a drain that could
+ * not reach the database print "0 completed, 0 failed, 500 already claimed" and
+ * read like success.
+ */
+export function isLostClaim(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  return (
+    error.message.includes("was changed by another worker") ||
+    error.message.includes("cannot transition to")
+  );
+}
+
 export function productionDrainDependencies(): DrainDependencies {
   return {
     listQueuedAuditIds: async (limit) => {
@@ -65,11 +83,15 @@ export function productionDrainDependencies(): DrainDependencies {
         .where(eq(prospectAudits.id, id))
         .limit(1);
       if (!row) return null;
+
       try {
-        // Compare-and-swap. A throw means another worker claimed it first.
+        // Compare-and-swap. A lost race means another worker claimed it first.
         await saveAuditRunning(id);
-      } catch {
-        return null;
+      } catch (error) {
+        if (isLostClaim(error)) return null;
+        // Anything else is a real failure and must reach the operator rather
+        // than be counted as a skip.
+        throw error;
       }
       return { requestedUrl: row.requestedUrl, prospectId: row.prospectId };
     },

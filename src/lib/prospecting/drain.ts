@@ -5,7 +5,11 @@ export type ClaimedAudit = { requestedUrl: string; prospectId: number | null };
 export type DrainDependencies = {
   /** Oldest-first ids of audits still sitting at `queued`. */
   listQueuedAuditIds: (limit: number) => Promise<number[]>;
-  /** Attempts the compare-and-swap claim. `null` means another worker won it. */
+  /**
+   * Attempts the compare-and-swap claim. `null` means another worker won it;
+   * a throw means the claim itself failed and the drain must not continue as
+   * though the audit were merely skipped.
+   */
   claimAudit: (id: number) => Promise<ClaimedAudit | null>;
   runAudit: (input: { auditId: number; requestedUrl: string }) => Promise<AuditJobResult>;
   applyResult: (input: {
