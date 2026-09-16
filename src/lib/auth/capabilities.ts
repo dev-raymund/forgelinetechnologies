@@ -17,6 +17,7 @@ const CAPABILITIES = {
   "reviews.manage": ["admin", "editor"],
   "inquiries.manage": ["admin", "editor"],
   "audit.read": ["admin"],
+  "prospecting.manage": ["admin"],
 } as const satisfies Record<string, readonly Role[]>;
 
 export type Capability = keyof typeof CAPABILITIES;

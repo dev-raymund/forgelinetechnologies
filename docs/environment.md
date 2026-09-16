@@ -1,6 +1,6 @@
 # Environment variables
 
-Five variables. `.env.example` lists the names with no values; copy it to
+`.env.example` lists the names with no values; copy it to
 `.env` locally and set the same names in the Vercel project for production.
 
 `.env` is gitignored. `.env.example` is committed.
@@ -42,6 +42,17 @@ The guards are asymmetric and worth knowing:
 
 Setting the key without `CONTACT_EMAIL` gives the worst outcome: the prospect
 is confirmed while nobody is told the enquiry exists. Set them together.
+
+## Prospecting audit jobs
+
+Prospecting audits run in the same process as the request that starts them,
+using the Next.js `after` API. The work is bounded — one homepage, robots.txt,
+sitemap.xml and at most twelve link probes, each capped at ten seconds — so it
+finishes well inside the `maxDuration = 60` declared on the two
+`/admin/prospecting` page segments that host the actions.
+
+They need no queue service, no background worker, and no environment variables
+of their own: `npm run dev` is the whole local setup.
 
 ## Never set in production
 

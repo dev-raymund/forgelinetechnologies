@@ -290,6 +290,65 @@ export const auditLogs = pgTable(
   ],
 );
 
+/**
+ * A manually requested website audit. A row is created before the background
+ * job starts so the admin can see queued, partial, and failed runs as well as
+ * successful reports.
+ */
+export const prospectAudits = pgTable(
+  "prospect_audits",
+  {
+    id: serial("id").primaryKey(),
+    requestedUrl: text("requested_url").notNull(),
+    finalUrl: text("final_url").notNull().default(""),
+    status: varchar("status", { length: 16 }).notNull().default("queued"),
+    auditVersion: varchar("audit_version", { length: 32 }).notNull().default("phase1-v1"),
+    requestedBy: integer("requested_by").references(() => users.id, { onDelete: "set null" }),
+    requestedAt: timestamp("requested_at", { withTimezone: true }).notNull().defaultNow(),
+    startedAt: timestamp("started_at", { withTimezone: true }),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    httpStatus: integer("http_status"),
+    https: boolean("https").notNull().default(false),
+    redirectChain: jsonb("redirect_chain").$type<string[]>().notNull().default([]),
+    report: jsonb("report").$type<Record<string, unknown>>().notNull().default({}),
+    scores: jsonb("scores").$type<Record<string, number>>().notNull().default({}),
+    totalScore: integer("total_score").notNull().default(0),
+    errorDetail: text("error_detail").notNull().default(""),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("prospect_audits_status_idx").on(t.status),
+    index("prospect_audits_requested_at_idx").on(t.requestedAt),
+    index("prospect_audits_requested_by_idx").on(t.requestedBy),
+  ],
+);
+
+/** Evidence-level observations belonging to one website audit. */
+export const auditFindings = pgTable(
+  "audit_findings",
+  {
+    id: serial("id").primaryKey(),
+    auditId: integer("audit_id")
+      .notNull()
+      .references(() => prospectAudits.id, { onDelete: "cascade" }),
+    category: varchar("category", { length: 32 }).notNull(),
+    rule: varchar("rule", { length: 80 }).notNull(),
+    severity: varchar("severity", { length: 16 }).notNull(),
+    pageUrl: text("page_url").notNull(),
+    evidence: jsonb("evidence").$type<Record<string, unknown>>().notNull().default({}),
+    recommendation: text("recommendation").notNull(),
+    confidence: varchar("confidence", { length: 16 }).notNull(),
+    observedAt: timestamp("observed_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("audit_findings_audit_idx").on(t.auditId),
+    index("audit_findings_category_idx").on(t.category),
+    index("audit_findings_severity_idx").on(t.severity),
+  ],
+);
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Project = typeof projects.$inferSelect;
@@ -303,3 +362,7 @@ export type Review = typeof reviews.$inferSelect;
 export type NewReview = typeof reviews.$inferInsert;
 export type InquiryNote = typeof inquiryNotes.$inferSelect;
 export type AuditLog = typeof auditLogs.$inferSelect;
+export type ProspectAudit = typeof prospectAudits.$inferSelect;
+export type NewProspectAudit = typeof prospectAudits.$inferInsert;
+export type AuditFinding = typeof auditFindings.$inferSelect;
+export type NewAuditFinding = typeof auditFindings.$inferInsert;

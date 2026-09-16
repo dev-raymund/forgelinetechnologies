@@ -1,6 +1,6 @@
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
-import * as schema from "./schema";
+import * as schema from "./schema.ts";
 
 /**
  * The database client, created on first use rather than at import.
@@ -34,4 +34,4 @@ export function getDb() {
   return client;
 }
 
-export * from "./schema";
+export * from "./schema.ts";

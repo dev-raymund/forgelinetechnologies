@@ -16,6 +16,7 @@ test("admin holds every capability", () => {
     "reviews.manage",
     "inquiries.manage",
     "audit.read",
+    "prospecting.manage",
   ] as const) {
     assert.equal(roleHas("admin", c), true, `admin should hold ${c}`);
   }
@@ -29,6 +30,7 @@ test("editor manages content but never accounts", () => {
 
   assert.equal(roleHas("editor", "users.manage"), false, "editors must not manage users");
   assert.equal(roleHas("editor", "audit.read"), false, "the audit log is admin-only");
+  assert.equal(roleHas("editor", "prospecting.manage"), false, "prospecting must be admin-only");
 });
 
 test("an unknown role holds nothing", () => {

@@ -1,0 +1,342 @@
+import { load, type CheerioAPI } from "cheerio";
+import type {
+  AuditFinding,
+  Confidence,
+  FindingCategory,
+  FindingSeverity,
+  JsonValue,
+} from "./types.ts";
+
+export type PageAnalysisInput = {
+  pageUrl: string;
+  finalUrl: string;
+  status: number;
+  headers: Record<string, string>;
+  body: string;
+  bytes: number;
+  elapsedMs: number;
+  redirectChain?: string[];
+  robotsTxt?: ResourceCheck;
+  sitemap?: ResourceCheck;
+};
+
+export type ResourceCheck = {
+  url: string;
+  status: number;
+  body: string;
+};
+
+export type DiscoveredLink = {
+  sourceUrl: string;
+  url: string;
+  sameOrigin: boolean;
+};
+
+export type TechnologyIndicator = {
+  name: string;
+  signal: string;
+  confidence: Confidence;
+};
+
+export type PageAnalysis = {
+  findings: AuditFinding[];
+  links: DiscoveredLink[];
+  technologyIndicators: TechnologyIndicator[];
+  performance: {
+    status: number;
+    responseTimeMs: number;
+    htmlBytes: number;
+    renderBlockingStylesheets: number;
+    scriptCount: number;
+    imageCount: number;
+    redirects: number;
+  };
+};
+
+function finding(
+  pageUrl: string,
+  rule: string,
+  category: FindingCategory,
+  severity: FindingSeverity,
+  evidence: Record<string, JsonValue>,
+  recommendation: string,
+  confidence: Confidence = "high",
+  suffix = "",
+): AuditFinding {
+  return {
+    id: `${rule}:${pageUrl}${suffix ? `:${suffix}` : ""}`,
+    category,
+    rule,
+    severity,
+    pageUrl,
+    evidence,
+    recommendation,
+    confidence,
+    observedAt: new Date().toISOString(),
+  };
+}
+
+function headersLowercase(headers: Record<string, string>): Record<string, string> {
+  return Object.fromEntries(Object.entries(headers).map(([key, value]) => [key.toLowerCase(), value]));
+}
+
+function hasPrimaryCta($: CheerioAPI): boolean {
+  return $("a, button, input[type='submit']")
+    .toArray()
+    .some((element) => /get started|contact|book|learn|start|quote|call|buy|shop/i.test($(element).text().trim()));
+}
+
+function canonicalUrl(pageUrl: string, raw: string): string | null {
+  try {
+    const url = new URL(raw, pageUrl);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return null;
+    url.hash = "";
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+export function collectAuditLinks(baseUrl: string, html: string): DiscoveredLink[] {
+  const $ = load(html);
+  const base = new URL(baseUrl);
+  const seen = new Set<string>();
+  const links: DiscoveredLink[] = [];
+
+  $("a[href]").each((_index, element) => {
+    const raw = $(element).attr("href")?.trim();
+    if (!raw || /^(?:#|mailto:|tel:|javascript:|data:)/i.test(raw)) return;
+    let url: URL;
+    try {
+      url = new URL(raw, base);
+    } catch {
+      return;
+    }
+    if (url.protocol !== "http:" && url.protocol !== "https:") return;
+    url.hash = "";
+    const normalized = url.toString();
+    if (seen.has(normalized)) return;
+    seen.add(normalized);
+    links.push({ sourceUrl: base.toString(), url: normalized, sameOrigin: url.origin === base.origin });
+  });
+
+  return links.sort((a, b) => Number(b.sameOrigin) - Number(a.sameOrigin)).slice(0, 12);
+}
+
+export function technologyIndicators(
+  headers: Record<string, string>,
+  $: CheerioAPI,
+): TechnologyIndicator[] {
+  const indicators: TechnologyIndicator[] = [];
+  const generator = $("meta[name='generator']").attr("content") ?? "";
+  const lowerGenerator = generator.toLowerCase();
+  const lowerServer = (headers.server ?? "").toLowerCase();
+
+  if (lowerGenerator.includes("wordpress")) {
+    indicators.push({ name: "WordPress", signal: `generator:${generator}`, confidence: "high" });
+  }
+  if (lowerGenerator.includes("shopify")) {
+    indicators.push({ name: "Shopify", signal: `generator:${generator}`, confidence: "high" });
+  }
+  if (lowerServer.includes("vercel")) {
+    indicators.push({ name: "Vercel", signal: `server:${headers.server}`, confidence: "medium" });
+  }
+  if ($("script[src*='/_next/'], link[href*='/_next/']").length > 0) {
+    indicators.push({ name: "Next.js", signal: "asset-path:/_next/", confidence: "medium" });
+  }
+  return indicators;
+}
+
+export function analyzePage(input: PageAnalysisInput): PageAnalysis {
+  const $ = load(input.body);
+  const headers = headersLowercase(input.headers);
+  const findings: AuditFinding[] = [];
+  const title = $("title").first().text().trim();
+  const metaDescription = $("meta[name='description']").attr("content")?.trim() ?? "";
+  const h1Count = $("h1").length;
+  const titleCount = $("title").length;
+  const descriptionCount = $("meta[name='description']").length;
+  const canonical = $("link[rel='canonical']").attr("href")?.trim() ?? "";
+  const viewport = $("meta[name='viewport']").attr("content")?.trim() ?? "";
+  const robots = $("meta[name='robots']").attr("content")?.trim() ?? "";
+  const stylesheets = $("link[rel~='stylesheet']").length;
+  const scripts = $("script").length;
+  const images = $("img").length;
+
+  if (!title) {
+    findings.push(finding(input.finalUrl, "missing-title", "seo", "high", {}, "Add a unique, descriptive page title."));
+  }
+  if (titleCount > 1) {
+    findings.push(finding(input.finalUrl, "duplicate-title", "seo", "low", { count: titleCount }, "Keep one unique title element."));
+  }
+  if (!metaDescription) {
+    findings.push(
+      finding(input.finalUrl, "missing-meta-description", "seo", "medium", {}, "Add a concise meta description that describes this page."),
+    );
+  }
+  if (descriptionCount > 1) {
+    findings.push(finding(input.finalUrl, "duplicate-meta-description", "seo", "low", { count: descriptionCount }, "Keep one meta description for the page."));
+  }
+  if (h1Count === 0) {
+    findings.push(finding(input.finalUrl, "missing-h1", "seo", "medium", {}, "Add one clear primary heading to the page."));
+  } else if (h1Count > 1) {
+    findings.push(
+      finding(input.finalUrl, "multiple-h1", "seo", "low", { count: h1Count }, "Review the heading hierarchy and keep one primary H1."),
+    );
+  }
+  if (!canonical) {
+    findings.push(finding(input.finalUrl, "missing-canonical", "seo", "low", {}, "Add a canonical URL when this page needs an explicit canonical."));
+  } else if (!canonicalUrl(input.finalUrl, canonical)) {
+    findings.push(
+      finding(input.finalUrl, "invalid-canonical", "seo", "medium", { value: canonical }, "Correct the canonical URL so it uses HTTP or HTTPS."),
+    );
+  }
+  if (!robots) {
+    findings.push(
+      finding(input.finalUrl, "missing-robots", "metadata", "informational", {}, "Check whether explicit robots metadata is needed for this page."),
+    );
+  }
+  if (robots && /\bnoindex\b/i.test(robots)) {
+    findings.push(finding(input.finalUrl, "noindex-meta", "seo", "informational", { value: robots }, "Confirm that the observed noindex directive is intentional."));
+  }
+  if (!viewport) {
+    findings.push(
+      finding(input.finalUrl, "missing-viewport", "mobile", "medium", {}, "Add a viewport meta tag for responsive mobile rendering."),
+    );
+  }
+
+  if ($("script[type='application/ld+json']").length === 0) {
+    findings.push(finding(input.finalUrl, "missing-structured-data", "metadata", "informational", {}, "Review whether relevant structured data is appropriate for this page."));
+  }
+
+  if (input.status >= 400) {
+    findings.push(finding(input.finalUrl, "http-response-error", "technical", "high", { status: input.status }, "Investigate the HTTP response before relying on this page as a public entry point."));
+  }
+  if (input.elapsedMs > 3_000) {
+    findings.push(finding(input.finalUrl, "slow-response", "technical", "medium", { responseTimeMs: input.elapsedMs, thresholdMs: 3_000 }, "Measure and review the response path for avoidable server or delivery delay."));
+  }
+  if (input.bytes > 500_000) {
+    findings.push(finding(input.finalUrl, "oversized-html", "technical", "medium", { bytes: input.bytes, thresholdBytes: 500_000 }, "Review the HTML payload and delivery path for unnecessary weight."));
+  }
+  if ((input.redirectChain?.length ?? 0) > 3) {
+    findings.push(finding(input.finalUrl, "redirect-chain-too-long", "technical", "medium", { redirects: input.redirectChain?.length ?? 0, threshold: 3 }, "Review the redirect chain and keep the canonical path direct."));
+  }
+
+  if (input.robotsTxt) {
+    if (input.robotsTxt.status < 200 || input.robotsTxt.status >= 400) {
+      findings.push(finding(input.robotsTxt.url, "missing-robots-txt", "seo", "low", { status: input.robotsTxt.status }, "Publish a readable robots.txt response when crawler guidance is needed."));
+    } else if (!/user-agent\s*:/i.test(input.robotsTxt.body)) {
+      findings.push(finding(input.robotsTxt.url, "invalid-robots", "seo", "low", { status: input.robotsTxt.status }, "Check that robots.txt uses recognizable User-agent directives."));
+    }
+  }
+  if (input.sitemap) {
+    if (input.sitemap.status < 200 || input.sitemap.status >= 400) {
+      findings.push(finding(input.sitemap.url, "missing-sitemap", "seo", "low", { status: input.sitemap.status }, "Publish or reference a valid XML sitemap when one is appropriate."));
+    } else if (!/<(?:urlset|sitemapindex)\b/i.test(input.sitemap.body)) {
+      findings.push(finding(input.sitemap.url, "invalid-sitemap", "seo", "low", { status: input.sitemap.status }, "Check that the sitemap response is valid XML with a sitemap root element."));
+    }
+  }
+
+  $("script[type='application/ld+json']").each((index, element) => {
+    const raw = $(element).text().trim();
+    try {
+      JSON.parse(raw);
+    } catch {
+      findings.push(
+        finding(
+          input.finalUrl,
+          "invalid-structured-data",
+          "metadata",
+          "medium",
+          { scriptIndex: index, length: raw.length },
+          "Correct or remove structured data that is not valid JSON.",
+          "high",
+          String(index),
+        ),
+      );
+    }
+  });
+
+  $("img").each((index, element) => {
+    if ($(element).attr("alt") === undefined) {
+      findings.push(
+        finding(
+          input.finalUrl,
+          "missing-image-alt",
+          "accessibility",
+          "low",
+          { imageIndex: index, src: $(element).attr("src") ?? "" },
+          "Give informative images useful alt text, or mark decorative images appropriately.",
+          "high",
+          String(index),
+        ),
+      );
+    }
+    if (!$(element).attr("width") && !$(element).attr("height")) {
+      findings.push(
+        finding(
+          input.finalUrl,
+          "missing-image-dimensions",
+          "image",
+          "informational",
+          { imageIndex: index, src: $(element).attr("src") ?? "" },
+          "Consider reserving image dimensions to reduce layout movement.",
+        ),
+      );
+    }
+  });
+
+  const fixedWidth = $("[style], [width]").toArray().some((element) => {
+    const style = $(element).attr("style") ?? "";
+    const width = $(element).attr("width") ?? "";
+    return /width\s*:\s*([1-9]\d{3,})px/i.test(style) || Number(width) > 1_200;
+  });
+  if (fixedWidth) {
+    findings.push(finding(input.finalUrl, "fixed-width-layout", "mobile", "medium", { signal: "large fixed width attribute or inline style" }, "Review large fixed-width layout signals at mobile breakpoints."));
+  }
+
+  $("form").each((index, element) => {
+    if ($(element).find("button[type='submit'], input[type='submit']").length === 0) {
+      findings.push(
+        finding(
+          input.finalUrl,
+          "form-without-submit-control",
+          "conversion",
+          "low",
+          { formIndex: index },
+          "Check that the form exposes a clear, usable submit control.",
+        ),
+      );
+    }
+  });
+
+  if (!hasPrimaryCta($)) {
+    findings.push(
+      finding(
+        input.finalUrl,
+        "missing-primary-cta",
+        "conversion",
+        "low",
+        { checkedElements: ["a", "button", "input[type=submit]"] },
+        "Consider making the intended next step clear in the first page view.",
+      ),
+    );
+  }
+
+  const indicators = technologyIndicators(headers, $);
+  const links = collectAuditLinks(input.finalUrl, input.body);
+  return {
+    findings,
+    links,
+    technologyIndicators: indicators,
+    performance: {
+      status: input.status,
+      responseTimeMs: input.elapsedMs,
+      htmlBytes: input.bytes,
+      renderBlockingStylesheets: stylesheets,
+      scriptCount: scripts,
+      imageCount: images,
+      redirects: input.redirectChain?.length ?? 0,
+    },
+  };
+}
