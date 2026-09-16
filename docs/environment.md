@@ -1,6 +1,6 @@
 # Environment variables
 
-Five variables. `.env.example` lists the names with no values; copy it to
+Six variables. `.env.example` lists the names with no values; copy it to
 `.env` locally and set the same names in the Vercel project for production.
 
 `.env` is gitignored. `.env.example` is committed.
@@ -12,6 +12,7 @@ Five variables. `.env.example` lists the names with no values; copy it to
 | `RESEND_API_KEY` | `src/lib/email.ts` | Runtime | Both emails skipped |
 | `CONTACT_EMAIL` | `src/lib/email.ts` | Runtime | Notification skipped |
 | `RESEND_FROM` | `src/lib/email.ts` | Runtime | Both emails skipped |
+| `BLOB_READ_WRITE_TOKEN` | `src/lib/media/library.ts` and the upload route (`src/app/api/media/upload/route.ts`) | Runtime | Uploads unavailable; committed assets still list |
 
 ## DATABASE_URL
 
@@ -42,6 +43,26 @@ The guards are asymmetric and worth knowing:
 
 Setting the key without `CONTACT_EMAIL` gives the worst outcome: the prospect
 is confirmed while nobody is told the enquiry exists. Set them together.
+
+## BLOB_READ_WRITE_TOKEN
+
+Read/write token for the Vercel Blob store, generated from the Blob store in
+the Vercel dashboard. `src/lib/media/library.ts` uses it to list uploaded
+media, and the upload route (`src/app/api/media/upload/route.ts`) uses it —
+via `@vercel/blob/client`'s `handleUpload` — to authorise and accept uploads.
+
+Set it locally in `.env`, and in Vercel's **Production** and **Preview**
+environments — not just Production, since Preview deployments exercise the
+admin too. Without it, `listMedia()` degrades: the images committed under
+`public/assets` still list, and the library reports that uploads are
+unavailable rather than failing silently.
+
+Uploads go directly from the browser to Blob storage (`@vercel/blob/client`'s
+`upload()` against `handleUploadUrl: "/api/media/upload"`), not through a
+server action's request body. That is what lets an 8 MB image upload at all:
+a Next.js server action's default body limit is 1 MB, and the upload route
+only ever handles the small token-exchange and webhook requests, never the
+file bytes themselves.
 
 ## Never set in production
 

@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { saveWork } from "@/lib/admin/work-actions";
+import { MediaPicker } from "@/components/admin/media/media-picker";
+import type { MediaItem } from "@/lib/media/merge";
 
 export type WorkFormValues = {
   id: number | null;
@@ -30,7 +32,15 @@ const STATUSES = ["draft", "published", "archived"];
 const field =
   "mt-1.5 w-full rounded-sm border border-rule-strong bg-white px-3 py-2 text-[0.9375rem] focus:border-ink focus:outline-none";
 
-export function WorkForm({ initial }: { initial: WorkFormValues }) {
+export function WorkForm({
+  initial,
+  mediaItems,
+  mediaError,
+}: {
+  initial: WorkFormValues;
+  mediaItems: MediaItem[];
+  mediaError: string | null;
+}) {
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [slug, setSlug] = useState(initial.slug);
@@ -106,7 +116,12 @@ export function WorkForm({ initial }: { initial: WorkFormValues }) {
           </p>
         </div>
 
-        <Text name="imageUrl" label="Image path" defaultValue={initial.imageUrl} />
+        <Text
+          name="imageUrl"
+          label="Image path"
+          defaultValue={initial.imageUrl}
+          action={<MediaPicker targetId="imageUrl" items={mediaItems} blobError={mediaError} />}
+        />
         <Text name="imageAlt" label="Image alt text" defaultValue={initial.imageAlt} />
 
         <div>
@@ -163,16 +178,21 @@ function Text({
   label,
   defaultValue,
   required,
+  action,
 }: {
   name: string;
   label: string;
   defaultValue: string;
   required?: boolean;
+  action?: React.ReactNode;
 }) {
   return (
     <div>
       <Label htmlFor={name}>{label}</Label>
-      <input id={name} name={name} defaultValue={defaultValue} required={required} className={field} />
+      <div className="flex items-start gap-2">
+        <input id={name} name={name} defaultValue={defaultValue} required={required} className={`${field} flex-1`} />
+        {action}
+      </div>
     </div>
   );
 }
