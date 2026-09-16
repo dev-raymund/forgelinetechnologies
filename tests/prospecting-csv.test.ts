@@ -35,6 +35,34 @@ test("a valid file produces normalized prospects", () => {
   assert.equal(rows[1]!.contactChannel, "");
 });
 
+test("a country is kept only when it is already a two-letter ISO code", () => {
+  const text = [
+    "company,website,country",
+    "Acme,acme.com,AU",
+    "Beta,beta.com,au",
+    "Kiwi Co,kiwi.co.nz,New Zealand",
+    "Nowhere Ltd,nowhere.com,",
+  ].join("\n");
+
+  const { rows, errors } = parseProspectCsv(text);
+  assert.deepEqual(rows.map((r) => r.domain), ["acme.com", "beta.com", "kiwi.co.nz", "nowhere.com"]);
+  assert.deepEqual(rows.map((r) => r.country), ["AU", "AU", "", ""]);
+
+  // Only the unusable value is reported, and the row survives it. An empty
+  // country is optional, not an error.
+  assert.equal(errors.length, 1);
+  assert.equal(errors[0]!.line, 4);
+  assert.match(errors[0]!.message, /New Zealand/);
+  assert.match(errors[0]!.message, /two-letter ISO country code/);
+});
+
+test("a country that is not alphabetic is refused rather than trimmed", () => {
+  const { rows, errors } = parseProspectCsv("company,website,country\nAcme,acme.com,A1");
+  assert.equal(rows[0]!.country, "");
+  assert.equal(errors.length, 1);
+  assert.match(errors[0]!.message, /"A1"/);
+});
+
 test("a bad row is reported with its line number and never aborts the file", () => {
   const text = [
     "company,website",

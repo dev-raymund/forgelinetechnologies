@@ -94,6 +94,18 @@ export function parseCsvRows(text: string): string[][] {
 
 const REQUIRED_HEADERS = ["company", "website"] as const;
 
+/**
+ * `country` is stored as ISO-3166-1 alpha-2 and filtered on exactly, so a value
+ * that is not already one is left empty rather than trimmed into one. Taking
+ * the first two letters of "New Zealand" produces NE (Niger) and of "United
+ * Kingdom" UN — confidently wrong data that then filters a real business out of
+ * a real market.
+ *
+ * The row is still imported: an unusable country is no reason to lose a good
+ * prospect. The reviewer is told which value was dropped.
+ */
+const ISO_ALPHA2 = /^[A-Z]{2}$/;
+
 function headerIndex(header: string[]): Record<string, number> {
   const map: Record<string, number> = {};
   header.forEach((name, index) => {
@@ -178,13 +190,19 @@ export function parseProspectCsv(text: string): {
       contactChannel = contact.value;
     }
 
+    const rawCountry = cell(row, "country");
+    const country = ISO_ALPHA2.test(rawCountry.toUpperCase()) ? rawCountry.toUpperCase() : "";
+    if (rawCountry && !country) {
+      errors.push({ line, message: `"${rawCountry}" is not a two-letter ISO country code.` });
+    }
+
     seen.set(domain, line);
     rows.push({
       companyName,
       domain,
       websiteUrl: websiteUrlForDomain(domain),
       industry: cell(row, "industry"),
-      country: cell(row, "country").toUpperCase().slice(0, 2),
+      country,
       location: cell(row, "location"),
       contactChannel,
       contactProvenance: contactChannel ? provenance : "",
