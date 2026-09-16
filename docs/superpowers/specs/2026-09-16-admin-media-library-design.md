@@ -1,7 +1,7 @@
 # Admin Media Library and Password Visibility (design)
 
 **Date:** 2026-09-16
-**Status:** awaiting review
+**Status:** implemented
 **Branch:** `admin-media-library`, branched from `main` (`cd7c3c5`)
 **Ships to production:** yes — this branch alone. The prospecting work stays unmerged on its own branches.
 
@@ -26,6 +26,8 @@ Two admin quality-of-life changes that ship together:
 ## Verified prerequisites
 
 `BLOB_READ_WRITE_TOKEN` is present in the local `.env` and was checked against the live API before this design was written: `GET https://blob.vercel-storage.com?limit=5` returned **HTTP 200** with **0 blobs**. The store exists and the token is valid.
+
+The store must be created with **Public access** — access is fixed at creation and cannot be changed afterwards. A private store still issues a token and still lists, so nothing looks wrong until the first upload, which fails with "Cannot use public access on a private store" (the admin picker calls `upload()` with `access: "public"`).
 
 **Outstanding, and required before this works in production:** the same variable must exist in the Vercel project's **Production and Preview** environments. A local-only token means the feature works on a laptop and fails on the deployed site.
 
@@ -135,7 +137,6 @@ The picker attaches to **three** fields, not two:
 `work-form.tsx` renders its field through a private `Text({ name, label, defaultValue, required })` helper. Rather than inlining a bare input there and breaking the file's own consistency, give `Text` an optional `action?: React.ReactNode` prop rendered beside the input. The other two call sites place the picker button directly.
 
 Because these are uncontrolled inputs with `defaultValue`, the picker sets the value imperatively through a ref and dispatches an `input` event, so React and any future validation both observe the change.
-| `src/app/admin/media/page.tsx` | The library full-page in manage mode, with no select handler. |
 
 Navigation gains a "Media" link gated on `media.manage`.
 

@@ -51,6 +51,16 @@ the Vercel dashboard. `src/lib/media/library.ts` uses it to list uploaded
 media, and the upload route (`src/app/api/media/upload/route.ts`) uses it —
 via `@vercel/blob/client`'s `handleUpload` — to authorise and accept uploads.
 
+**The store must be created with Public access.** Access is fixed at
+creation and cannot be changed afterwards — there is no "make this store
+public" toggle later. A private store still issues a token and still lists,
+so nothing looks wrong until the first upload, which fails with "Cannot use
+public access on a private store": the admin picker calls
+`upload(pathname, file, { access: "public", ... })`, and a private store
+refuses that access level outright. If a store already exists as private,
+create a new one with Public access and point `BLOB_READ_WRITE_TOKEN` at it —
+there is no in-place conversion.
+
 Set it locally in `.env`, and in Vercel's **Production** and **Preview**
 environments — not just Production, since Preview deployments exercise the
 admin too. Without it, `listMedia()` degrades: the images committed under
@@ -63,6 +73,19 @@ server action's request body. That is what lets an 8 MB image upload at all:
 a Next.js server action's default body limit is 1 MB, and the upload route
 only ever handles the small token-exchange and webhook requests, never the
 file bytes themselves.
+
+Two things worth knowing that are easy to hit by accident:
+
+- In `@vercel/blob` 2.8.0, `list()` and `del()` prefer OIDC credentials when
+  running on Vercel and use `BLOB_STORE_ID` if it is set, while uploads
+  (`handleUpload`/`upload()`) always use `BLOB_READ_WRITE_TOKEN`. A stale
+  `BLOB_STORE_ID` left over from an earlier store can silently split reads
+  and writes across two different stores — uploads land in one, the library
+  lists another.
+- On a preview deployment behind Vercel's Deployment Protection, Vercel's own
+  upload-completed callback (`onUploadCompleted`, which writes the
+  `media.upload` audit entry) can itself be rejected by that protection. The
+  upload still succeeds; the audit entry may simply not appear there.
 
 ## Never set in production
 
