@@ -2,6 +2,7 @@
 
 import { after } from "next/server";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { authorise } from "@/lib/auth/guard";
 import { audit, type AuditAction } from "@/lib/auth/audit";
 import {
@@ -16,7 +17,14 @@ import {
   type AuditActionResult,
 } from "@/lib/prospecting/admin";
 import { parseProspectCsv, type ParsedProspect, type RowError } from "@/lib/prospecting/csv";
-import { upsertProspects } from "@/lib/prospecting/prospects";
+import {
+  listProspects,
+  suppressProspect,
+  unsuppressProspect,
+  upsertProspects,
+} from "@/lib/prospecting/prospects";
+import { drainAuditQueue, type DrainSummary } from "@/lib/prospecting/drain";
+import { enqueueProspects, productionDrainDependencies } from "@/lib/prospecting/queue";
 
 export type { AuditActionResult } from "@/lib/prospecting/admin";
 
@@ -132,4 +140,70 @@ export async function commitImport(formData: FormData): Promise<ImportResult> {
   });
 
   return { status: "imported", ...summary };
+}
+
+export async function queueAllNew(): Promise<{ queued: number } | { error: string }> {
+  const authorised = await authorise("prospecting.manage");
+  if (!authorised.ok) return { error: authorised.error };
+
+  const ids = (await listProspects({ status: "new" })).map((p) => p.id);
+  const queued = await enqueueProspects(ids, authorised.user.id);
+  await audit({
+    action: "prospect.queue",
+    userId: authorised.user.id,
+    actorEmail: authorised.user.email,
+    entity: "prospect",
+    detail: `queued ${queued}`,
+  });
+  revalidatePath("/admin/prospecting/prospects");
+  return { queued };
+}
+
+/** One batch, bounded to fit this invocation. Bulk work belongs in the CLI. */
+export async function runQueueNow(): Promise<DrainSummary | { error: string }> {
+  const authorised = await authorise("prospecting.manage");
+  if (!authorised.ok) return { error: authorised.error };
+
+  const summary = await drainAuditQueue(
+    { limit: 5, budgetMs: 45_000, pauseMs: 500 },
+    productionDrainDependencies(),
+  );
+  revalidatePath("/admin/prospecting/prospects");
+  return summary;
+}
+
+export async function suppressProspectAction(
+  id: number,
+  reason: string,
+): Promise<{ ok: true } | { error: string }> {
+  const authorised = await authorise("prospecting.manage");
+  if (!authorised.ok) return { error: authorised.error };
+  await suppressProspect(id, reason);
+  await audit({
+    action: "prospect.suppress",
+    userId: authorised.user.id,
+    actorEmail: authorised.user.email,
+    entity: "prospect",
+    entityId: id,
+    detail: reason,
+  });
+  revalidatePath(`/admin/prospecting/prospects/${id}`);
+  return { ok: true };
+}
+
+export async function unsuppressProspectAction(
+  id: number,
+): Promise<{ ok: true } | { error: string }> {
+  const authorised = await authorise("prospecting.manage");
+  if (!authorised.ok) return { error: authorised.error };
+  await unsuppressProspect(id);
+  await audit({
+    action: "prospect.unsuppress",
+    userId: authorised.user.id,
+    actorEmail: authorised.user.email,
+    entity: "prospect",
+    entityId: id,
+  });
+  revalidatePath(`/admin/prospecting/prospects/${id}`);
+  return { ok: true };
 }
