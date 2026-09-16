@@ -135,16 +135,29 @@ export async function commitImport(formData: FormData): Promise<ImportResult> {
   const { rows } = parseProspectCsv(text);
   if (rows.length === 0) return { status: "error", message: "No valid rows to import." };
 
-  const summary = await upsertProspects(
-    rows,
-    {
-      name: sourceName,
-      url: sourceUrl,
-      importedAt: new Date().toISOString(),
-      importedBy: authorised.user.id,
-    },
-    authorised.user.id,
-  );
+  // The upsert is deliberately one atomic statement, so anything the database
+  // refuses fails all of the rows at once. That must reach the reviewer as a
+  // message on the import screen rather than as an unhandled server error on a
+  // page that has already shown them a clean preview.
+  let summary;
+  try {
+    summary = await upsertProspects(
+      rows,
+      {
+        name: sourceName,
+        url: sourceUrl,
+        importedAt: new Date().toISOString(),
+        importedBy: authorised.user.id,
+      },
+      authorised.user.id,
+    );
+  } catch (error) {
+    console.error("[prospecting] import failed", sourceName, error);
+    return {
+      status: "error",
+      message: "The import could not be saved and nothing was written. Check the file and try again.",
+    };
+  }
 
   await audit({
     action: "prospect.import",

@@ -3,6 +3,8 @@ import { classifyContact } from "./contact.ts";
 
 export const MAX_ROWS = 2_000;
 export const MAX_BYTES = 1_000_000;
+/** Matches `prospects.industry`, which is varchar(80). */
+export const MAX_INDUSTRY = 80;
 
 export type ParsedProspect = {
   companyName: string;
@@ -201,7 +203,9 @@ export function parseProspectCsv(text: string): {
       companyName,
       domain,
       websiteUrl: websiteUrlForDomain(domain),
-      industry: cell(row, "industry"),
+      // `prospects.industry` is varchar(80). Bounded here so one long cell
+      // cannot fail the single atomic INSERT the whole file is written with.
+      industry: cell(row, "industry").slice(0, MAX_INDUSTRY),
       country,
       location: cell(row, "location"),
       contactChannel,

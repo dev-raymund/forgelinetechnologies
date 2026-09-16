@@ -63,6 +63,13 @@ test("a country that is not alphabetic is refused rather than trimmed", () => {
   assert.match(errors[0]!.message, /"A1"/);
 });
 
+test("an over-length industry is bounded to the column width, not left to fail the import", () => {
+  const long = "A".repeat(200);
+  const { rows, errors } = parseProspectCsv(`company,website,industry\nAcme,acme.com,${long}`);
+  assert.deepEqual(errors, []);
+  assert.equal(rows[0]!.industry.length, 80);
+});
+
 test("a bad row is reported with its line number and never aborts the file", () => {
   const text = [
     "company,website",
