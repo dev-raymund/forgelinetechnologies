@@ -514,6 +514,7 @@ EOF
 
 **Files:**
 - Modify: `package.json`, `package-lock.json` (add `@vercel/blob`)
+- Create: `src/lib/media/merge.ts`
 - Create: `src/lib/media/library.ts`
 - Create: `src/lib/media/actions.ts`
 - Create: `src/app/api/media/upload/route.ts`
@@ -523,11 +524,12 @@ EOF
 **Interfaces:**
 - Consumes: `ALLOWED_UPLOAD_TYPES`, `MAX_UPLOAD_BYTES`, `isAllowedUpload`, `isSafeBlobPathname` (Task 2); `media.manage` and the audit actions (Task 3).
 - Produces:
-  - `type MediaItem = { url: string; name: string; source: "blob" | "static"; bytes: number; uploadedAt?: string }`
-  - `mergeMedia(blobs: MediaItem[], statics: MediaItem[]): MediaItem[]`
-  - `listMedia(): Promise<{ items: MediaItem[]; blobError: string | null }>`
-  - `deleteMedia(url: string): Promise<{ ok: true } | { error: string }>`
+  - from `src/lib/media/merge.ts`: `type MediaItem = { url: string; name: string; source: "blob" | "static"; bytes: number; uploadedAt?: string }` and `mergeMedia(blobs: MediaItem[], statics: MediaItem[]): MediaItem[]`
+  - from `src/lib/media/library.ts`: `listMedia(): Promise<{ items: MediaItem[]; blobError: string | null }>` (and it re-exports the `MediaItem` type)
+  - from `src/lib/media/actions.ts`: `deleteMedia(url: string): Promise<{ ok: true } | { error: string }>`
   - `POST /api/media/upload`
+
+> **Why `merge.ts` is separate from `library.ts`:** `library.ts` carries `import "server-only"`, and that package does not resolve under plain Node — a `node:test` file importing it fails with `ERR_MODULE_NOT_FOUND` before any assertion runs. Verified against the existing `src/lib/queries.ts`. So the pure, testable half lives in its own import-free module, exactly as `src/lib/auth/capabilities.ts` explains for itself ("Plain data with no imports, so it can be tested directly"). Do not merge these two files back together.
 
 - [ ] **Step 1: Install the dependency**
 
@@ -541,7 +543,7 @@ Create `tests/media-merge.test.ts`:
 ```ts
 import assert from "node:assert/strict";
 import test from "node:test";
-import { mergeMedia, type MediaItem } from "../src/lib/media/library.ts";
+import { mergeMedia, type MediaItem } from "../src/lib/media/merge.ts";
 
 const blob = (name: string, uploadedAt: string): MediaItem => ({
   url: `https://x.public.blob.vercel-storage.com/media/2026/03/${name}`,
@@ -582,15 +584,17 @@ test("an empty library merges to an empty list", () => {
 Run: `node --test --experimental-strip-types tests/media-merge.test.ts`
 Expected: FAIL — module not found
 
-- [ ] **Step 4: Write the library module**
+- [ ] **Step 4a: Write the pure merge module**
 
-Create `src/lib/media/library.ts`:
+Create `src/lib/media/merge.ts` — no imports, so `node:test` can load it:
 
 ```ts
-import "server-only";
-import { list } from "@vercel/blob";
-import manifest from "./static-manifest.json";
-
+/**
+ * The shape of one library entry, and the ordering rule.
+ *
+ * Deliberately import-free and separate from library.ts, which is
+ * `server-only` and therefore cannot be loaded by a plain Node test.
+ */
 export type MediaItem = {
   url: string;
   name: string;
@@ -599,7 +603,7 @@ export type MediaItem = {
   uploadedAt?: string;
 };
 
-/** Pure: uploads newest-first, then the committed assets by name, de-duplicated by url. */
+/** Uploads newest-first, then the committed assets by name, de-duplicated by url. */
 export function mergeMedia(blobs: MediaItem[], statics: MediaItem[]): MediaItem[] {
   const uploads = [...blobs].sort((a, b) => (b.uploadedAt ?? "").localeCompare(a.uploadedAt ?? ""));
   const assets = [...statics].sort((a, b) => a.name.localeCompare(b.name));
@@ -611,6 +615,19 @@ export function mergeMedia(blobs: MediaItem[], statics: MediaItem[]): MediaItem[
     return true;
   });
 }
+```
+
+- [ ] **Step 4b: Write the library module**
+
+Create `src/lib/media/library.ts`:
+
+```ts
+import "server-only";
+import { list } from "@vercel/blob";
+import manifest from "./static-manifest.json";
+import { mergeMedia, type MediaItem } from "./merge";
+
+export type { MediaItem } from "./merge";
 
 function staticItems(): MediaItem[] {
   return (manifest as { path: string; bytes: number }[]).map((entry) => ({
@@ -1059,7 +1076,11 @@ EOF
 
 **Spec coverage:** password component and all three inputs (Task 1); blob naming, the allow-list, the size cap, SVG exclusion and path-escape safety (Task 2); `media.manage`, the audit actions and the static manifest (Task 3); `@vercel/blob`, `listMedia` with graceful degradation, `deleteMedia`, the authorised token route and `remotePatterns` (Task 4); the library UI, the `/admin/media` page and navigation (Task 5); the inline picker, all three form fields and the environment documentation (Task 6).
 
-**Type consistency checked:** `MediaItem`, `mergeMedia`, `listMedia`, `deleteMedia`, `blobPathname`, `isSafeBlobPathname`, `isAllowedUpload`, `ALLOWED_UPLOAD_TYPES` and `MAX_UPLOAD_BYTES` are each defined once and referenced under the same names throughout. `MediaLibrary` takes `onSelect?`; `MediaPicker` supplies it.
+**Type consistency checked:** `MediaItem`, `mergeMedia`, `listMedia`, `deleteMedia`, `blobPathname`, `isSafeBlobPathname`, `isAllowedUpload`, `ALLOWED_UPLOAD_TYPES` and `MAX_UPLOAD_BYTES` are each defined once and referenced under the same names throughout. `MediaItem` and `mergeMedia` live in `merge.ts`; `library.ts` re-exports the type so later tasks may import it from either. `MediaLibrary` takes `onSelect?`; `MediaPicker` supplies it.
+
+**Caught by the pre-flight scan and fixed here, not left for an implementer:** the first draft put `mergeMedia` inside `library.ts` and had `tests/media-merge.test.ts` import it from there. `library.ts` carries `import "server-only"`, which does not resolve under plain Node — verified by importing the existing `src/lib/queries.ts` from a scratch `node:test` file, which failed with `ERR_MODULE_NOT_FOUND: Cannot find package 'server-only'`. The test would have failed before its first assertion. The pure half now lives in `merge.ts`.
+
+**Import conventions verified against `main`:** tests import source with an explicit `.ts` extension (`../src/lib/auth/capabilities.ts`); modules under `src/lib/` use the `@/` alias with no extension, except for same-directory siblings, which use `./name` with no extension.
 
 **Known risk for Task 4:** `@vercel/blob`'s `handleUpload` must be imported from `@vercel/blob/client`, not the package root, and `access: "public"` is required on the client `upload()` call. If the installed version's types disagree with the code above, follow the installed types and say so in the report — do not weaken the authorisation or the validation to make it compile.
 
