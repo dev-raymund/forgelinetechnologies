@@ -314,6 +314,15 @@ export function MediaLibrary({
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
+          onKeyDown={(event) => {
+            // A type="search" input triggers a form's implicit submission on
+            // Enter — a default action of the keypress, not a bubbling event,
+            // so only preventDefault() (not stopPropagation()) stops it. This
+            // component renders no <form> of its own, so when it's embedded
+            // as a picker inside another page's form (MediaPicker), an Enter
+            // here would otherwise submit that host form.
+            if (event.key === "Enter") event.preventDefault();
+          }}
           placeholder="Search by file name…"
           className={field}
         />
