@@ -77,6 +77,28 @@ test("the drain stops cleanly when the time budget is spent", async () => {
   assert.equal(summary.stoppedBecause, "budget");
 });
 
+test("a skipped audit still reports the limit, not an empty queue", async () => {
+  // The queue filled the request (three candidates for a limit of three) but
+  // one was claimed elsewhere, so only two ran. Reporting "empty" here would
+  // tell the operator the queue was drained while work was still waiting.
+  const summary = await drainAuditQueue(
+    { limit: 3, budgetMs: 1_000_000 },
+    deps({
+      claimAudit: async (id: number) =>
+        id === 2 ? null : { requestedUrl: "https://e.com/", prospectId: id },
+    }),
+  );
+  assert.equal(summary.claimed, 2);
+  assert.equal(summary.skipped, 1);
+  assert.equal(summary.stoppedBecause, "limit");
+});
+
+test("a queue that runs dry reports an empty queue", async () => {
+  const summary = await drainAuditQueue({ limit: 10, budgetMs: 1_000_000 }, deps());
+  assert.equal(summary.completed, 3);
+  assert.equal(summary.stoppedBecause, "empty");
+});
+
 test("the limit caps how many audits one drain runs", async () => {
   const ran: number[] = [];
   const summary = await drainAuditQueue(

@@ -99,6 +99,10 @@ export async function drainAuditQueue(
     if (options.pauseMs) await dependencies.delay(options.pauseMs);
   }
 
-  summary.stoppedBecause = run >= options.limit && candidates.length >= options.limit ? "limit" : "empty";
+  // The candidate list is what the queue offered for this limit, so a full list
+  // means the queue had at least that much work — whether or not every audit in
+  // it was actually run. Counting runs instead reported "empty" to the operator
+  // whenever an audit was skipped, while work was still waiting.
+  summary.stoppedBecause = candidates.length >= options.limit ? "limit" : "empty";
   return summary;
 }
