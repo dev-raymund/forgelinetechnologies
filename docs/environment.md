@@ -51,9 +51,9 @@ the Vercel dashboard. `src/lib/media/library.ts` uses it to list uploaded
 media, and the upload route (`src/app/api/media/upload/route.ts`) uses it —
 via `@vercel/blob/client`'s `handleUpload` — to authorise and accept uploads.
 
-**The store must be created with Public access.** Access is fixed at
-creation and cannot be changed afterwards — there is no "make this store
-public" toggle later. A private store still issues a token and still lists,
+**The store must be created with Public access.** Access is chosen at
+creation, and Vercel documents no way to change it afterwards, so treat it as
+fixed. A private store still issues a token and still lists,
 so nothing looks wrong until the first upload, which fails with "Cannot use
 public access on a private store": the admin picker calls
 `upload(pathname, file, { access: "public", ... })`, and a private store
@@ -86,6 +86,13 @@ Two things worth knowing that are easy to hit by accident:
   upload-completed callback (`onUploadCompleted`, which writes the
   `media.upload` audit entry) can itself be rejected by that protection. The
   upload still succeeds; the audit entry may simply not appear there.
+- `next.config.ts` has no `images.remotePatterns` entry until a public store
+  exists, on purpose (a hostname wildcard would make `/_next/image` an open
+  proxy for every Vercel Blob store). Works render their image through
+  `next/image`, so when the public store is created, add that store's exact
+  lower-cased host with `pathname: "/media/**"` and redeploy **before**
+  choosing an uploaded image for a work — otherwise that work's public page
+  cannot render the image. Blog covers use a plain `<img>` and are unaffected.
 
 ## Never set in production
 

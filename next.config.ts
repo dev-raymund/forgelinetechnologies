@@ -38,11 +38,28 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
-  images: {
-    remotePatterns: [
-      { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
-    ],
-  },
+  /* No `images.remotePatterns` yet, deliberately.
+
+     A wildcard such as `*.public.blob.vercel-storage.com` turns /_next/image into
+     an anonymous open proxy: that endpoint is public, its `url` parameter is
+     whatever the caller sends, and the matcher checks only the hostname glob.
+     Anyone could make this domain fetch, resize and serve images from ANY
+     Vercel Blob store, against this project's image-optimisation usage.
+
+     Only works render images through next/image; blog covers and the media
+     library use a plain <img>, which needs no entry here. So nothing breaks
+     without it today.
+
+     When the public Blob store exists, add exactly that store's host, lower-cased,
+     scoped to the upload prefix — BEFORE an uploaded image is chosen for a work:
+
+       images: {
+         remotePatterns: [
+           { protocol: "https", hostname: "<store-id>.public.blob.vercel-storage.com", pathname: "/media/**" },
+         ],
+       },
+
+     Without it, a work whose image is a Blob URL fails to render on its public page. */
 };
 
 export default nextConfig;

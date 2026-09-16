@@ -27,7 +27,7 @@ Two admin quality-of-life changes that ship together:
 
 `BLOB_READ_WRITE_TOKEN` is present in the local `.env` and was checked against the live API before this design was written: `GET https://blob.vercel-storage.com?limit=5` returned **HTTP 200** with **0 blobs**. The store exists and the token is valid.
 
-The store must be created with **Public access** — access is fixed at creation and cannot be changed afterwards. A private store still issues a token and still lists, so nothing looks wrong until the first upload, which fails with "Cannot use public access on a private store" (the admin picker calls `upload()` with `access: "public"`).
+The store must be created with **Public access** — access is chosen at creation, and Vercel documents no way to change it afterwards. A private store still issues a token and still lists, so nothing looks wrong until the first upload, which fails with "Cannot use public access on a private store" (the admin picker calls `upload()` with `access: "public"`).
 
 **Outstanding, and required before this works in production:** the same variable must exist in the Vercel project's **Production and Preview** environments. A local-only token means the feature works on a laptop and fails on the deployed site.
 
@@ -140,7 +140,7 @@ Because these are uncontrolled inputs with `defaultValue`, the picker sets the v
 
 Navigation gains a "Media" link gated on `media.manage`.
 
-`next.config.ts` gains an `images.remotePatterns` entry for the Blob public host, because the site renders these through `next/image`.
+`next.config.ts` deliberately has **no** `images.remotePatterns` entry yet. A wildcard such as `*.public.blob.vercel-storage.com` makes `/_next/image` an anonymous open proxy for every Vercel Blob store, because that endpoint is public and the matcher checks only the hostname glob. Only works render through `next/image` (blog covers and the library use a plain `<img>`), so nothing breaks without it. When the public store exists, add exactly that store's lower-cased host with `pathname: "/media/**"` — before an uploaded image is chosen for a work, or that work's public page fails to render its image.
 
 ### Testing
 
