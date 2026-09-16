@@ -25,16 +25,24 @@ export function normalizeDomain(input: string): string | null {
   if (url.username || url.password) return null;
 
   let host = url.hostname.toLowerCase();
-  if (host.endsWith(".")) host = host.slice(0, -1);
+  // Strip all trailing dots fully.
+  host = host.replace(/\.+$/, "");
   if (host.startsWith("www.")) host = host.slice(4);
 
   if (host.length === 0 || host.length > 253) return null;
   // An IPv6 literal keeps its brackets in `hostname`.
   if (host.startsWith("[")) return null;
   if (/^\d{1,3}(?:\.\d{1,3}){3}$/.test(host)) return null;
-  // A business site always has a dot; this also rejects "localhost".
-  if (!host.includes(".")) return null;
-  if (!/^[a-z0-9.-]+$/.test(host)) return null;
+
+  // Validate per-label: each label must be 1-63 chars, contain only [a-z0-9-],
+  // and not start or end with hyphen. A business site always has at least two labels.
+  const labels = host.split(".");
+  if (labels.length < 2) return null;
+  for (const label of labels) {
+    if (label.length === 0 || label.length > 63) return null;
+    if (!/^[a-z0-9-]+$/.test(label)) return null;
+    if (label.startsWith("-") || label.endsWith("-")) return null;
+  }
 
   return host;
 }
