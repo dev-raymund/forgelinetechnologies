@@ -8,6 +8,7 @@ import {
   type ProspectSource,
 } from "../../db/index.ts";
 import { saveAuditFailure } from "./audit.ts";
+import { isLostClaim } from "./queue.ts";
 import type { ParsedProspect } from "./csv.ts";
 
 export type UpsertSummary = { inserted: number; updated: number; skippedSuppressed: number };
@@ -142,11 +143,19 @@ export async function suppressProspect(id: number, reason: string): Promise<void
     .where(and(eq(prospectAudits.prospectId, id), eq(prospectAudits.status, "queued")));
 
   for (const audit of queued) {
-    // queued -> failed is a legal transition. A drain that claimed this audit
-    // between the select and here wins the compare-and-swap and this throws;
-    // that is the `running` case above, so the rejection is expected and the
-    // suppression itself is already committed.
-    await saveAuditFailure(audit.id, "Superseded by suppression.").catch(() => undefined);
+    try {
+      // queued -> failed is a legal transition. A drain that claimed this audit
+      // between the select and here wins the compare-and-swap and this throws;
+      // that is the `running` case above, so the rejection is expected and the
+      // suppression itself is already committed.
+      await saveAuditFailure(audit.id, "Superseded by suppression.");
+    } catch (error) {
+      // Only that race is expected. Swallowing everything hid the case that
+      // matters: if the database is unreachable the cancellation never lands,
+      // and the suppressed prospect keeps a live queued audit for the next
+      // drain to fetch — the opt-out breach, silently.
+      if (!isLostClaim(error)) throw error;
+    }
   }
 }
 
