@@ -1,11 +1,13 @@
 import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import {
   getDb,
+  prospectAudits,
   prospects,
   type NewProspect,
   type Prospect,
   type ProspectSource,
 } from "../../db/index.ts";
+import { saveAuditFailure } from "./audit.ts";
 import type { ParsedProspect } from "./csv.ts";
 
 export type UpsertSummary = { inserted: number; updated: number; skippedSuppressed: number };
@@ -113,6 +115,16 @@ export async function getProspect(id: number): Promise<Prospect | null> {
   return row ?? null;
 }
 
+/**
+ * Suppression is an opt-out, so it has to stop work that is already scheduled
+ * as well as work that has not started: a prospect suppressed while it sits in
+ * the queue would otherwise keep its queued audit row and still have its site
+ * fetched by the next drain.
+ *
+ * Audits already at `running` are left alone. That row is owned by the
+ * compare-and-swap in `transitionAudit`, and the worker holding it is mid-fetch
+ * — `applyResult` will not undo the suppression when it lands.
+ */
 export async function suppressProspect(id: number, reason: string): Promise<void> {
   await getDb()
     .update(prospects)
@@ -123,6 +135,19 @@ export async function suppressProspect(id: number, reason: string): Promise<void
       updatedAt: new Date(),
     })
     .where(eq(prospects.id, id));
+
+  const queued = await getDb()
+    .select({ id: prospectAudits.id })
+    .from(prospectAudits)
+    .where(and(eq(prospectAudits.prospectId, id), eq(prospectAudits.status, "queued")));
+
+  for (const audit of queued) {
+    // queued -> failed is a legal transition. A drain that claimed this audit
+    // between the select and here wins the compare-and-swap and this throws;
+    // that is the `running` case above, so the rejection is expected and the
+    // suppression itself is already committed.
+    await saveAuditFailure(audit.id, "Superseded by suppression.").catch(() => undefined);
+  }
 }
 
 export async function unsuppressProspect(id: number): Promise<void> {

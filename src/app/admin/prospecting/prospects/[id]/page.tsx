@@ -52,7 +52,10 @@ export default async function ProspectDetailPage({
       .orderBy(desc(prospectAudits.id)),
   );
 
-  const suppressed = prospect.status === "suppressed";
+  // `suppressedAt` is the column that carries the opt-out, not `status`, which
+  // is only a workflow label: a drain that finished after the suppression
+  // leaves the status at `audited` on a row that is genuinely suppressed.
+  const suppressed = prospect.suppressedAt !== null;
 
   return (
     <>

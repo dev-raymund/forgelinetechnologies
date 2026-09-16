@@ -1,18 +1,31 @@
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 import { getDb, prospectAudits, prospects } from "../../db/index.ts";
 import { saveAuditRunning } from "./audit.ts";
 import { runAuditJob } from "./runner.ts";
 import { auditJobDependencies } from "./run.ts";
 import type { DrainDependencies } from "./drain.ts";
 
-/** Creates a queued audit row per prospect and moves the prospect to `queued`. */
+/**
+ * Creates a queued audit row per prospect and moves the prospect to `queued`.
+ *
+ * `suppressed_at IS NULL` is checked alongside the status rather than trusting
+ * the status alone: `status` is a display value, `suppressed_at` is the column
+ * that carries the opt-out guarantee. A suppressed prospect whose status was
+ * left at `new` by some other path must still never be fetched again.
+ */
 export async function enqueueProspects(ids: number[], actorId: number): Promise<number> {
   if (ids.length === 0) return 0;
 
   const targets = await getDb()
     .select({ id: prospects.id, websiteUrl: prospects.websiteUrl })
     .from(prospects)
-    .where(and(inArray(prospects.id, ids), eq(prospects.status, "new")));
+    .where(
+      and(
+        inArray(prospects.id, ids),
+        eq(prospects.status, "new"),
+        isNull(prospects.suppressedAt),
+      ),
+    );
   if (targets.length === 0) return 0;
 
   await getDb()
@@ -66,23 +79,41 @@ export function productionDrainDependencies(): DrainDependencies {
 
     applyResult: async ({ prospectId, auditId, result }) => {
       if (prospectId === null) return;
+
+      const [prospect] = await getDb()
+        .select({ suppressedAt: prospects.suppressedAt })
+        .from(prospects)
+        .where(eq(prospects.id, prospectId))
+        .limit(1);
+      if (!prospect) return;
+
       // A failed audit returns the prospect to `new` so it can be queued again,
       // while still pointing at the failed run so the error is readable.
       // Narrow on `result.status` directly: a separate boolean would not narrow
       // the union and `result.score` would not typecheck.
-      const scored =
+      const snapshot =
         result.status === "failed"
-          ? { status: "new", totalScore: 0, primaryOpportunity: "" }
+          ? { totalScore: 0, primaryOpportunity: "" }
           : {
-              status: "audited",
               totalScore: result.score.total,
               primaryOpportunity: result.score.primaryOpportunity,
             };
 
+      // A suppressed prospect keeps its status. Writing `audited` here would
+      // hide the opt-out from the list, and writing `new` after a failure would
+      // hand the prospect straight back to "Queue all new" and have it audited
+      // again, forever. The audit links are still written so the run that was
+      // already in flight stays traceable.
+      const lifecycle =
+        prospect.suppressedAt === null
+          ? { status: result.status === "failed" ? "new" : "audited" }
+          : {};
+
       await getDb()
         .update(prospects)
         .set({
-          ...scored,
+          ...snapshot,
+          ...lifecycle,
           lastAuditId: auditId,
           lastAuditedAt: new Date(),
           updatedAt: new Date(),
