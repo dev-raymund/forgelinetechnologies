@@ -732,18 +732,25 @@ import {
 } from "@/lib/media/paths";
 
 /**
- * Issues a scoped upload token so the browser can send bytes straight to Blob.
+ * One route, two different callers — which is why authorisation lives inside
+ * `onBeforeGenerateToken` and NOT at the top of this function.
  *
- * This is a public HTTP endpoint. It authorises before issuing anything, and
- * re-checks the pathname and the type and size limits here rather than trusting
- * the client that computed them.
+ * 1. The signed-in admin's browser asks for an upload token. That request
+ *    carries a session cookie; `onBeforeGenerateToken` authorises it and
+ *    re-checks the pathname, type and size rather than trusting the client.
+ * 2. Vercel Blob itself calls back when the upload finishes, to run
+ *    `onUploadCompleted`. That request comes from Vercel's servers and carries
+ *    no session cookie at all. `handleUpload` authenticates it by verifying the
+ *    webhook signature against `request`.
+ *
+ * A session check at the top of the route would return 403 to caller 2, so
+ * every upload would succeed while `onUploadCompleted` silently never ran and
+ * the audit entry was never written — with Vercel retrying five times.
+ *
+ * Vercel cannot reach localhost, so `onUploadCompleted` only fires on a deployed
+ * environment. Uploads still work locally; the audit entry appears in production.
  */
 export async function POST(request: Request): Promise<Response> {
-  const authorised = await authorise("media.manage");
-  if (!authorised.ok) {
-    return Response.json({ error: "Not authorised." }, { status: 403 });
-  }
-
   const body = (await request.json()) as HandleUploadBody;
 
   try {
@@ -751,6 +758,10 @@ export async function POST(request: Request): Promise<Response> {
       body,
       request,
       onBeforeGenerateToken: async (pathname) => {
+        const authorised = await authorise("media.manage");
+        if (!authorised.ok) {
+          throw new Error("Not authorised to upload media.");
+        }
         if (!isSafeBlobPathname(pathname)) {
           throw new Error("That file name is not allowed.");
         }
@@ -1050,13 +1061,15 @@ Expected: 42 tests pass, all clean.
 Run `npm run dev`, sign in, and:
 
 1. Open `/admin/media`. Confirm the 44 committed assets list and no error banner appears.
-2. Drag a PNG under 8 MB onto the dropzone. Confirm it uploads, appears at the top of the grid, and that `audit_logs` gains a `media.upload` row.
+2. Drag a PNG under 8 MB onto the dropzone. Confirm it uploads and appears at the top of the grid. **Do not expect a `media.upload` row in `audit_logs` locally** — that entry is written by `onUploadCompleted`, which Vercel invokes as a webhook, and Vercel cannot reach `localhost`. The upload itself works locally; its audit entry appears only on a deployed environment. Record this as expected, not as a failure.
 3. Try to upload an `.svg`. Confirm it is refused with a readable message and nothing reaches the store.
 4. Open `/admin/blog/new`, click "Choose image" beside Cover image, pick the uploaded file, and confirm the field fills with the blob URL.
-5. Delete the uploaded file from `/admin/media`. Confirm it disappears and `audit_logs` gains a `media.delete` row.
+5. Delete the uploaded file from `/admin/media`. Confirm it disappears and `audit_logs` gains a `media.delete` row — this one DOES work locally, because `deleteMedia` is a server action running in your own request.
 6. Confirm a static asset's delete control is disabled.
 
 Record what actually happened for each of the six, including anything that did not work.
+
+**Post-deploy check (not runnable locally):** after the branch is deployed, upload one image through `/admin/media` in production and confirm `audit_logs` gains a `media.upload` row within a few seconds. That is the only way to verify the webhook path end to end.
 
 - [ ] **Step 7: Commit**
 
