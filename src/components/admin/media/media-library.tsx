@@ -89,7 +89,7 @@ export function MediaLibrary({
   const [dragging, setDragging] = useState(false);
   const [uploads, setUploads] = useState<UploadEntry[]>([]);
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
-  const [copyError, setCopyError] = useState<string | null>(null);
+  const [copyError, setCopyError] = useState<{ message: string; url: string } | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deletingUrl, setDeletingUrl] = useState<string | null>(null);
   const [isDeleting, startDelete] = useTransition();
@@ -203,9 +203,15 @@ export function MediaLibrary({
     // navigator.clipboard is undefined outside a secure context (plain HTTP,
     // some embedded webviews), and writeText can reject even when it exists
     // (no permission, no focus). Both paths must degrade to a message, not a
-    // thrown error.
+    // thrown error. Neither the browser chrome nor this page shows the URL
+    // anywhere else, so the message carries it as selectable text — on
+    // /admin/media the address bar reads /admin/media, not the image, so
+    // pointing someone there was never actually true.
     if (!navigator.clipboard) {
-      setCopyError("Copying is not available here. Copy the URL from the address bar instead.");
+      setCopyError({
+        message: "Could not copy automatically. Select the image and copy its URL from the link instead.",
+        url,
+      });
       return;
     }
     try {
@@ -213,7 +219,10 @@ export function MediaLibrary({
       setCopiedUrl(url);
       window.setTimeout(() => setCopiedUrl((prev) => (prev === url ? null : prev)), 2000);
     } catch {
-      setCopyError("Could not copy that URL. Copy it manually instead.");
+      setCopyError({
+        message: "Could not copy automatically. Select the image and copy its URL from the link instead.",
+        url,
+      });
     }
   }, []);
 
@@ -253,7 +262,10 @@ export function MediaLibrary({
 
       {copyError ? (
         <p role="alert" className="mb-5 border-l-2 border-accent bg-white px-4 py-3 text-[0.9375rem]">
-          {copyError}
+          {copyError.message}{" "}
+          <span className="select-all break-all font-mono text-[0.8125rem] text-graphite">
+            {copyError.url}
+          </span>
         </p>
       ) : null}
 
