@@ -107,6 +107,16 @@ export async function previewImport(formData: FormData): Promise<ImportPreview> 
   return { status: "ready", rows, errors, sourceName };
 }
 
+/** True for an absolute http(s) URL. Used to keep a free-text source URL from becoming a clickable non-http scheme later. */
+function isHttpUrl(value: string): boolean {
+  try {
+    const protocol = new URL(value).protocol;
+    return protocol === "http:" || protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 export async function commitImport(formData: FormData): Promise<ImportResult> {
   const authorised = await authorise("prospecting.manage");
   if (!authorised.ok) return { status: "error", message: authorised.error };
@@ -117,6 +127,11 @@ export async function commitImport(formData: FormData): Promise<ImportResult> {
     return { status: "error", message: "The import is missing its file or its source name." };
   }
 
+  const sourceUrl = String(formData.get("sourceUrl") ?? "").trim();
+  if (sourceUrl && !isHttpUrl(sourceUrl)) {
+    return { status: "error", message: "The source URL must be an http or https address." };
+  }
+
   const { rows } = parseProspectCsv(text);
   if (rows.length === 0) return { status: "error", message: "No valid rows to import." };
 
@@ -124,7 +139,7 @@ export async function commitImport(formData: FormData): Promise<ImportResult> {
     rows,
     {
       name: sourceName,
-      url: String(formData.get("sourceUrl") ?? "").trim(),
+      url: sourceUrl,
       importedAt: new Date().toISOString(),
       importedBy: authorised.user.id,
     },
@@ -178,6 +193,7 @@ export async function suppressProspectAction(
 ): Promise<{ ok: true } | { error: string }> {
   const authorised = await authorise("prospecting.manage");
   if (!authorised.ok) return { error: authorised.error };
+  if (!reason.trim()) return { error: "Give a reason before suppressing this prospect." };
   await suppressProspect(id, reason);
   await audit({
     action: "prospect.suppress",

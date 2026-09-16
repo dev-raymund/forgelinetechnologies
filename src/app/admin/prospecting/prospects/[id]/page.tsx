@@ -10,6 +10,22 @@ import { SuppressControls } from "@/components/admin/prospecting/suppress-contro
 
 export const metadata = { title: "Prospect" };
 
+/**
+ * `ProspectSource.url` is free text supplied at import time and is not
+ * guaranteed to be a safe scheme even after `commitImport` started rejecting
+ * new ones — rows written before that check still exist. Only ever render it
+ * as a clickable href when it parses as http(s); otherwise show it as plain
+ * text with no href.
+ */
+function isHttpUrl(value: string): boolean {
+  try {
+    const protocol = new URL(value).protocol;
+    return protocol === "http:" || protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 export default async function ProspectDetailPage({
   params,
 }: {
@@ -127,7 +143,7 @@ export default async function ProspectDetailPage({
                 {prospect.sources.map((source, index) => (
                   <li key={`${source.name}-${index}`} className="border-t border-rule pt-3 first:border-t-0 first:pt-0">
                     <p className="font-medium text-graphite">{source.name || "Unnamed source"}</p>
-                    {source.url ? (
+                    {source.url && isHttpUrl(source.url) ? (
                       <a
                         href={source.url}
                         target="_blank"
@@ -136,6 +152,8 @@ export default async function ProspectDetailPage({
                       >
                         {source.url}
                       </a>
+                    ) : source.url ? (
+                      <span className="break-all text-[0.8125rem] text-muted">{source.url}</span>
                     ) : null}
                     <p className="mt-1 font-mono text-micro text-faint">
                       Imported {source.importedAt ? when(new Date(source.importedAt)) : "—"}
