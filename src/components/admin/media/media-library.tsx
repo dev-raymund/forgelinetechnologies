@@ -166,6 +166,21 @@ export function MediaLibrary({
     if (!uploadDisabled) inputRef.current?.click();
   };
 
+  /**
+   * A drop anywhere in this component that is not the dropzone above must not
+   * fall through to the browser's default of opening the dropped file — in
+   * Firefox that replaces the tab outright, losing whatever the surrounding
+   * form (a blog post, a work) had unsaved. This only calls preventDefault():
+   * it never reads `dataTransfer` (so it cannot swallow files meant for the
+   * dropzone's own handler) and never calls stopPropagation() (so, during the
+   * bubble phase, the dropzone's own onDrop above still runs first and still
+   * receives the files — this handler only catches what reaches the root
+   * afterwards).
+   */
+  const blockStrayDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+  };
+
   const handleCopy = useCallback(async (url: string) => {
     setCopyError(null);
     // navigator.clipboard is undefined outside a secure context (plain HTTP,
@@ -206,7 +221,7 @@ export function MediaLibrary({
   const allSettled = uploads.length > 0 && uploads.every((u) => u.status !== "uploading");
 
   return (
-    <div>
+    <div onDragOver={blockStrayDrop} onDrop={blockStrayDrop}>
       {blobError ? (
         <p role="alert" className="mb-5 border-l-2 border-accent bg-white px-4 py-3 text-[0.9375rem]">
           {blobError}

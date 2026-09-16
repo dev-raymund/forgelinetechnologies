@@ -85,6 +85,8 @@ export function MediaPicker({
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-8"
           onClick={close}
+          onDragOver={(event) => event.preventDefault()}
+          onDrop={(event) => event.preventDefault()}
         >
           <div
             role="dialog"
