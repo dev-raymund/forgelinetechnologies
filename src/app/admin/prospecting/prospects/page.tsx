@@ -42,7 +42,11 @@ export default async function ProspectsPage({
   const filter = {
     status: sp.status,
     opportunity: sp.opportunity,
-    country: sp.country,
+    // `country` is stored as an upper-case ISO code and matched with `eq`, and
+    // the input's `uppercase` class only restyles the glyphs — the form still
+    // submits what was typed. Without this, "au" matches nothing and the empty
+    // result is indistinguishable from having no Australian prospects.
+    country: sp.country?.toUpperCase(),
     industry: sp.industry,
   };
   const filtered = Boolean(sp.status || sp.opportunity || sp.country || sp.industry);
@@ -72,7 +76,7 @@ export default async function ProspectsPage({
           <input
             type="text"
             name="country"
-            defaultValue={sp.country ?? ""}
+            defaultValue={filter.country ?? ""}
             placeholder="AU"
             maxLength={2}
             className="w-20 rounded-sm border border-rule-strong bg-white px-3 py-2 text-[0.875rem] uppercase focus:border-ink focus:outline-none"
