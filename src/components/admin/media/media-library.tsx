@@ -90,9 +90,6 @@ export function MediaLibrary({
   const [uploads, setUploads] = useState<UploadEntry[]>([]);
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
   const [copyError, setCopyError] = useState<{ message: string; url: string } | null>(null);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
-  const [deletingUrl, setDeletingUrl] = useState<string | null>(null);
-  const [isDeleting, startDelete] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const filtered = useMemo(() => {
@@ -226,24 +223,6 @@ export function MediaLibrary({
     }
   }, []);
 
-  const handleDelete = useCallback(
-    (url: string) => {
-      setDeleteError(null);
-      setDeletingUrl(url);
-      startDelete(async () => {
-        const result = await deleteMedia(url);
-        if ("error" in result) {
-          setDeleteError(result.error);
-          setDeletingUrl(null);
-          return;
-        }
-        setDeletingUrl(null);
-        router.refresh();
-      });
-    },
-    [router],
-  );
-
   const allSettled = uploads.length > 0 && uploads.every((u) => u.status !== "uploading");
 
   return (
@@ -251,12 +230,6 @@ export function MediaLibrary({
       {blobError ? (
         <p role="alert" className="mb-5 border-l-2 border-accent bg-white px-4 py-3 text-[0.9375rem]">
           {blobError}
-        </p>
-      ) : null}
-
-      {deleteError ? (
-        <p role="alert" className="mb-5 border-l-2 border-accent bg-white px-4 py-3 text-[0.9375rem]">
-          {deleteError}
         </p>
       ) : null}
 
@@ -400,11 +373,9 @@ export function MediaLibrary({
                   </button>
 
                   {manageMode ? (
-                    <div className="flex items-center justify-between gap-2 border-t border-rule px-3 py-2">
-                      <span className="text-[0.75rem] text-faint">
-                        {copiedUrl === item.url ? "Copied" : isStatic ? "Repository" : "Uploaded"}
-                      </span>
-                      {isStatic ? (
+                    isStatic ? (
+                      <div className="flex items-center justify-between gap-2 border-t border-rule px-3 py-2">
+                        <span className="text-[0.75rem] text-faint">Repository</span>
                         <button
                           type="button"
                           disabled
@@ -413,17 +384,10 @@ export function MediaLibrary({
                         >
                           Delete
                         </button>
-                      ) : (
-                        <button
-                          type="button"
-                          disabled={isDeleting && deletingUrl === item.url}
-                          onClick={() => handleDelete(item.url)}
-                          className="text-[0.75rem] font-medium text-muted underline decoration-rule-strong underline-offset-4 hover:text-graphite disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                          {isDeleting && deletingUrl === item.url ? "Deleting…" : "Delete"}
-                        </button>
-                      )}
-                    </div>
+                      </div>
+                    ) : (
+                      <MediaDeleteControl url={item.url} copied={copiedUrl === item.url} />
+                    )
                   ) : null}
                 </div>
               );
@@ -431,6 +395,86 @@ export function MediaLibrary({
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+/**
+ * One uploaded item's Delete affordance: a single click must never delete —
+ * an image removed here breaks a live post's cover or `og:image`, or a
+ * published work's image, with no way to get it back. Modelled directly on
+ * `InquiryControls`' two-step delete (`src/components/admin/inquiry-controls.tsx`):
+ * first click shows a confirmation with "Yes, delete" and "Cancel"; only
+ * "Yes, delete" calls the server action.
+ *
+ * State lives here, one instance per grid item, rather than as
+ * `deletingUrl`/`isDeleting` shared across the whole grid — the previous
+ * shape could desync (a stale disabled state, a confirmation meant for one
+ * thumbnail applying to another) the moment more than one item was touched.
+ * The server's in-use refusal (if any) renders inline, on this item alone.
+ */
+function MediaDeleteControl({ url, copied }: { url: string; copied: boolean }) {
+  const router = useRouter();
+  const [pending, start] = useTransition();
+  const [confirming, setConfirming] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  if (confirming) {
+    return (
+      <div className="border-t border-rule px-3 py-2">
+        <p className="text-[0.75rem] text-graphite">
+          Delete this image permanently? This cannot be undone.
+        </p>
+        {error ? (
+          <p role="alert" className="mt-1.5 text-[0.75rem] text-muted">
+            {error}
+          </p>
+        ) : null}
+        <div className="mt-2 flex gap-2">
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() => {
+              setError(null);
+              start(async () => {
+                const result = await deleteMedia(url);
+                if ("error" in result) {
+                  setError(result.error);
+                  return;
+                }
+                router.refresh();
+              });
+            }}
+            className="rounded-sm bg-accent px-2.5 py-1 text-[0.75rem] font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {pending ? "Deleting…" : "Yes, delete"}
+          </button>
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() => {
+              setConfirming(false);
+              setError(null);
+            }}
+            className="rounded-sm border border-rule-strong px-2.5 py-1 text-[0.75rem] font-medium disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center justify-between gap-2 border-t border-rule px-3 py-2">
+      <span className="text-[0.75rem] text-faint">{copied ? "Copied" : "Uploaded"}</span>
+      <button
+        type="button"
+        onClick={() => setConfirming(true)}
+        className="text-[0.75rem] font-medium text-muted underline decoration-rule-strong underline-offset-4 hover:text-graphite"
+      >
+        Delete
+      </button>
     </div>
   );
 }
