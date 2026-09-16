@@ -16,7 +16,7 @@ Checked on 2026-09-14 (Asia/Manila):
 | Latest commit | `cd7c3c57abcb0dad9e50706bbc0307ba0397de32` — `Remove a fabricated testimonial and two false claims before outreach` |
 | Worktree state before Phase 1 implementation | Phase 0 docs and untracked `AGENTS.md` were present; an unrelated tracked deletion of `public/google7ea74dc5ce189336.html` remains preserved. |
 | Application stack | Next.js 16.3.4, React 19, TypeScript, Neon PostgreSQL, Drizzle ORM, Resend, Vercel. |
-| Current Prospecting Engine | Phase 1 implemented and verified end-to-end against Neon; the migration is applied and audits run with no external job service. |
+| Current Prospecting Engine | Phase 1 implemented and verified end-to-end against Neon; the migration is applied and audits run with no external job service. Phase 2 (bulk CSV import, drain, ranked review) is implemented in code as of 2026-09-16; its migration (`drizzle/0002_prospects.sql`) has **not** been applied to any database and the drain CLI has **not** been executed. Verification so far is unit tests, `tsc --noEmit`, lint, and build — no end-to-end or production result yet. |
 
 Do not assume the commit currently deployed to Vercel is the same as this repository commit without checking Vercel deployment metadata. Public route reachability was checked, but deployment-to-commit provenance was not available from the repository.
 
@@ -126,6 +126,48 @@ The job runs in-process through the Next.js `after()` API, so there is no queue
 service, no worker process, and no prospecting environment variable. `npm run
 dev` is the entire local setup. This replaced Inngest on 2026-09-16 — see the
 Phase 1 report for why.
+
+## Phase 2 implementation checkpoint
+
+Phase 2 adds bulk prospecting on top of the Phase 1 single-URL engine: CSV
+import, domain-deduplicated upsert, a drainable audit queue, and a ranked
+review list. Its change log lives in the same
+[`docs/prospecting-engine-phase1-report.md`](./prospecting-engine-phase1-report.md)
+used for Phase 1, and the executable plan is at
+[`docs/superpowers/plans/2026-09-16-prospecting-phase2.md`](./superpowers/plans/2026-09-16-prospecting-phase2.md).
+
+Implemented flow:
+
+```text
+CSV import → domain-unique upsert → queued audit → drain → ranked review
+```
+
+`/admin/prospecting/import` previews a parsed CSV before committing it, so a
+later edit to the source file cannot silently change what gets imported. The
+upsert is keyed on a normalized, unique domain (`normalizeDomain`), so
+re-importing the same business updates its row instead of duplicating it and
+a suppressed prospect stays suppressed. "Queue all new" creates one
+`prospect_audits` row per prospect and moves it to `queued`; `drainAuditQueue`
+(`src/lib/prospecting/drain.ts`) then claims queued rows with the same
+compare-and-swap `transitionAudit` guard Phase 1 uses for a single audit, and
+runs them one at a time. It has two callers — the bounded "Run queue now"
+button on `/admin/prospecting/prospects` and the unbounded
+`npm run prospecting:drain` CLI (`scripts/drain-prospecting.mts`) — documented
+in [`docs/environment.md`](./environment.md#prospecting-audit-jobs). Audited
+prospects then show on `/admin/prospecting/prospects`, ranked by score, for
+review.
+
+The Phase 1 manual single-URL flow is unchanged and still lives at
+`/admin/prospecting/audit`; Phase 2 is an additional bulk path, not a
+replacement.
+
+**Not yet true of this checkpoint:** `drizzle/0002_prospects.sql` has been
+written but **not applied** to any database, so the `prospects` table does
+not exist yet in Neon. The drain CLI has not been run. Verification performed
+so far is `npm test`, `npx tsc --noEmit`, `npm run lint`, and `npm run
+build` — see the Phase 2 row in the Phase 1 report's change log for the
+current test count. There is no end-to-end or production verification to
+report.
 
 ## Next phase — build this first
 

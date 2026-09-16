@@ -54,6 +54,25 @@ finishes well inside the `maxDuration = 60` declared on the two
 They need no queue service, no background worker, and no environment variables
 of their own: `npm run dev` is the whole local setup.
 
+Phase 2 adds a second path for bulk CSV imports: instead of running inline, an
+audit is queued (`prospect_audits.status = "queued"`) and drained later by
+`drainAuditQueue`. There are two callers of that same function, both reading
+only `DATABASE_URL`:
+
+- `npm run prospecting:drain` (`scripts/drain-prospecting.mts`) — the primary
+  way to work through a large import. It runs on your machine, not on Vercel,
+  so no serverless time limit applies and it can work through a queue of
+  hundreds unattended.
+- The "Run queue now" button on `/admin/prospecting/prospects` — a bounded,
+  in-request convenience (roughly a 45-second budget under the page's
+  `maxDuration = 60`) for clearing a small batch without opening a terminal.
+
+There is deliberately **no cron job and no `CRON_SECRET`**. This project runs
+on Vercel's Hobby plan, where scheduled functions run on the order of once a
+day — far too infrequent to drain a queue that should clear within minutes of
+an import. A CLI you run yourself, plus a bounded button for small batches,
+covers the real need without paying for Pro just to get hourly cron.
+
 ## Never set in production
 
 **`NEXT_PUBLIC_BASE_PATH`** does not exist in this codebase and must not be
