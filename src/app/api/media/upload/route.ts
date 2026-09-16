@@ -27,9 +27,8 @@ import {
  * environment. Uploads still work locally; the audit entry appears in production.
  */
 export async function POST(request: Request): Promise<Response> {
-  const body = (await request.json()) as HandleUploadBody;
-
   try {
+    const body = (await request.json()) as HandleUploadBody;
     const result = await handleUpload({
       body,
       request,
