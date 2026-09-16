@@ -304,6 +304,7 @@ export const prospectAudits = pgTable(
     status: varchar("status", { length: 16 }).notNull().default("queued"),
     auditVersion: varchar("audit_version", { length: 32 }).notNull().default("phase1-v1"),
     requestedBy: integer("requested_by").references(() => users.id, { onDelete: "set null" }),
+    prospectId: integer("prospect_id"),
     requestedAt: timestamp("requested_at", { withTimezone: true }).notNull().defaultNow(),
     startedAt: timestamp("started_at", { withTimezone: true }),
     completedAt: timestamp("completed_at", { withTimezone: true }),
@@ -321,6 +322,7 @@ export const prospectAudits = pgTable(
     index("prospect_audits_status_idx").on(t.status),
     index("prospect_audits_requested_at_idx").on(t.requestedAt),
     index("prospect_audits_requested_by_idx").on(t.requestedBy),
+    index("prospect_audits_prospect_idx").on(t.prospectId),
   ],
 );
 
@@ -349,6 +351,58 @@ export const auditFindings = pgTable(
   ],
 );
 
+/** Where one import learned about a prospect. Append-only provenance. */
+export type ProspectSource = {
+  name: string;
+  url: string;
+  importedAt: string;
+  importedBy: number | null;
+};
+
+/**
+ * A researched organisation, not an inbound enquiry.
+ *
+ * `domain` is the deduplication key and is unique: re-importing a list can
+ * never create a second row for the same business, which is what stops anyone
+ * being worked or contacted twice.
+ *
+ * `totalScore` and `primaryOpportunity` are snapshots of the latest audit, kept
+ * only so the list can sort and filter in SQL. The detail page recalculates
+ * from stored findings, because the spec requires scores be explainable rather
+ * than trusted as totals.
+ */
+export const prospects = pgTable(
+  "prospects",
+  {
+    id: serial("id").primaryKey(),
+    companyName: text("company_name").notNull(),
+    domain: varchar("domain", { length: 253 }).notNull().unique(),
+    websiteUrl: text("website_url").notNull(),
+    industry: varchar("industry", { length: 80 }).notNull().default(""),
+    country: varchar("country", { length: 2 }).notNull().default(""),
+    location: text("location").notNull().default(""),
+    contactChannel: text("contact_channel").notNull().default(""),
+    contactProvenance: text("contact_provenance").notNull().default(""),
+    sources: jsonb("sources").$type<ProspectSource[]>().notNull().default([]),
+    status: varchar("status", { length: 16 }).notNull().default("new"),
+    suppressedAt: timestamp("suppressed_at", { withTimezone: true }),
+    suppressionReason: text("suppression_reason").notNull().default(""),
+    lastAuditId: integer("last_audit_id"),
+    lastAuditedAt: timestamp("last_audited_at", { withTimezone: true }),
+    totalScore: integer("total_score").notNull().default(0),
+    primaryOpportunity: varchar("primary_opportunity", { length: 32 }).notNull().default(""),
+    createdBy: integer("created_by").references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("prospects_status_idx").on(t.status),
+    index("prospects_score_idx").on(t.totalScore),
+    index("prospects_country_idx").on(t.country),
+    index("prospects_industry_idx").on(t.industry),
+  ],
+);
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Project = typeof projects.$inferSelect;
@@ -366,3 +420,5 @@ export type ProspectAudit = typeof prospectAudits.$inferSelect;
 export type NewProspectAudit = typeof prospectAudits.$inferInsert;
 export type AuditFinding = typeof auditFindings.$inferSelect;
 export type NewAuditFinding = typeof auditFindings.$inferInsert;
+export type Prospect = typeof prospects.$inferSelect;
+export type NewProspect = typeof prospects.$inferInsert;

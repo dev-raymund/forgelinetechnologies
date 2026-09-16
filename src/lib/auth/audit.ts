@@ -25,7 +25,9 @@ export type AuditAction =
   | "user.create" | "user.update" | "user.deactivate" | "user.delete"
   | "prospecting.audit.requested" | "prospecting.audit.running"
   | "prospecting.audit.completed" | "prospecting.audit.failed"
-  | "prospecting.audit.rerun";
+  | "prospecting.audit.rerun"
+  | "prospect.import" | "prospect.queue" | "prospect.suppress"
+  | "prospect.unsuppress" | "prospect.dismiss";
 
 export async function clientIp(): Promise<string> {
   const h = await headers();
