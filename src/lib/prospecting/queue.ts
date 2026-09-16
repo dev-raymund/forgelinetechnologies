@@ -5,6 +5,49 @@ import { runAuditJob } from "./runner.ts";
 import { auditJobDependencies } from "./run.ts";
 import type { DrainDependencies } from "./drain.ts";
 
+export type EnqueueDependencies = {
+  /** Prospects that may be queued: still at `new`, and not suppressed. */
+  selectQueueable: (ids: number[]) => Promise<{ id: number; websiteUrl: string }[]>;
+  /**
+   * Moves prospects to `queued`, returning only the ids it actually changed.
+   * The suppression guard lives here as well as in the read, so an id the
+   * caller believed was queueable can still be refused at write time.
+   */
+  markQueued: (ids: number[]) => Promise<number[]>;
+  insertAudits: (
+    rows: { requestedUrl: string; requestedBy: number; prospectId: number }[],
+  ) => Promise<void>;
+};
+
+export function productionEnqueueDependencies(): EnqueueDependencies {
+  return {
+    selectQueueable: async (ids) =>
+      getDb()
+        .select({ id: prospects.id, websiteUrl: prospects.websiteUrl })
+        .from(prospects)
+        .where(
+          and(
+            inArray(prospects.id, ids),
+            eq(prospects.status, "new"),
+            isNull(prospects.suppressedAt),
+          ),
+        ),
+
+    markQueued: async (ids) => {
+      const rows = await getDb()
+        .update(prospects)
+        .set({ status: "queued", updatedAt: new Date() })
+        .where(and(inArray(prospects.id, ids), isNull(prospects.suppressedAt)))
+        .returning({ id: prospects.id });
+      return rows.map((row) => row.id);
+    },
+
+    insertAudits: async (rows) => {
+      await getDb().insert(prospectAudits).values(rows);
+    },
+  };
+}
+
 /**
  * Creates a queued audit row per prospect and moves the prospect to `queued`.
  *
@@ -12,38 +55,40 @@ import type { DrainDependencies } from "./drain.ts";
  * the status alone: `status` is a display value, `suppressed_at` is the column
  * that carries the opt-out guarantee. A suppressed prospect whose status was
  * left at `new` by some other path must still never be fetched again.
+ *
+ * The UPDATE is the authority, and it runs first. Reading the queueable
+ * prospects and then writing to them is two statements, so a suppression can
+ * commit in between: the read saw a live prospect, and by the time the writes
+ * land the business has opted out. Inserting the audit rows first left exactly
+ * that prospect with `suppressed_at` set, `status = 'queued'` and a live queued
+ * audit row for the next drain to fetch. So the UPDATE carries the same
+ * suppression guard and reports back the ids it really changed, and only those
+ * ids get an audit row — a prospect suppressed mid-flight gets neither.
  */
-export async function enqueueProspects(ids: number[], actorId: number): Promise<number> {
+export async function enqueueProspects(
+  ids: number[],
+  actorId: number,
+  dependencies: EnqueueDependencies = productionEnqueueDependencies(),
+): Promise<number> {
   if (ids.length === 0) return 0;
 
-  const targets = await getDb()
-    .select({ id: prospects.id, websiteUrl: prospects.websiteUrl })
-    .from(prospects)
-    .where(
-      and(
-        inArray(prospects.id, ids),
-        eq(prospects.status, "new"),
-        isNull(prospects.suppressedAt),
-      ),
-    );
+  const targets = await dependencies.selectQueueable(ids);
   if (targets.length === 0) return 0;
 
-  await getDb()
-    .insert(prospectAudits)
-    .values(
-      targets.map((target) => ({
+  const enqueued = new Set(await dependencies.markQueued(targets.map((t) => t.id)));
+  if (enqueued.size === 0) return 0;
+
+  await dependencies.insertAudits(
+    targets
+      .filter((target) => enqueued.has(target.id))
+      .map((target) => ({
         requestedUrl: target.websiteUrl,
         requestedBy: actorId,
         prospectId: target.id,
       })),
-    );
+  );
 
-  await getDb()
-    .update(prospects)
-    .set({ status: "queued", updatedAt: new Date() })
-    .where(inArray(prospects.id, targets.map((t) => t.id)));
-
-  return targets.length;
+  return enqueued.size;
 }
 
 /**
