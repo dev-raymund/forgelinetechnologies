@@ -18,16 +18,26 @@ export type ParsedProspect = {
 export type RowError = { line: number; message: string };
 
 /**
- * RFC 4180 field splitting. Hand-rolled rather than adding a dependency: the
- * whole grammar is quoted fields, doubled quotes, and separators.
+ * Internal representation of a parsed row with its physical line number.
  */
-export function parseCsvRows(text: string): string[][] {
-  const rows: string[][] = [];
+type RawRow = { cells: string[]; line: number };
+
+/**
+ * RFC 4180 field splitting with physical line number tracking.
+ * Hand-rolled rather than adding a dependency: the whole grammar is
+ * quoted fields, doubled quotes, and separators.
+ * Line numbers are counted from 1 (header is line 1).
+ * Each row's line number is the line on which it STARTS.
+ */
+function tokenize(text: string): RawRow[] {
+  const rows: RawRow[] = [];
   let row: string[] = [];
   let field = "";
   let quoted = false;
   let started = false;
   let i = text.charCodeAt(0) === 0xfeff ? 1 : 0;
+  let line = 1;
+  let rowStartLine = 1;
 
   const endField = () => {
     row.push(field);
@@ -36,7 +46,7 @@ export function parseCsvRows(text: string): string[][] {
   };
   const endRow = () => {
     endField();
-    rows.push(row);
+    rows.push({ cells: row, line: rowStartLine });
     row = [];
     started = false;
   };
@@ -46,6 +56,7 @@ export function parseCsvRows(text: string): string[][] {
     if (quoted) {
       if (char !== '"') {
         field += char;
+        if (char === "\n") line += 1;
       } else if (text[i + 1] === '"') {
         field += '"';
         i += 1;
@@ -61,6 +72,8 @@ export function parseCsvRows(text: string): string[][] {
       endField();
     } else if (char === "\n") {
       endRow();
+      line += 1;
+      rowStartLine = line;
     } else if (char !== "\r") {
       field += char;
       started = true;
@@ -69,6 +82,14 @@ export function parseCsvRows(text: string): string[][] {
   if (started || field.length > 0 || row.length > 0) endRow();
 
   return rows;
+}
+
+/**
+ * RFC 4180 field splitting. Hand-rolled rather than adding a dependency: the
+ * whole grammar is quoted fields, doubled quotes, and separators.
+ */
+export function parseCsvRows(text: string): string[][] {
+  return tokenize(text).map((r) => r.cells);
 }
 
 const REQUIRED_HEADERS = ["company", "website"] as const;
@@ -90,10 +111,11 @@ export function parseProspectCsv(text: string): {
     return { rows: [], errors: [{ line: 0, message: `The file exceeds the ${MAX_BYTES}-byte limit.` }] };
   }
 
-  const raw = parseCsvRows(text).filter((row) => row.some((cell) => cell.trim() !== ""));
+  const rawRows = tokenize(text);
+  const raw = rawRows.filter((row) => row.cells.some((cell) => cell.trim() !== ""));
   if (raw.length === 0) return { rows: [], errors: [{ line: 0, message: "The file is empty." }] };
 
-  const columns = headerIndex(raw[0]!);
+  const columns = headerIndex(raw[0]!.cells);
   const missing = REQUIRED_HEADERS.filter((name) => columns[name] === undefined);
   if (missing.length > 0) {
     return {
@@ -109,13 +131,13 @@ export function parseProspectCsv(text: string): {
   const seen = new Map<string, number>();
 
   for (let index = 1; index < raw.length; index += 1) {
-    const line = index + 1;
+    const line = raw[index]!.line;
     if (rows.length >= MAX_ROWS) {
       errors.push({ line, message: `The file exceeds the ${MAX_ROWS.toLocaleString("en-AU")}-row limit.` });
       break;
     }
 
-    const row = raw[index]!;
+    const row = raw[index]!.cells;
     const companyName = cell(row, "company");
     if (!companyName) {
       errors.push({ line, message: "Company name is required." });

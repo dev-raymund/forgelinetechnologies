@@ -96,3 +96,23 @@ test("the row cap is enforced", () => {
   const { errors } = parseProspectCsv(lines.join("\n"));
   assert.match(errors.at(-1)!.message, /2,000/);
 });
+
+test("error line numbers survive a blank line earlier in the file", () => {
+  const text = [
+    "company,website",
+    "Good Co,good.com",
+    "",
+    "Bad Host,not a domain",
+    "Later Co,later.com",
+  ].join("\n");
+  const { rows, errors } = parseProspectCsv(text);
+  assert.deepEqual(rows.map((r) => r.domain), ["good.com", "later.com"]);
+  assert.deepEqual(errors.map((e) => e.line), [4]);
+});
+
+test("error line numbers survive a quoted field spanning several lines", () => {
+  const text = 'company,website\n"Good\nCo",good.com\nBad Host,not a domain\n';
+  const { rows, errors } = parseProspectCsv(text);
+  assert.deepEqual(rows.map((r) => r.domain), ["good.com"]);
+  assert.deepEqual(errors.map((e) => e.line), [4]);
+});
