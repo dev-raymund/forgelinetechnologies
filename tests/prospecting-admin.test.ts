@@ -96,10 +96,10 @@ test("re-running a stuck audit fails the old row and starts a fresh one for the 
   const calls: string[] = [];
   const result = await rerunAuditForUser(8, {
     authorize: admin,
-    loadAudit: async (id) => ({ id, requestedUrl: "https://example.com/", status: "running" as const }),
+    loadAudit: async (id) => ({ id, requestedUrl: "https://example.com/", status: "running" as const, prospectId: 31 }),
     saveFailure: async (id, detail) => calls.push(`failure:${id}:${detail}`),
     createAuditRequest: async (input) => {
-      calls.push(`create:${input.requestedUrl}:${input.requestedBy}`);
+      calls.push(`create:${input.requestedUrl}:${input.requestedBy}:${input.prospectId}`);
       return { id: 11 };
     },
     startAudit: (input) => {
@@ -109,11 +109,48 @@ test("re-running a stuck audit fails the old row and starts a fresh one for the 
   });
 
   assert.deepEqual(result, { status: "queued", id: 11, redirectTo: "/admin/prospecting/audits/11" });
+  // The replacement inherits prospect 31: an orphaned re-run would never show
+  // up in that prospect's audit history and the drain would discard its result.
   assert.deepEqual(calls, [
     "failure:8:Superseded by a re-run.",
-    "create:https://example.com/:4",
+    "create:https://example.com/:4:31",
     "start:11",
   ]);
+});
+
+test("a re-run of an audit that belongs to no prospect stays unattached", async () => {
+  const seen: (number | null | undefined)[] = [];
+  await rerunAuditForUser(8, {
+    authorize: admin,
+    loadAudit: async (id) => ({ id, requestedUrl: "https://example.com/", status: "running" as const, prospectId: null }),
+    saveFailure: async () => undefined,
+    createAuditRequest: async (input) => {
+      seen.push(input.prospectId);
+      return { id: 11 };
+    },
+    startAudit: () => undefined,
+    resolveHost: publicResolver,
+  });
+
+  assert.deepEqual(seen, [null]);
+});
+
+test("a manually requested audit is created with no prospect attached", async () => {
+  const seen: (number | null | undefined)[] = [];
+  const form = new FormData();
+  form.set("url", "https://example.com/");
+  await requestAuditForUser(form, {
+    authorize: admin,
+    createAuditRequest: async (input) => {
+      seen.push(input.prospectId);
+      return { id: 42 };
+    },
+    startAudit: () => undefined,
+    saveFailure: async () => undefined,
+    resolveHost: publicResolver,
+  });
+
+  assert.deepEqual(seen, [null]);
 });
 
 test("re-running refuses an audit that already reached a terminal state", async () => {
@@ -121,7 +158,7 @@ test("re-running refuses an audit that already reached a terminal state", async 
   for (const status of ["completed", "partial", "failed"] as const) {
     const result = await rerunAuditForUser(8, {
       authorize: admin,
-      loadAudit: async (id) => ({ id, requestedUrl: "https://example.com/", status }),
+      loadAudit: async (id) => ({ id, requestedUrl: "https://example.com/", status, prospectId: null }),
       saveFailure: async () => calls.push("failure"),
       createAuditRequest: async () => {
         calls.push("create");
@@ -156,7 +193,7 @@ test("re-running refuses an unknown audit and an unauthorised caller", async () 
     authorize: async () => ({ ok: false as const, error: "Your session has expired. Sign in again." }),
     loadAudit: async () => {
       calls.push("load");
-      return { id: 8, requestedUrl: "https://example.com/", status: "running" as const };
+      return { id: 8, requestedUrl: "https://example.com/", status: "running" as const, prospectId: null };
     },
     saveFailure: async () => undefined,
     createAuditRequest: async () => ({ id: 11 }),
@@ -171,7 +208,7 @@ test("re-running revalidates the stored URL before it starts a new job", async (
   const calls: string[] = [];
   const result = await rerunAuditForUser(8, {
     authorize: admin,
-    loadAudit: async (id) => ({ id, requestedUrl: "https://example.com/", status: "queued" as const }),
+    loadAudit: async (id) => ({ id, requestedUrl: "https://example.com/", status: "queued" as const, prospectId: null }),
     saveFailure: async () => calls.push("failure"),
     createAuditRequest: async () => {
       calls.push("create");

@@ -39,13 +39,25 @@ async function transitionAudit(id: number, to: AuditStatus, values: Record<strin
   return rows[0];
 }
 
+/**
+ * `prospectId` is optional because a Phase 1 audit is a bare URL with no
+ * prospect behind it, but it must be carried whenever there is one: an audit
+ * created without it never appears in that prospect's history, and the drain's
+ * `applyResult` returns early on a null prospectId, so the run would also never
+ * reach the prospect's score.
+ */
 export async function createAuditRequest(input: {
   requestedUrl: string;
   requestedBy: number;
+  prospectId?: number | null;
 }): Promise<{ id: number }> {
   const [row] = await getDb()
     .insert(prospectAudits)
-    .values({ requestedUrl: input.requestedUrl, requestedBy: input.requestedBy })
+    .values({
+      requestedUrl: input.requestedUrl,
+      requestedBy: input.requestedBy,
+      prospectId: input.prospectId ?? null,
+    })
     .returning({ id: prospectAudits.id });
   if (!row) throw new Error("The audit request could not be created.");
   return row;
@@ -70,16 +82,20 @@ export async function getAuditForAdmin(
 
 /**
  * The minimum a reviewer action needs to decide whether an audit can be
- * re-run, without loading the full report and its findings.
+ * re-run, and to carry the prospect it belongs to onto the replacement,
+ * without loading the full report and its findings.
  */
 export async function getAuditSummary(
   id: number,
-): Promise<{ id: number; requestedUrl: string; status: AuditStatus } | null> {
+): Promise<
+  { id: number; requestedUrl: string; status: AuditStatus; prospectId: number | null } | null
+> {
   const [row] = await getDb()
     .select({
       id: prospectAudits.id,
       requestedUrl: prospectAudits.requestedUrl,
       status: prospectAudits.status,
+      prospectId: prospectAudits.prospectId,
     })
     .from(prospectAudits)
     .where(eq(prospectAudits.id, id))

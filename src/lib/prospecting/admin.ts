@@ -24,6 +24,7 @@ type StartAudit = (input: {
 type CreateAuditRequest = (input: {
   requestedUrl: string;
   requestedBy: number;
+  prospectId: number | null;
 }) => Promise<{ id: number }>;
 
 type OnQueued = (input: {
@@ -45,6 +46,8 @@ export type StoredAuditSummary = {
   id: number;
   requestedUrl: string;
   status: AuditStatus;
+  /** Null for a Phase 1 audit of a bare URL, which belongs to no prospect. */
+  prospectId: number | null;
 };
 
 type AuditRerunDependencies = {
@@ -73,7 +76,7 @@ function queued(id: number): AuditActionResult {
  * reviewer never sees an audit that silently never started.
  */
 async function createAndStart(
-  input: { requestedUrl: string; actor: AuditActor },
+  input: { requestedUrl: string; actor: AuditActor; prospectId?: number | null },
   dependencies: {
     createAuditRequest: CreateAuditRequest;
     startAudit: StartAudit;
@@ -84,6 +87,7 @@ async function createAndStart(
   const created = await dependencies.createAuditRequest({
     requestedUrl: input.requestedUrl,
     requestedBy: input.actor.id,
+    prospectId: input.prospectId ?? null,
   });
 
   try {
@@ -139,6 +143,10 @@ export async function requestAuditForUser(
  * process running the job stops before it can record a result. The stuck row is
  * closed as failed and a fresh audit is created for the same URL, so the report
  * history stays truthful about what was actually observed and when.
+ *
+ * The replacement inherits the original's `prospectId`. Without it a re-run of
+ * a prospect's audit is orphaned: it never appears in that prospect's audit
+ * history, and the drain's `applyResult` drops the result on the floor.
  */
 export async function rerunAuditForUser(
   auditId: number,
@@ -169,5 +177,8 @@ export async function rerunAuditForUser(
   }
 
   await dependencies.saveFailure(existing.id, "Superseded by a re-run.").catch(() => undefined);
-  return createAndStart({ requestedUrl: normalizedUrl, actor: authorised.user }, dependencies);
+  return createAndStart(
+    { requestedUrl: normalizedUrl, actor: authorised.user, prospectId: existing.prospectId },
+    dependencies,
+  );
 }
