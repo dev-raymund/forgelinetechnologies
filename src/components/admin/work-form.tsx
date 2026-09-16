@@ -29,8 +29,9 @@ export type WorkFormValues = {
 const KINDS = ["Website", "Web App", "E-commerce", "Custom Build"];
 const STATUSES = ["draft", "published", "archived"];
 
-const field =
-  "mt-1.5 w-full rounded-sm border border-rule-strong bg-white px-3 py-2 text-[0.9375rem] focus:border-ink focus:outline-none";
+const fieldBase =
+  "w-full rounded-sm border border-rule-strong bg-white px-3 py-2 text-[0.9375rem] focus:border-ink focus:outline-none";
+const field = `mt-1.5 ${fieldBase}`;
 
 export function WorkForm({
   initial,
@@ -189,8 +190,14 @@ function Text({
   return (
     <div>
       <Label htmlFor={name}>{label}</Label>
-      <div className="flex items-start gap-2">
-        <input id={name} name={name} defaultValue={defaultValue} required={required} className={`${field} flex-1`} />
+      {/* The margin sits on this row, not on the input inside it — an input
+          and its action button are siblings in a flex row, and a margin on
+          only one of them (as `field` alone would put here) pushes it down
+          without moving the other, so the two go out of top-alignment. One
+          shared offset on the row keeps every field's label-to-control gap
+          identical to before, and additionally top-aligns the action. */}
+      <div className="mt-1.5 flex items-start gap-2">
+        <input id={name} name={name} defaultValue={defaultValue} required={required} className={`${fieldBase} flex-1`} />
         {action}
       </div>
     </div>

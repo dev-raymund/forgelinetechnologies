@@ -19,8 +19,9 @@ export type PostFormValues = {
   status: string;
 };
 
-const field =
-  "mt-1.5 w-full rounded-sm border border-rule-strong bg-white px-3 py-2 text-[0.9375rem] focus:border-ink focus:outline-none";
+const fieldBase =
+  "w-full rounded-sm border border-rule-strong bg-white px-3 py-2 text-[0.9375rem] focus:border-ink focus:outline-none";
+const field = `mt-1.5 ${fieldBase}`;
 
 /** Slugify as you type, but only for a new post — never silently move a URL. */
 function slugify(s: string) {
@@ -189,7 +190,7 @@ export function PostForm({
         <div>
           <label htmlFor="coverUrl" className="text-[0.875rem] font-medium">Cover image</label>
           <div className="mt-1.5 flex items-start gap-2">
-            <input id="coverUrl" name="coverUrl" defaultValue={initial.coverUrl} className={`${field} mt-0 flex-1`} />
+            <input id="coverUrl" name="coverUrl" defaultValue={initial.coverUrl} className={`${fieldBase} flex-1`} />
             <MediaPicker targetId="coverUrl" items={mediaItems} blobError={mediaError} />
           </div>
         </div>
@@ -208,7 +209,7 @@ export function PostForm({
             <div>
               <label htmlFor="ogImage" className="text-[0.875rem] font-medium">Social image</label>
               <div className="mt-1.5 flex items-start gap-2">
-                <input id="ogImage" name="ogImage" defaultValue={initial.ogImage} className={`${field} mt-0 flex-1`} />
+                <input id="ogImage" name="ogImage" defaultValue={initial.ogImage} className={`${fieldBase} flex-1`} />
                 <MediaPicker targetId="ogImage" items={mediaItems} blobError={mediaError} />
               </div>
             </div>
