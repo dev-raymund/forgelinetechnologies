@@ -43,7 +43,7 @@ adds one nullable column. It alters no existing column and drops nothing.
 | `contact_channel` | text NOT NULL DEFAULT `''` | Role-based email, contact-page URL, or switchboard number. |
 | `contact_provenance` | text NOT NULL DEFAULT `''` | Required whenever `contact_channel` is set. |
 | `sources` | jsonb NOT NULL DEFAULT `[]` | Append-only `[{name, url, importedAt, importedBy}]`. |
-| `status` | varchar(16) NOT NULL DEFAULT `'new'` | `new` → `queued` → `audited`; plus `dismissed`, `suppressed`. |
+| `status` | varchar(16) NOT NULL DEFAULT `'new'` | `new` → `queued` → `audited`, plus `suppressed`. `dismissed` is deferred: nothing in Phase 2 writes it. A display value — the opt-out is carried by `suppressed_at`. |
 | `suppressed_at` | timestamptz NULL | Set by opt-out. |
 | `suppression_reason` | text NOT NULL DEFAULT `''` | |
 | `last_audit_id` | integer NULL → `prospect_audits(id)` ON DELETE SET NULL | |
@@ -75,7 +75,9 @@ The Phase 0 plan lists one, but it also says to keep using `audit_logs` for
 authenticated admin mutations and to add a prospect event model "only when event
 detail requires its own bounded model." Provenance lives in `sources`; actions
 go to `audit_logs` via new `AuditAction` values: `prospect.import`,
-`prospect.queue`, `prospect.suppress`, `prospect.unsuppress`, `prospect.dismiss`.
+`prospect.queue`, `prospect.suppress`, `prospect.unsuppress`. There is no
+`prospect.dismiss`: nothing in Phase 2 dismisses a prospect, and an action no
+code emits reads as a capability the audit log does not have.
 
 Revisit when outreach drafts need a per-prospect timeline.
 
@@ -150,9 +152,10 @@ error, but it becomes eligible for queueing again rather than sitting in a state
 that claims it was audited. `completed` and `partial` both count as audited —
 `partial` is a real result with findings, not a failure.
 
-**"Queue all new" queues only `status = 'new'`.** Suppressed and dismissed
-prospects are never queued, and an already-`queued` prospect is not queued
-twice.
+**"Queue all new" queues only `status = 'new'` with `suppressed_at IS NULL`.**
+A suppressed prospect is never queued — checked on `suppressed_at`, the column
+that carries the opt-out, rather than on the display status — and an
+already-`queued` prospect is not queued twice.
 
 `drainAuditQueue` is one tested function with two callers. There is no cron
 route, no `vercel.json`, and no `CRON_SECRET`.

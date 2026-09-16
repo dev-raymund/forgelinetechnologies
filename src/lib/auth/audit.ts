@@ -27,7 +27,7 @@ export type AuditAction =
   | "prospecting.audit.completed" | "prospecting.audit.failed"
   | "prospecting.audit.rerun"
   | "prospect.import" | "prospect.queue" | "prospect.suppress"
-  | "prospect.unsuppress" | "prospect.dismiss";
+  | "prospect.unsuppress";
 
 export async function clientIp(): Promise<string> {
   const h = await headers();
