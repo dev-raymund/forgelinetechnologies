@@ -30,6 +30,7 @@ const LINKS: {
   { href: "/admin/blog", label: "Blog posts", capability: "posts.manage", icon: "file" },
   { href: "/admin/works", label: "Works", capability: "works.manage", icon: "briefcase" },
   { href: "/admin/prospecting/prospects", label: "Prospects", capability: "prospecting.manage", icon: "users" },
+  { href: "/admin/prospecting/import", label: "Import prospects", capability: "prospecting.manage", icon: "file" },
   { href: "/admin/prospecting/audit", label: "Prospecting audit", capability: "prospecting.manage", icon: "gauge" },
   { href: "/admin/users", label: "Users", capability: "users.manage", icon: "users" },
 ];
