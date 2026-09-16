@@ -22,7 +22,8 @@ export type AuditAction =
   | "work.create" | "work.update" | "work.publish" | "work.unpublish" | "work.delete"
   | "review.approve" | "review.reject" | "review.publish" | "review.unpublish" | "review.delete"
   | "inquiry.status" | "inquiry.note" | "inquiry.delete"
-  | "user.create" | "user.update" | "user.deactivate" | "user.delete";
+  | "user.create" | "user.update" | "user.deactivate" | "user.delete"
+  | "media.upload" | "media.delete";
 
 export async function clientIp(): Promise<string> {
   const h = await headers();
