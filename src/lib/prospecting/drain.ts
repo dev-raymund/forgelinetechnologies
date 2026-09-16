@@ -3,7 +3,11 @@ import type { AuditJobResult } from "./runner.ts";
 export type ClaimedAudit = { requestedUrl: string; prospectId: number | null };
 
 export type DrainDependencies = {
-  /** Oldest-first ids of audits still sitting at `queued`. */
+  /**
+   * Oldest-first ids of audits waiting to run: those still at `queued`, plus
+   * any stranded at `running` for long enough that the worker holding them
+   * must have died.
+   */
   listQueuedAuditIds: (limit: number) => Promise<number[]>;
   /**
    * Attempts the compare-and-swap claim. `null` means another worker won it;

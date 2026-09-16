@@ -1,4 +1,4 @@
-import { and, asc, eq, inArray, isNull } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, lt, or } from "drizzle-orm";
 import { getDb, prospectAudits, prospects } from "../../db/index.ts";
 import { saveAuditRunning } from "./audit.ts";
 import { runAuditJob } from "./runner.ts";
@@ -64,13 +64,36 @@ export function isLostClaim(error: unknown): boolean {
   );
 }
 
+/**
+ * How long an audit may sit at `running` before it is treated as abandoned.
+ *
+ * A real audit is bounded to roughly 30 seconds — one homepage, robots.txt,
+ * sitemap.xml and at most twelve link probes, each with a ten second timeout —
+ * so a row still running fifteen minutes later cannot be making progress. It
+ * can only mean the worker died between claiming the audit and recording a
+ * result: Ctrl-C on the CLI, or a killed serverless invocation. Without this,
+ * the audit stays at `running` and its prospect at `queued` with nothing in
+ * the system able to recover either — `listQueuedAuditIds` used to select only
+ * `queued`, TRANSITIONS has no running -> queued edge, and `enqueueProspects`
+ * accepts only `new`.
+ */
+const STALE_CLAIM_MS = 15 * 60 * 1000;
+
 export function productionDrainDependencies(): DrainDependencies {
   return {
     listQueuedAuditIds: async (limit) => {
       const rows = await getDb()
         .select({ id: prospectAudits.id })
         .from(prospectAudits)
-        .where(eq(prospectAudits.status, "queued"))
+        .where(
+          or(
+            eq(prospectAudits.status, "queued"),
+            and(
+              eq(prospectAudits.status, "running"),
+              lt(prospectAudits.startedAt, new Date(Date.now() - STALE_CLAIM_MS)),
+            ),
+          ),
+        )
         .orderBy(asc(prospectAudits.id))
         .limit(limit);
       return rows.map((row) => row.id);
@@ -78,11 +101,42 @@ export function productionDrainDependencies(): DrainDependencies {
 
     claimAudit: async (id) => {
       const [row] = await getDb()
-        .select({ requestedUrl: prospectAudits.requestedUrl, prospectId: prospectAudits.prospectId })
+        .select({
+          requestedUrl: prospectAudits.requestedUrl,
+          prospectId: prospectAudits.prospectId,
+          status: prospectAudits.status,
+          startedAt: prospectAudits.startedAt,
+        })
         .from(prospectAudits)
         .where(eq(prospectAudits.id, id))
         .limit(1);
       if (!row) return null;
+      const claimed = { requestedUrl: row.requestedUrl, prospectId: row.prospectId };
+
+      if (row.status === "running") {
+        // Re-claiming an abandoned run. `saveAuditRunning` refuses
+        // running -> running, so this claim is written directly — but it keeps
+        // the shape of `transitionAudit`: the UPDATE matches on the startedAt
+        // this worker read, so of two drains re-claiming the same stale row
+        // exactly one gets a row back and the loser gets none. `started_at` is
+        // only ever written from a JS Date, so the stored value keeps
+        // millisecond precision and compares equal on the way back in.
+        const startedAt = row.startedAt;
+        if (!startedAt || Date.now() - startedAt.getTime() < STALE_CLAIM_MS) return null;
+
+        const retaken = await getDb()
+          .update(prospectAudits)
+          .set({ startedAt: new Date(), updatedAt: new Date() })
+          .where(
+            and(
+              eq(prospectAudits.id, id),
+              eq(prospectAudits.status, "running"),
+              eq(prospectAudits.startedAt, startedAt),
+            ),
+          )
+          .returning({ id: prospectAudits.id });
+        return retaken[0] ? claimed : null;
+      }
 
       try {
         // Compare-and-swap. A lost race means another worker claimed it first.
@@ -93,7 +147,7 @@ export function productionDrainDependencies(): DrainDependencies {
         // than be counted as a skip.
         throw error;
       }
-      return { requestedUrl: row.requestedUrl, prospectId: row.prospectId };
+      return claimed;
     },
 
     runAudit: (input) =>
