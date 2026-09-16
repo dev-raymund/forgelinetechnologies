@@ -25,6 +25,26 @@ const ACCEPT = ALLOWED_UPLOAD_TYPES.join(",");
 const field =
   "w-full rounded-sm border border-rule-strong bg-white px-3 py-2 text-[0.9375rem] focus:border-ink focus:outline-none";
 
+/**
+ * `upload()` from `@vercel/blob/client` throws this exact string (double
+ * space and all — it's the library's own typo) for *any* non-OK response to
+ * the token request, so the route's actual reason — not authorised, file
+ * name rejected, session expired — never reaches the admin. Matched
+ * case-insensitively, with `\s+` standing in for the double space so a fix
+ * upstream doesn't silently break this match.
+ */
+const TOKEN_REQUEST_FAILED = /retrieve\s+the\s+client\s+token/i;
+
+function uploadErrorMessage(error: unknown, filename: string): string {
+  if (error instanceof Error) {
+    if (TOKEN_REQUEST_FAILED.test(error.message)) {
+      return "The upload was refused. Your session may have expired — sign in again — or the file was not accepted.";
+    }
+    return error.message;
+  }
+  return `${filename} could not be uploaded.`;
+}
+
 type UploadStatus = "uploading" | "done" | "error";
 
 type UploadEntry = {
@@ -127,10 +147,7 @@ export function MediaLibrary({
           });
           setEntry(key, { status: "done", progress: 100 });
         } catch (error) {
-          setEntry(key, {
-            status: "error",
-            error: error instanceof Error ? error.message : `${file.name} could not be uploaded.`,
-          });
+          setEntry(key, { status: "error", error: uploadErrorMessage(error, file.name) });
         }
       }
 
