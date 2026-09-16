@@ -30,7 +30,22 @@ export async function listMedia(): Promise<{ items: MediaItem[]; blobError: stri
       bytes: b.size,
       uploadedAt: new Date(b.uploadedAt).toISOString(),
     }));
-    return { items: mergeMedia(uploads, assets), blobError: null };
+    const items = mergeMedia(uploads, assets);
+
+    // list() takes no access mode, so a token pointed at a private store
+    // succeeds here and gives no warning — the images just never load on the
+    // public site. A private store's blob URLs carry ".private.blob." in the
+    // host instead of ".public.blob.", so that's the signal to check for.
+    const isPrivateStore = blobs.some((b) => b.url.includes(".private.blob."));
+    if (isPrivateStore) {
+      return {
+        items,
+        blobError:
+          "This Blob store is private. Uploaded images will not load on the public site — create a store with Public access and update BLOB_READ_WRITE_TOKEN.",
+      };
+    }
+
+    return { items, blobError: null };
   } catch (error) {
     console.error("[media] blob list failed", error);
     return {
