@@ -25,6 +25,7 @@ export function MediaPicker({
 }) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
   const titleId = useId();
 
   const close = useCallback(() => {
@@ -35,6 +36,13 @@ export function MediaPicker({
     triggerRef.current?.focus();
   }, []);
 
+  // Move focus into the dialog once it exists, rather than leaving it on the
+  // trigger button behind the overlay — the aria-modal="true" below promises
+  // assistive tech that focus is contained, and nothing enforced that.
+  useEffect(() => {
+    if (open) closeButtonRef.current?.focus();
+  }, [open]);
+
   // Escape closes the modal. The listener is only attached while the modal
   // is open, and effect cleanup removes it on close or unmount either way —
   // it never lingers to fire for some other modal.
@@ -42,8 +50,14 @@ export function MediaPicker({
     if (!open) return;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        // Stop this Escape from also reaching the host form or any other
-        // ancestor listener — the modal, not the form, owns this keypress.
+        // By the time a listener attached directly to `document` runs, the
+        // keydown has already bubbled through every element below it —
+        // including the host form's own listeners, if it had any — so this
+        // stopPropagation() cannot and does not stop the event from reaching
+        // them; that already happened. What it actually stops is any other
+        // document-level (or window-level) Escape listener registered after
+        // this one, so a second open dialog does not also react to the same
+        // keypress.
         event.stopPropagation();
         close();
       }
@@ -101,6 +115,7 @@ export function MediaPicker({
               </h2>
               <button
                 type="button"
+                ref={closeButtonRef}
                 onClick={close}
                 className="shrink-0 rounded-sm border border-rule-strong px-3 py-1 text-[0.8125rem] font-medium text-graphite hover:bg-black/[0.05]"
               >
