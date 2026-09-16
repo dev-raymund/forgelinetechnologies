@@ -57,9 +57,11 @@ Indexes: unique on `domain`; plus `status`, `total_score DESC`, `country`,
 `industry`.
 
 `total_score` and `primary_opportunity` are denormalized snapshots for list
-sorting only. The spec requires scores be recalculated from stored findings, so
-the prospect detail page recomputes from `audit_findings` rather than trusting
-these columns.
+sorting and filtering. Phase 2 does not recompute them: the prospect list and
+detail page render these columns, and a score stays explainable through the
+Phase 1 audit report, which shows the per-category scores and the findings
+behind them. Recomputing a prospect's score from `audit_findings` is deferred
+to Phase 3 (Prospect Qualification), which rebuilds this surface.
 
 #### `prospect_audits` — one added column
 

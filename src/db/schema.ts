@@ -366,10 +366,12 @@ export type ProspectSource = {
  * never create a second row for the same business, which is what stops anyone
  * being worked or contacted twice.
  *
- * `totalScore` and `primaryOpportunity` are snapshots of the latest audit, kept
- * only so the list can sort and filter in SQL. The detail page recalculates
- * from stored findings, because the spec requires scores be explainable rather
- * than trusted as totals.
+ * `totalScore` and `primaryOpportunity` are denormalized snapshots of the
+ * latest audit, kept so the list can sort and filter in SQL. Nothing yet
+ * recomputes them: the prospect pages render these columns, and the audit
+ * report is where a score can be read back against the findings that produced
+ * it. Recomputing a prospect's score from `audit_findings` is deferred to
+ * Phase 3 (Prospect Qualification), which rebuilds this surface anyway.
  */
 export const prospects = pgTable(
   "prospects",
