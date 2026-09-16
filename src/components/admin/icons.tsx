@@ -127,3 +127,14 @@ export function ArrowLeftIcon(props: IconProps) {
     </Svg>
   );
 }
+
+/** Media — a picture frame with a hill and a sun. */
+export function ImageIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <rect x="1.8" y="2.8" width="12.4" height="10.4" rx="1.2" />
+      <circle cx="5.8" cy="6.4" r="1.1" />
+      <path d="M2.4 11.6l3.4-3.2 3 2.6 2-1.8 2.8 2.4" />
+    </Svg>
+  );
+}

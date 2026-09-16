@@ -9,6 +9,7 @@ import {
   BriefcaseIcon,
   FileTextIcon,
   GaugeIcon,
+  ImageIcon,
   InboxIcon,
   SignOutIcon,
   StarIcon,
@@ -31,6 +32,7 @@ const ICONS: Record<string, (p: { className?: string }) => React.ReactElement> =
   file: FileTextIcon,
   briefcase: BriefcaseIcon,
   users: UsersIcon,
+  image: ImageIcon,
 };
 
 /**
