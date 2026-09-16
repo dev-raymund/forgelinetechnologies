@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import { EyeIcon, EyeOffIcon } from "@/components/admin/icons";
 
 /**
  * A password input with a reveal toggle.
@@ -44,16 +45,19 @@ export function PasswordField({
         autoComplete={autoComplete}
         defaultValue={defaultValue}
         aria-describedby={describedBy}
-        className={`${className} pr-20`}
+        className={`${className} pr-11`}
       />
       <button
         type="button"
         onClick={() => setShown((v) => !v)}
         aria-pressed={shown}
         aria-label={shown ? "Hide password" : "Show password"}
-        className="absolute inset-y-0 right-0 px-3 text-[0.8125rem] font-medium text-muted transition-colors hover:text-graphite focus:text-graphite focus:outline-none"
+        title={shown ? "Hide password" : "Show password"}
+        className="absolute inset-y-0 right-0 flex items-center px-3 text-muted transition-colors hover:text-graphite focus-visible:text-graphite"
       >
-        {shown ? "Hide" : "Show"}
+        {/* The icon shows the action, not the state: an open eye offers to
+            reveal, a struck-through eye offers to hide. */}
+        {shown ? <EyeOffIcon className="text-[1.1rem]" /> : <EyeIcon className="text-[1.1rem]" />}
       </button>
       <span id={describedBy} className="sr-only">
         {shown ? "Password is visible" : "Password is hidden"}
