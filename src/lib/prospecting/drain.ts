@@ -1,3 +1,4 @@
+import { isLostClaim } from "./queue.ts";
 import type { AuditJobResult } from "./runner.ts";
 
 export type ClaimedAudit = { requestedUrl: string; prospectId: number | null };
@@ -86,14 +87,34 @@ export async function drainAuditQueue(
     }
     summary.claimed += 1;
 
-    const result = await dependencies.runAudit({
-      auditId,
-      requestedUrl: claimed.requestedUrl,
-    });
-    if (result.status === "failed") summary.failed += 1;
-    else summary.completed += 1;
+    try {
+      const result = await dependencies.runAudit({
+        auditId,
+        requestedUrl: claimed.requestedUrl,
+      });
+      if (result.status === "failed") summary.failed += 1;
+      else summary.completed += 1;
 
-    await dependencies.applyResult({ prospectId: claimed.prospectId, auditId, result });
+      await dependencies.applyResult({ prospectId: claimed.prospectId, auditId, result });
+    } catch (error) {
+      // Stale-claim recovery lets two workers hold the same audit, so the
+      // worker presumed dead can revive and find the row already finished by
+      // its replacement. `saveResult` then refuses completed -> completed, and
+      // `runAuditJob`'s catch calls `saveFailure`, which refuses
+      // completed -> failed as well — a second throw from inside the catch,
+      // which escapes `runAuditJob` entirely. That is this worker discovering
+      // it no longer owns the audit, which is a skip: the run it was racing is
+      // already recorded. Left to propagate it aborted the whole batch,
+      // including every candidate after it, and both callers are unguarded —
+      // the CLI rejects and `runQueueNow` is a plain server action.
+      //
+      // Only a transition refusal reads as a lost claim. A dropped connection
+      // or a Neon outage still propagates: a drain that cannot reach the
+      // database must not report a tidy summary of skips.
+      if (!isLostClaim(error)) throw error;
+      summary.skipped += 1;
+      continue;
+    }
     run += 1;
 
     if (options.pauseMs) await dependencies.delay(options.pauseMs);

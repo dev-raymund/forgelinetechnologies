@@ -63,6 +63,57 @@ test("one failing audit does not stop the batch", async () => {
   assert.equal(summary.failed, 1);
 });
 
+test("an audit finished by the worker that re-claimed it is skipped, not fatal", async () => {
+  // Stale-claim recovery can leave two workers holding one audit. The revived
+  // original finds the row already completed, so `saveResult` refuses the
+  // transition and `saveFailure` refuses it again from inside runAuditJob's
+  // catch — the second throw escapes. It must cost this one audit, not the
+  // batch: every later candidate used to be abandoned with it.
+  const ran: number[] = [];
+  const applied: number[] = [];
+  const summary = await drainAuditQueue(
+    { limit: 10, budgetMs: 1_000_000 },
+    deps({
+      runAudit: async (input: { auditId: number }) => {
+        ran.push(input.auditId);
+        if (input.auditId === 2) throw new Error("Audit 2 cannot transition to failed.");
+        return ok;
+      },
+      applyResult: async (input: { auditId: number }) => {
+        applied.push(input.auditId);
+      },
+    }),
+  );
+
+  assert.deepEqual(ran, [1, 2, 3]);
+  assert.deepEqual(applied, [1, 3]);
+  assert.equal(summary.skipped, 1);
+  assert.equal(summary.completed, 2);
+  assert.equal(summary.failed, 0);
+});
+
+test("a real failure still stops the drain rather than counting as a skip", async () => {
+  // The guard above must stay a lost-claim guard. A blanket catch would turn a
+  // database outage into a summary of quiet skips and hide it from the
+  // operator, which is the regression this locks out.
+  const ran: number[] = [];
+  await assert.rejects(
+    drainAuditQueue(
+      { limit: 10, budgetMs: 1_000_000 },
+      deps({
+        runAudit: async (input: { auditId: number }) => {
+          ran.push(input.auditId);
+          if (input.auditId === 2) throw new Error("fetch failed");
+          return ok;
+        },
+      }),
+    ),
+    /fetch failed/,
+  );
+
+  assert.deepEqual(ran, [1, 2]);
+});
+
 test("the drain stops cleanly when the time budget is spent", async () => {
   let clock = 0;
   const ran: number[] = [];
