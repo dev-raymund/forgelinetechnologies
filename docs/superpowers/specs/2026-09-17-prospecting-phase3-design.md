@@ -194,6 +194,7 @@ Plus an index on `decision`. The Drizzle schema is updated to match.
 - after an audit is applied (the drain's `applyResult`),
 - after a score adjustment is set or cleared,
 - after an opportunity override is set or cleared,
+- after an audit re-run finishes inline (the manual re-run path, which does not go through the drain),
 - after a re-import changes a prospect's country, industry or contact.
 
 The last path is why the helper exists at all: the Phase 2 upsert is one SQL statement and cannot recompute. After it, the helper runs for each updated prospect — and suppressed prospects are skipped, since the upsert never touches them. A snapshot write never touches `status`, `suppressed_at` or the decision columns.

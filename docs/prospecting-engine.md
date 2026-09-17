@@ -134,7 +134,7 @@ Use selected audit findings to classify one primary opportunity and optional sec
 
 Qualification is a recommendation to a reviewer, not an automatic decision to contact someone.
 
-**Status:** built on the `prospecting-phase-3` branch. Not in production until merged and migration 0003 is applied. Design: [`docs/superpowers/specs/2026-09-17-prospecting-phase3-design.md`](superpowers/specs/2026-09-17-prospecting-phase3-design.md).
+**Status:** built on the `prospecting-phase-3` branch. Before merging: apply migration 0003 to production and verify it, then merge — applying it early is safe, since every added column has a default and today's deployed code never names them, but merging first would 500 the prospect pages (`listProspects` selects every column) until the columns exist. There is no down-migration; reversing it means dropping the six added columns, which destroys every stored decision and adjustment. Design: [`docs/superpowers/specs/2026-09-17-prospecting-phase3-design.md`](superpowers/specs/2026-09-17-prospecting-phase3-design.md).
 
 How it works:
 
@@ -143,7 +143,7 @@ How it works:
 - **Opportunities.** The primary comes from the website components only. Secondaries use explicit thresholds, and E-commerce appears when Shopify or WooCommerce is detected. A reviewer override is the only route to Automation, API / Integration or Custom Software.
 - **Bands.** 75–100 human review before any draft; 50–74 review the evidence; 25–49 do not prioritise outreach; 0–24 do not create outreach.
 - **Decision.** Qualified (reason optional) or Dismissed (reason required), both reversible and written to the audit log. A dismissed prospect is hidden from the default list and cannot be queued. A suppressed prospect cannot be qualified.
-- **List snapshot.** `prospects.total_score` and `primary_opportunity` hold the effective values and are refreshed after every audit, adjustment, override and re-import that changes fit or contact. After applying migration 0003, or after changing a scoring rule, run `npm run prospecting:requalify` once.
+- **List snapshot.** `prospects.total_score` and `primary_opportunity` hold the effective values and are refreshed after every audit, adjustment, override, audit re-run finishing inline outside the drain, and re-import that changes fit or contact. After applying migration 0003, or after changing a scoring rule, run `npm run prospecting:requalify` once.
 
 ### Phase 4 — AI Analysis
 
