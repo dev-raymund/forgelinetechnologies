@@ -2,6 +2,7 @@ import type {
   AuditFinding,
   AuditScore,
   FindingCategory,
+  FindingComponentKey,
   Opportunity,
   ScoreInput,
 } from "./types";
@@ -14,7 +15,7 @@ export type {
   ScoreInput,
 } from "./types";
 
-const CAPS = {
+export const CAPS = {
   websiteUx: 25,
   seo: 20,
   technical: 20,
@@ -22,6 +23,21 @@ const CAPS = {
   businessFit: 10,
   decisionMakerAvailability: 10,
 } as const;
+
+/**
+ * Below this many finding-based points, the evidence does not justify
+ * prescribing a specific solution, so the opportunity is Build Audit.
+ */
+export const MIN_FINDING_TOTAL = 10;
+
+/** The finding-based points `classify` reads. Extra fields are ignored. */
+export type FindingTotals = {
+  websiteUx: number;
+  seo: number;
+  technical: number;
+  conversion: number;
+  total: number;
+};
 
 const RULE_POINTS: Record<string, number> = {
   "missing-meta-description": 10,
@@ -47,7 +63,7 @@ const RULE_POINTS: Record<string, number> = {
   "oversized-html": 4,
 };
 
-function pointsForFinding(finding: AuditFinding): number {
+export function pointsForFinding(finding: AuditFinding): number {
   const explicit = RULE_POINTS[finding.rule];
   if (explicit !== undefined) return explicit;
 
@@ -63,7 +79,7 @@ function pointsForFinding(finding: AuditFinding): number {
   }
 }
 
-function componentFor(category: FindingCategory): keyof typeof CAPS | null {
+export function componentFor(category: FindingCategory): FindingComponentKey | null {
   switch (category) {
     case "seo":
     case "metadata":
@@ -80,8 +96,8 @@ function componentFor(category: FindingCategory): keyof typeof CAPS | null {
   }
 }
 
-function classify(score: Omit<AuditScore, "primaryOpportunity">): Opportunity {
-  if (score.total < 10) return "Build Audit";
+export function classify(score: FindingTotals): Opportunity {
+  if (score.total < MIN_FINDING_TOTAL) return "Build Audit";
   if (score.seo >= 8 && score.seo >= score.technical && score.seo >= score.websiteUx) {
     return "SEO";
   }

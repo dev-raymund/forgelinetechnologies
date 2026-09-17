@@ -60,3 +60,53 @@ export type AuditScore = {
   total: number;
   primaryOpportunity: Opportunity;
 };
+
+/** Every opportunity, in the order the admin lists them. */
+export const OPPORTUNITIES: readonly Opportunity[] = [
+  "Website Improvement",
+  "Website Rebuild",
+  "SEO",
+  "Automation",
+  "E-commerce",
+  "API / Integration",
+  "Custom Software",
+  "Build Audit",
+];
+
+export type ComponentKey =
+  | "websiteUx"
+  | "seo"
+  | "technical"
+  | "conversion"
+  | "businessFit"
+  | "decisionMakerAvailability";
+
+/** The four components scored from audit findings. */
+export type FindingComponentKey = Exclude<ComponentKey, "businessFit" | "decisionMakerAvailability">;
+
+/** A reviewer's value for one score component, with the reason it was set. */
+export type ScoreAdjustment = {
+  points: number;
+  reason: string;
+  byUserId: number;
+  byEmail: string;
+  /** ISO timestamp. */
+  at: string;
+  /** The audit a finding-based adjustment judged; null for business fit and contact. */
+  auditId: number | null;
+};
+
+export type ScoreAdjustments = Partial<Record<ComponentKey, ScoreAdjustment>>;
+
+export type OpportunityOverride = {
+  primary: Opportunity;
+  /** Distinct, and never the primary. */
+  secondary: Opportunity[];
+  reason: string;
+  byUserId: number;
+  byEmail: string;
+  at: string;
+};
+
+/** `""` is undecided. */
+export type ProspectDecision = "" | "qualified" | "dismissed";
