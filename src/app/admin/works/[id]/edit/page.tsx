@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { requireCapability } from "@/lib/auth/guard";
 import { getDb, projects } from "@/db";
+import { listMedia } from "@/lib/media/library";
 import { PageTitle } from "@/components/admin/ui";
 import { WorkForm } from "@/components/admin/work-form";
 
@@ -20,10 +21,14 @@ export default async function EditWorkPage({
   const [row] = await getDb().select().from(projects).where(eq(projects.id, id)).limit(1);
   if (!row) notFound();
 
+  const { items: mediaItems, blobError: mediaError } = await listMedia();
+
   return (
     <>
       <PageTitle title={row.title} count={`/work/${row.slug}`} />
       <WorkForm
+        mediaItems={mediaItems}
+        mediaError={mediaError}
         initial={{
           id: row.id,
           title: row.title,

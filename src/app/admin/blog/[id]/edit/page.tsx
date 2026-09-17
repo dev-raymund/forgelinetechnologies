@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { requireCapability } from "@/lib/auth/guard";
 import { getDb, posts } from "@/db";
 import { renderMarkdown } from "@/lib/markdown";
+import { listMedia } from "@/lib/media/library";
 import { PageTitle } from "@/components/admin/ui";
 import { PostForm } from "@/components/admin/post-form";
 
@@ -21,6 +22,8 @@ export default async function EditPostPage({
   const [row] = await getDb().select().from(posts).where(eq(posts.id, id)).limit(1);
   if (!row) notFound();
 
+  const { items: mediaItems, blobError: mediaError } = await listMedia();
+
   return (
     <>
       <PageTitle title={row.title} count={`/blog/${row.slug}`} />
@@ -28,6 +31,8 @@ export default async function EditPostPage({
         // Rendered here, with the same function the public page calls, so the
         // preview cannot drift from what a reader will actually see.
         preview={renderMarkdown(row.body)}
+        mediaItems={mediaItems}
+        mediaError={mediaError}
         initial={{
           id: row.id,
           title: row.title,

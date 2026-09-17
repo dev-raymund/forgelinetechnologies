@@ -555,28 +555,38 @@
 [data-admin-theme="dark"] .admin-root {
   color-scheme: dark;
 
-  --admin-canvas: #0c1016;
+  /* A dim slate rather than near-black. The first version (#0c1016) read as
+     too dark for long working sessions; this lifts every surface while keeping
+     the brand's navy undertone.
+
+     How far it lifts is bounded by one pair: `text-white` on the orange accent
+     buttons resolves to --color-white, which is the CARD colour in this theme.
+     Lighter cards lower that button text's contrast. At these values it is
+     5.06:1; one step lighter reaches 4.51:1 (no margin), two steps fails AA at
+     4.06:1. Every other text pair clears AA with more room — the tightest is
+     faint-on-paper at 5.02:1. Re-check that pair before lightening further. */
+  --admin-canvas: #1a2130;
 
   /* Surfaces. `white` is the card ground throughout the admin, so it becomes
      the raised surface rather than actual white. */
-  --color-white: #151b23;
-  --color-paper: #1b222c;
+  --color-white: #232b3b;
+  --color-paper: #2a3345;
 
   /* Text. Muted and faint keep their relationship to each other so the
      hierarchy survives the inversion. */
-  --color-graphite: #e4eaf1;
-  --color-muted: #a3b0bf;
-  --color-faint: #7f8c9b;
+  --color-graphite: #e8edf4;
+  --color-muted: #b6c1cf;
+  --color-faint: #98a4b6;
 
   /* Hairlines, which carry most of the admin's structure. */
-  --color-rule: #242c37;
-  --color-rule-strong: #33404f;
+  --color-rule: #343e51;
+  --color-rule-strong: #4a566b;
 
   /* `ink` is the active-nav and primary-button ground. On a dark canvas a
      navy block disappears, so it lifts to a visible raised tone instead. */
-  --color-ink: #2b3a52;
-  --color-on-ink: #e4eaf1;
-  --color-on-ink-muted: #a3b0bf;
+  --color-ink: #3d4f6e;
+  --color-on-ink: #f1f4f9;
+  --color-on-ink-muted: #c3cedc;
 }
 
 .admin-root {

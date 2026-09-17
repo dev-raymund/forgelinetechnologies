@@ -8,7 +8,7 @@ import { Section } from "@/components/ui/section";
 import { getDb, posts } from "@/db";
 import { getPostBySlug, withRetry } from "@/lib/queries";
 import { renderMarkdown, excerptFrom } from "@/lib/markdown";
-import { site } from "@/lib/site";
+import { absoluteUrl, site } from "@/lib/site";
 import { jsonLd, breadcrumbSchema } from "@/lib/structured-data";
 
 /**
@@ -90,7 +90,7 @@ export default async function PostPage({
             datePublished: post.publishedAt?.toISOString(),
             dateModified: post.updatedAt.toISOString(),
             url: `${site.url}/blog/${post.slug}`,
-            ...(post.coverUrl ? { image: post.coverUrl } : {}),
+            ...(post.coverUrl ? { image: absoluteUrl(post.coverUrl) } : {}),
             publisher: {
               "@type": "Organization",
               name: site.name,

@@ -16,6 +16,7 @@ const CAPABILITIES = {
   "works.manage": ["admin", "editor"],
   "reviews.manage": ["admin", "editor"],
   "inquiries.manage": ["admin", "editor"],
+  "media.manage": ["admin", "editor"],
   "audit.read": ["admin"],
   "prospecting.manage": ["admin"],
 } as const satisfies Record<string, readonly Role[]>;

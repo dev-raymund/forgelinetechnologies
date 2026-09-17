@@ -67,6 +67,25 @@ export const site = {
 } as const;
 
 /**
+ * Turns a repository-relative asset path into an absolute URL. For a picked
+ * Blob URL — already absolute — this is a no-op; for a committed asset like
+ * `/assets/projects/mhc.jpg` it prefixes `site.url`.
+ *
+ * Needed anywhere an image reaches structured data (JSON-LD) by hand rather
+ * than through Next's Metadata API: a `<script type="application/ld+json">`
+ * is plain text a crawler parses with no base URL of its own, so a relative
+ * `image` there is simply broken, and naive `${site.url}${src}` string
+ * concatenation on an already-absolute Blob URL produces a mangled
+ * `https://forgelinetechnologies.comhttps://...` value instead. Next's own
+ * `generateMetadata`/`openGraph` fields do not need this: they resolve a
+ * relative URL against `metadataBase` (set in `src/app/layout.tsx`) on their
+ * own.
+ */
+export function absoluteUrl(src: string): string {
+  return src.startsWith("/") ? `${site.url}${src}` : src;
+}
+
+/**
  * Credibility figures.
  *
  * Every one of these is verifiable: the project count matches the portfolio

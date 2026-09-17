@@ -9,7 +9,10 @@
  * breadth of choice.
  *
  * Every one is decorative. The label beside it carries the meaning, so none of
- * these are ever the only thing identifying a control.
+ * these are ever the only thing identifying a control — with one exception: the
+ * eye icons on the password reveal toggle stand alone. That control carries its
+ * meaning in an `aria-label` for assistive technology and a `title` for anyone
+ * pointing at it, rather than in visible text.
  */
 type IconProps = { className?: string };
 
@@ -124,6 +127,39 @@ export function ArrowLeftIcon(props: IconProps) {
     <Svg {...props}>
       <path d="M13.5 8h-11" />
       <path d="M6.5 3.5 2 8l4.5 4.5" />
+    </Svg>
+  );
+}
+
+/** Media — a picture frame with a hill and a sun. */
+export function ImageIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <rect x="1.8" y="2.8" width="12.4" height="10.4" rx="1.2" />
+      <circle cx="5.8" cy="6.4" r="1.1" />
+      <path d="M2.4 11.6l3.4-3.2 3 2.6 2-1.8 2.8 2.4" />
+    </Svg>
+  );
+}
+
+/** Show password — an open eye. */
+export function EyeIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M1.5 8S3.9 3.5 8 3.5 14.5 8 14.5 8 12.1 12.5 8 12.5 1.5 8 1.5 8Z" />
+      <circle cx="8" cy="8" r="2" />
+    </Svg>
+  );
+}
+
+/** Hide password — the eye, struck through. */
+export function EyeOffIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M6.2 3.8A6.4 6.4 0 0 1 8 3.5c4.1 0 6.5 4.5 6.5 4.5a11 11 0 0 1-1.6 2.1" />
+      <path d="M4.3 4.9C2.5 6 1.5 8 1.5 8s2.4 4.5 6.5 4.5a6.2 6.2 0 0 0 2.9-.7" />
+      <path d="M6.6 6.6a2 2 0 0 0 2.8 2.8" />
+      <path d="M2 2l12 12" />
     </Svg>
   );
 }

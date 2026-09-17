@@ -9,6 +9,7 @@ import {
   updateUser,
   type UserResult,
 } from "@/lib/admin/user-actions";
+import { PasswordField } from "@/components/admin/password-field";
 
 export type AdminUser = {
   id: number;
@@ -109,7 +110,7 @@ export function UserManager({
                 <label htmlFor="new-password" className="text-[0.875rem] font-medium">
                   Password
                 </label>
-                <input id="new-password" name="password" type="text" autoComplete="off" className={field} />
+                <PasswordField id="new-password" name="password" autoComplete="off" className={field} />
                 <p className="mt-1.5 text-[0.8125rem] text-muted">
                   Leave empty to generate a strong one.
                 </p>
@@ -227,10 +228,9 @@ export function UserManager({
                           <label htmlFor={`pw-${u.id}`} className="sr-only">
                             New password for {u.email}
                           </label>
-                          <input
+                          <PasswordField
                             id={`pw-${u.id}`}
                             name="password"
-                            type="text"
                             autoComplete="new-password"
                             minLength={12}
                             placeholder="Type a password, or leave empty to generate one"

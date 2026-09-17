@@ -14,10 +14,12 @@
     "db:generate": "node --env-file=.env ./node_modules/drizzle-kit/bin.cjs generate",
     "admin:create": "node --env-file=.env ./node_modules/tsx/dist/cli.mjs scripts/create-admin.mts",
     "seed:works": "node --env-file=.env ./node_modules/tsx/dist/cli.mjs scripts/seed-works.mts",
-    "prospecting:drain": "node --env-file=.env ./node_modules/tsx/dist/cli.mjs scripts/drain-prospecting.mts"
+    "prospecting:drain": "node --env-file=.env ./node_modules/tsx/dist/cli.mjs scripts/drain-prospecting.mts",
+    "media:manifest": "node ./node_modules/tsx/dist/cli.mjs scripts/build-media-manifest.mts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
+    "@vercel/blob": "^2.8.0",
     "cheerio": "^1.2.0",
     "drizzle-orm": "^0.45.2",
     "next": "16.3.4",

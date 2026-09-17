@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { savePost } from "@/lib/admin/post-actions";
+import { MediaPicker } from "@/components/admin/media/media-picker";
+import type { MediaItem } from "@/lib/media/merge";
 
 export type PostFormValues = {
   id: number | null;
@@ -17,8 +19,9 @@ export type PostFormValues = {
   status: string;
 };
 
-const field =
-  "mt-1.5 w-full rounded-sm border border-rule-strong bg-white px-3 py-2 text-[0.9375rem] focus:border-ink focus:outline-none";
+const fieldBase =
+  "w-full rounded-sm border border-rule-strong bg-white px-3 py-2 text-[0.9375rem] focus:border-ink focus:outline-none";
+const field = `mt-1.5 ${fieldBase}`;
 
 /** Slugify as you type, but only for a new post — never silently move a URL. */
 function slugify(s: string) {
@@ -32,11 +35,15 @@ function slugify(s: string) {
 export function PostForm({
   initial,
   preview,
+  mediaItems,
+  mediaError,
 }: {
   initial: PostFormValues;
   /** Rendered server-side from the saved body, so the preview uses the same
       renderer the public page will — not a second implementation. */
   preview: string;
+  mediaItems: MediaItem[];
+  mediaError: string | null;
 }) {
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -182,7 +189,10 @@ export function PostForm({
 
         <div>
           <label htmlFor="coverUrl" className="text-[0.875rem] font-medium">Cover image</label>
-          <input id="coverUrl" name="coverUrl" defaultValue={initial.coverUrl} className={field} />
+          <div className="mt-1.5 flex items-start gap-2">
+            <input id="coverUrl" name="coverUrl" defaultValue={initial.coverUrl} className={`${fieldBase} flex-1`} />
+            <MediaPicker targetId="coverUrl" items={mediaItems} blobError={mediaError} />
+          </div>
         </div>
 
         <fieldset className="border-t border-rule pt-4">
@@ -198,7 +208,10 @@ export function PostForm({
             </div>
             <div>
               <label htmlFor="ogImage" className="text-[0.875rem] font-medium">Social image</label>
-              <input id="ogImage" name="ogImage" defaultValue={initial.ogImage} className={field} />
+              <div className="mt-1.5 flex items-start gap-2">
+                <input id="ogImage" name="ogImage" defaultValue={initial.ogImage} className={`${fieldBase} flex-1`} />
+                <MediaPicker targetId="ogImage" items={mediaItems} blobError={mediaError} />
+              </div>
             </div>
           </div>
           <p className="mt-3 text-[0.8125rem] text-muted">

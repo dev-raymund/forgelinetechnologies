@@ -34,6 +34,7 @@ Leave Build and Install on defaults. A `cd web` override is what produced
 | `RESEND_API_KEY` | Optional — enquiry email only |
 | `CONTACT_EMAIL` | Optional |
 | `RESEND_FROM` | Optional |
+| `BLOB_READ_WRITE_TOKEN` | Yes, for the media library — required in both **Production and Preview**. The Blob store behind it must be created with **Public access** (fixed at creation); a private store issues a token but refuses uploads with "Cannot use public access on a private store". See `docs/environment.md`. |
 
 **Do not set `NEXT_PUBLIC_BASE_PATH`.** It belonged to a staging experiment
 in the previous app, does not exist in this codebase, and would move every
@@ -75,9 +76,11 @@ Attaching the domain to a project that has a green deployment resolves it.
 
 1. Clear Root Directory (currently `web`)
 2. Add `DATABASE_URL` and `SESSION_SECRET` to Production
-3. Attach both domains, apex primary
-4. Push — or Redeploy
-5. Verify:
+3. Add `BLOB_READ_WRITE_TOKEN` to **Production and Preview**, from a Blob
+   store created with **Public access**
+4. Attach both domains, apex primary
+5. Push — or Redeploy
+6. Verify:
 
 ```
 curl -sI https://forgelinetechnologies.com/       → 200

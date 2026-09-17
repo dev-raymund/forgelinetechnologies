@@ -48,3 +48,9 @@ test("capability names are matched exactly", () => {
   // @ts-expect-error — deliberately not a declared capability
   assert.equal(roleHas("admin", "everything"), false);
 });
+
+test("media is managed by admins and editors, like posts and works", () => {
+  assert.equal(roleHas("admin", "media.manage"), true);
+  assert.equal(roleHas("editor", "media.manage"), true);
+  assert.equal(roleHas("unknown", "media.manage"), false);
+});

@@ -3,6 +3,7 @@
 import { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { login, type LoginState } from "@/lib/auth/actions";
+import { PasswordField } from "@/components/admin/password-field";
 
 const initial: LoginState = { status: "idle" };
 
@@ -60,10 +61,9 @@ export function LoginForm({ next }: { next: string }) {
         >
           Password
         </label>
-        <input
+        <PasswordField
           id="admin-password"
           name="password"
-          type="password"
           required
           autoComplete="current-password"
           className="mt-2 w-full rounded-sm border border-rule-strong bg-white px-3 py-2.5 text-[0.9375rem] text-graphite focus:border-ink focus:outline-none"

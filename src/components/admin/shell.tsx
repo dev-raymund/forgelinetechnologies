@@ -29,6 +29,7 @@ const LINKS: {
   { href: "/admin/reviews", label: "Reviews", capability: "reviews.manage", icon: "star" },
   { href: "/admin/blog", label: "Blog posts", capability: "posts.manage", icon: "file" },
   { href: "/admin/works", label: "Works", capability: "works.manage", icon: "briefcase" },
+  { href: "/admin/media", label: "Media", capability: "media.manage", icon: "image" },
   { href: "/admin/prospecting/prospects", label: "Prospects", capability: "prospecting.manage", icon: "users" },
   { href: "/admin/prospecting/import", label: "Import prospects", capability: "prospecting.manage", icon: "file" },
   { href: "/admin/prospecting/audit", label: "Prospecting audit", capability: "prospecting.manage", icon: "gauge" },
