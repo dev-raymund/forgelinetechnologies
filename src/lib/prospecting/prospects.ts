@@ -72,6 +72,26 @@ export function qualificationInputsChanged(before: QualificationFields, after: Q
 }
 
 /**
+ * Pure: the `onConflictDoUpdate` SET clause `upsertProspects` uses for a
+ * re-import. Named here, once, so a test asserting it never touches the
+ * decision or reviewer-adjustment columns renders the same object the upsert
+ * uses rather than a restatement of it.
+ */
+export function upsertConflictSet(now: Date = new Date()) {
+  return {
+    companyName: sql`excluded.company_name`,
+    websiteUrl: sql`excluded.website_url`,
+    industry: sql`excluded.industry`,
+    country: sql`excluded.country`,
+    location: sql`excluded.location`,
+    contactChannel: sql`excluded.contact_channel`,
+    contactProvenance: sql`excluded.contact_provenance`,
+    sources: sql`${prospects.sources} || excluded.sources`,
+    updatedAt: now,
+  };
+}
+
+/**
  * Domain-unique upsert.
  *
  * The `WHERE prospects.suppressed_at IS NULL` clause is the opt-out guarantee,
@@ -107,17 +127,7 @@ export async function upsertProspects(
     .values(values)
     .onConflictDoUpdate({
       target: prospects.domain,
-      set: {
-        companyName: sql`excluded.company_name`,
-        websiteUrl: sql`excluded.website_url`,
-        industry: sql`excluded.industry`,
-        country: sql`excluded.country`,
-        location: sql`excluded.location`,
-        contactChannel: sql`excluded.contact_channel`,
-        contactProvenance: sql`excluded.contact_provenance`,
-        sources: sql`${prospects.sources} || excluded.sources`,
-        updatedAt: new Date(),
-      },
+      set: upsertConflictSet(),
       setWhere: isNull(prospects.suppressedAt),
     })
     .returning({ domain: prospects.domain });

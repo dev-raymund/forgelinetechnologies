@@ -6,6 +6,18 @@ import { OpportunityControls } from "./opportunity-controls";
 import { ScoreAdjustControls } from "./score-adjust-controls";
 
 /**
+ * `at` comes from an adjustment or override, stored jsonb a reviewer could
+ * have hand-edited — `qualify.ts` already defends `points` against exactly
+ * this class of input. `Intl.DateTimeFormat.format` throws `RangeError` on an
+ * invalid date, which would take out the whole page, so a malformed
+ * timestamp gets the same one-line guard here.
+ */
+function whenSafe(at: string): string {
+  const date = new Date(at);
+  return Number.isNaN(date.getTime()) ? "—" : when(date);
+}
+
+/**
  * A prospect's qualification, rendered from a fresh `qualifyProspect` result
  * and never from the list's snapshot columns, so every number can be read
  * back against the evidence beside it.
@@ -83,7 +95,7 @@ export function QualificationPanel({
                         Adjusted to {c.adjustment.points}: {c.adjustment.reason}
                       </p>
                       <p className="font-mono text-micro text-faint">
-                        {c.adjustment.byEmail}, {when(new Date(c.adjustment.at))}
+                        {c.adjustment.byEmail}, {whenSafe(c.adjustment.at)}
                       </p>
                       {c.adjustmentApplies ? null : (
                         <p className="text-graphite">
@@ -130,7 +142,7 @@ export function QualificationPanel({
                 <dd className="mt-1 text-muted">
                   {override.reason}
                   <span className="block font-mono text-micro text-faint">
-                    {override.byEmail}, {when(new Date(override.at))}
+                    {override.byEmail}, {whenSafe(override.at)}
                   </span>
                 </dd>
               </div>

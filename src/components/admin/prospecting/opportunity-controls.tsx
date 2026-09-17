@@ -51,6 +51,12 @@ export function OpportunityControls({
       } else {
         setOpen(false);
         setReason("");
+        // `chosenPrimary` and `chosenSecondary` were seeded from `primary` and
+        // `secondary` only once, at mount, so they would otherwise keep
+        // showing whatever was last chosen here. Reset them so reopening the
+        // form starts fresh rather than stale.
+        setChosenPrimary(primary ?? "Build Audit");
+        setChosenSecondary(secondary);
       }
     });
   }
@@ -59,7 +65,12 @@ export function OpportunityControls({
     start(async () => {
       setError(null);
       const result = await clearOpportunityOverrideAction(prospectId);
-      if ("error" in result) setError(result.error);
+      if ("error" in result) {
+        setError(result.error);
+      } else {
+        setChosenPrimary(primary ?? "Build Audit");
+        setChosenSecondary(secondary);
+      }
     });
   }
 

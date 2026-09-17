@@ -41,6 +41,8 @@ export function ScoreAdjustControls({
   const [reason, setReason] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
+  const hintId = `adjust-${component}-hint`;
+  const isDecisionMaker = component === "decisionMakerAvailability";
 
   function save() {
     const value = Number(points);
@@ -60,6 +62,10 @@ export function ScoreAdjustControls({
       } else {
         setOpen(false);
         setReason("");
+        // `points` was seeded from `automatic` only once, at mount, so it
+        // would otherwise keep showing whatever was last typed here. Reset it
+        // so reopening the form starts fresh rather than stale.
+        setPoints(String(automatic));
       }
     });
   }
@@ -68,7 +74,11 @@ export function ScoreAdjustControls({
     start(async () => {
       setError(null);
       const result = await clearScoreAdjustmentAction(prospectId, component);
-      if ("error" in result) setError(result.error);
+      if ("error" in result) {
+        setError(result.error);
+      } else {
+        setPoints(String(automatic));
+      }
     });
   }
 
@@ -110,10 +120,11 @@ export function ScoreAdjustControls({
               if (error) setError(null);
             }}
             placeholder={PLACEHOLDERS[component]}
+            aria-describedby={isDecisionMaker ? hintId : undefined}
             className="w-full rounded-sm border border-rule-strong bg-white px-3 py-2 text-[0.875rem] focus:border-ink focus:outline-none"
           />
-          {component === "decisionMakerAvailability" ? (
-            <p className="text-[0.75rem] text-faint">
+          {isDecisionMaker ? (
+            <p id={hintId} className="text-[0.75rem] text-faint">
               Name the role and where the company publishes it. Never name the person.
             </p>
           ) : null}

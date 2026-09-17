@@ -12,8 +12,9 @@ export type EnqueueDependencies = {
   selectQueueable: (ids: number[]) => Promise<{ id: number; websiteUrl: string }[]>;
   /**
    * Moves prospects to `queued`, returning only the ids it actually changed.
-   * The suppression guard lives here as well as in the read, so an id the
-   * caller believed was queueable can still be refused at write time.
+   * The suppression and dismissal guards live here as well as in the read, so
+   * an id the caller believed was queueable can still be refused at write
+   * time.
    */
   markQueued: (ids: number[]) => Promise<number[]>;
   insertAudits: (
@@ -146,6 +147,25 @@ export function isLostClaim(error: unknown): boolean {
  */
 const STALE_CLAIM_MS = 15 * 60 * 1000;
 
+/**
+ * Pure: the prospect UPDATE `applyResult` issues after an audit — lifecycle
+ * and audit links only. Named here, once, so a test asserting it never
+ * touches the decision or reviewer-adjustment columns renders the same
+ * object `applyResult` uses rather than a restatement of it.
+ */
+export function applyResultSet(
+  lifecycle: Record<string, unknown>,
+  auditId: number,
+  now: Date = new Date(),
+) {
+  return {
+    ...lifecycle,
+    lastAuditId: auditId,
+    lastAuditedAt: now,
+    updatedAt: now,
+  };
+}
+
 export function productionDrainDependencies(): DrainDependencies {
   return {
     listQueuedAuditIds: async (limit) => {
@@ -251,19 +271,24 @@ export function productionDrainDependencies(): DrainDependencies {
 
       await getDb()
         .update(prospects)
-        .set({
-          ...lifecycle,
-          lastAuditId: auditId,
-          lastAuditedAt: new Date(),
-          updatedAt: new Date(),
-        })
+        .set(applyResultSet(lifecycle, auditId))
         .where(eq(prospects.id, prospectId));
 
       // The score and opportunity are recomputed rather than copied from this
       // result. After a failed run, an earlier completed audit is still the
       // evidence, and business fit, contact and reviewer adjustments belong in
       // the total too.
-      await refreshQualificationSnapshot(prospectId);
+      //
+      // The snapshot is derived data, and the audit is already saved above. A
+      // transient failure here must not abort the rest of the batch: retry
+      // it, then log and move on, the way `upsertProspects` already does for
+      // this same call. `prospecting:requalify` rebuilds anything that
+      // slipped through.
+      try {
+        await withRetry(() => refreshQualificationSnapshot(prospectId));
+      } catch (error) {
+        console.error("[prospecting] snapshot refresh after audit failed", prospectId, error);
+      }
     },
 
     now: () => Date.now(),

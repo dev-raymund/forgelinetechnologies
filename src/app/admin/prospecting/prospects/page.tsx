@@ -52,7 +52,10 @@ export default async function ProspectsPage({
   const filtered = Boolean(
     sp.status || sp.opportunity || sp.country || sp.industry || sp.decision || sp.band,
   );
-  const hidingDismissed = sp.decision !== "dismissed";
+  // Only the default (no decision filter chosen) actually hides dismissed
+  // prospects — filtering to Qualified or Undecided narrows to that decision
+  // and shows no dismissed prospects either, but not because of the note.
+  const hidingDismissed = sp.decision === undefined;
 
   const rows = await withRetry(() => listProspects(filter));
 

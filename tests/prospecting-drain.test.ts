@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { drainAuditQueue } from "../src/lib/prospecting/drain.ts";
 import type { AuditJobResult } from "../src/lib/prospecting/runner.ts";
+import { withRetry } from "../src/lib/retry.ts";
 
 // Cast through `unknown`: this fixture only needs to carry `status` for
 // drain.ts's own branching (drain.ts never reads `analysis` or `score`), but
@@ -112,6 +113,40 @@ test("a real failure still stops the drain rather than counting as a skip", asyn
   );
 
   assert.deepEqual(ran, [1, 2]);
+});
+
+test("a drain whose applyResult recovers from one transient blip does not lose the remaining candidates", async () => {
+  // Models the fix to queue.ts's applyResult: the post-audit snapshot
+  // refresh is retried (with the real `withRetry`, exactly as the fix uses
+  // it) rather than left to escape and abort the batch after the audit was
+  // already saved and counted. A real, non-transient failure still correctly
+  // aborts the batch — see "a real failure still stops the drain..." above.
+  const applied: number[] = [];
+  let refreshAttempts = 0;
+  const summary = await drainAuditQueue(
+    { limit: 10, budgetMs: 1_000_000 },
+    deps({
+      applyResult: async (input: { auditId: number }) => {
+        if (input.auditId === 2) {
+          await withRetry(
+            async () => {
+              refreshAttempts += 1;
+              if (refreshAttempts === 1) throw new Error("fetch failed");
+            },
+            3,
+            async () => undefined,
+          );
+        }
+        applied.push(input.auditId);
+      },
+    }),
+  );
+
+  assert.equal(refreshAttempts, 2);
+  assert.deepEqual(applied, [1, 2, 3]);
+  assert.equal(summary.claimed, 3);
+  assert.equal(summary.completed, 3);
+  assert.equal(summary.skipped, 0);
 });
 
 test("the drain stops cleanly when the time budget is spent", async () => {
