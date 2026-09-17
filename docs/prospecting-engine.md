@@ -134,6 +134,17 @@ Use selected audit findings to classify one primary opportunity and optional sec
 
 Qualification is a recommendation to a reviewer, not an automatic decision to contact someone.
 
+**Status:** built on the `prospecting-phase-3` branch. Not in production until merged and migration 0003 is applied. Design: [`docs/superpowers/specs/2026-09-17-prospecting-phase3-design.md`](superpowers/specs/2026-09-17-prospecting-phase3-design.md).
+
+How it works:
+
+- **Score (100).** Website / UX 25, SEO 20, Technical 20 and Conversion 15 come from the latest completed or partial audit's stored findings. Business fit 10 is 5 for a target market (AU, GB/UK, US, CA) and 5 for a target industry matched exactly against a fixed synonym table in `src/lib/prospecting/fit.ts`. Decision-maker availability 10 is 5 for a public business channel with recorded provenance; the other 5 only a reviewer can award, for a decision-making role the company publishes. The reviewer names the role, never the person.
+- **Adjustments.** A reviewer can set any component from 0 to its cap, with a reason. The automatic value stays visible. Adjustments to the four website components are pinned to the audit they judged and stop applying after a newer audit.
+- **Opportunities.** The primary comes from the website components only. Secondaries use explicit thresholds, and E-commerce appears when Shopify or WooCommerce is detected. A reviewer override is the only route to Automation, API / Integration or Custom Software.
+- **Bands.** 75–100 human review before any draft; 50–74 review the evidence; 25–49 do not prioritise outreach; 0–24 do not create outreach.
+- **Decision.** Qualified (reason optional) or Dismissed (reason required), both reversible and written to the audit log. A dismissed prospect is hidden from the default list and cannot be queued. A suppressed prospect cannot be qualified.
+- **List snapshot.** `prospects.total_score` and `primary_opportunity` hold the effective values and are refreshed after every audit, adjustment, override and re-import that changes fit or contact. After applying migration 0003, or after changing a scoring rule, run `npm run prospecting:requalify` once.
+
 ### Phase 4 — AI Analysis
 
 **Input:** a completed structured audit and the subset of findings selected for analysis.

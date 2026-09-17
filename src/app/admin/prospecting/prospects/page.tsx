@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { requireCapability } from "@/lib/auth/guard";
-import { listProspects } from "@/lib/prospecting/prospects";
-import type { Opportunity } from "@/lib/prospecting/types";
+import { DECISION_FILTERS, listProspects } from "@/lib/prospecting/prospects";
+import { BANDS, bandFor } from "@/lib/prospecting/qualify";
+import { OPPORTUNITIES } from "@/lib/prospecting/types";
 import { withRetry } from "@/lib/queries";
 import { Empty, PageTitle, Status, when } from "@/components/admin/ui";
 import { QueueActions } from "@/components/admin/prospecting/queue-actions";
@@ -16,16 +17,11 @@ export const metadata = { title: "Prospects" };
 export const maxDuration = 60;
 
 const STATUSES = ["new", "queued", "audited", "suppressed"];
-const OPPORTUNITIES: Opportunity[] = [
-  "Website Improvement",
-  "Website Rebuild",
-  "SEO",
-  "Automation",
-  "E-commerce",
-  "API / Integration",
-  "Custom Software",
-  "Build Audit",
-];
+const DECISION_LABELS: Record<(typeof DECISION_FILTERS)[number], string> = {
+  undecided: "Undecided",
+  qualified: "Qualified",
+  dismissed: "Dismissed",
+};
 
 export default async function ProspectsPage({
   searchParams,
@@ -35,6 +31,8 @@ export default async function ProspectsPage({
     opportunity?: string;
     country?: string;
     industry?: string;
+    decision?: string;
+    band?: string;
   }>;
 }) {
   await requireCapability("prospecting.manage", "/admin/prospecting/prospects");
@@ -48,8 +46,13 @@ export default async function ProspectsPage({
     // result is indistinguishable from having no Australian prospects.
     country: sp.country?.toUpperCase(),
     industry: sp.industry,
+    decision: sp.decision,
+    band: sp.band,
   };
-  const filtered = Boolean(sp.status || sp.opportunity || sp.country || sp.industry);
+  const filtered = Boolean(
+    sp.status || sp.opportunity || sp.country || sp.industry || sp.decision || sp.band,
+  );
+  const hidingDismissed = sp.decision !== "dismissed";
 
   const rows = await withRetry(() => listProspects(filter));
 
@@ -67,7 +70,9 @@ export default async function ProspectsPage({
         title="Prospects"
         count={`${rows.length} ${rows.length === 1 ? "prospect" : "prospects"}${
           filtered ? " matching" : ""
-        }${rows.length === 200 ? " — showing the top 200 by score" : ""}`}
+        }${rows.length === 200 ? " — showing the top 200 by score" : ""}${
+          hidingDismissed ? " · dismissed hidden" : ""
+        }`}
         action={<QueueActions />}
       />
 
@@ -105,6 +110,34 @@ export default async function ProspectsPage({
             ))}
           </select>
         </FilterField>
+        <FilterField label="Decision">
+          <select
+            name="decision"
+            defaultValue={sp.decision ?? ""}
+            className="rounded-sm border border-rule-strong bg-white px-3 py-2 text-[0.875rem] focus:border-ink focus:outline-none"
+          >
+            <option value="">All except dismissed</option>
+            {DECISION_FILTERS.map((d) => (
+              <option key={d} value={d}>
+                {DECISION_LABELS[d]}
+              </option>
+            ))}
+          </select>
+        </FilterField>
+        <FilterField label="Band">
+          <select
+            name="band"
+            defaultValue={sp.band ?? ""}
+            className="rounded-sm border border-rule-strong bg-white px-3 py-2 text-[0.875rem] focus:border-ink focus:outline-none"
+          >
+            <option value="">All</option>
+            {BANDS.map((b) => (
+              <option key={b.key} value={b.key}>
+                {b.label} ({b.min}–{b.max})
+              </option>
+            ))}
+          </select>
+        </FilterField>
         {sp.status ? <input type="hidden" name="status" value={sp.status} /> : null}
         <button
           type="submit"
@@ -133,20 +166,29 @@ export default async function ProspectsPage({
         </Empty>
       ) : (
         <div className="overflow-x-auto rounded-sm border border-rule bg-white">
-          <table className="w-full min-w-[56rem] border-collapse text-left">
+          <table className="w-full min-w-[66rem] border-collapse text-left">
             <thead>
               <tr className="border-b border-rule">
-                {["Company", "Domain", "Industry", "Location", "Status", "Score", "Last audited", ""].map(
-                  (h) => (
-                    <th
-                      key={h}
-                      scope="col"
-                      className="px-4 py-2.5 font-mono text-micro font-normal text-faint"
-                    >
-                      {h}
-                    </th>
-                  ),
-                )}
+                {[
+                  "Company",
+                  "Domain",
+                  "Industry",
+                  "Location",
+                  "Status",
+                  "Decision",
+                  "Score",
+                  "Band",
+                  "Last audited",
+                  "",
+                ].map((h) => (
+                  <th
+                    key={h}
+                    scope="col"
+                    className="px-4 py-2.5 font-mono text-micro font-normal text-faint"
+                  >
+                    {h}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -174,7 +216,15 @@ export default async function ProspectsPage({
                   <td className="px-4 py-3">
                     <Status value={r.status} />
                   </td>
+                  <td className="px-4 py-3">
+                    {r.decision ? (
+                      <Status value={r.decision} />
+                    ) : (
+                      <span className="text-[0.875rem] text-faint">—</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 font-mono text-[0.875rem] text-graphite">{r.totalScore}</td>
+                  <td className="px-4 py-3 text-[0.875rem] text-muted">{bandFor(r.totalScore).label}</td>
                   <td className="px-4 py-3 text-[0.875rem] text-muted">{when(r.lastAuditedAt)}</td>
                   <td className="px-4 py-3 text-right">
                     <Link
