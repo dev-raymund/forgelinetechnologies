@@ -4,6 +4,7 @@ import { saveAuditRunning } from "./audit.ts";
 import { runAuditJob } from "./runner.ts";
 import { auditJobDependencies } from "./run.ts";
 import { withRetry } from "../retry.ts";
+import { refreshQualificationSnapshot } from "./qualification.ts";
 import type { DrainDependencies } from "./drain.ts";
 
 export type EnqueueDependencies = {
@@ -217,16 +218,7 @@ export function productionDrainDependencies(): DrainDependencies {
 
       // A failed audit returns the prospect to `new` so it can be queued again,
       // while still pointing at the failed run so the error is readable.
-      // Narrow on `result.status` directly: a separate boolean would not narrow
-      // the union and `result.score` would not typecheck.
-      const snapshot =
-        result.status === "failed"
-          ? { totalScore: 0, primaryOpportunity: "" }
-          : {
-              totalScore: result.score.total,
-              primaryOpportunity: result.score.primaryOpportunity,
-            };
-
+      //
       // A suppressed prospect keeps its status. Writing `audited` here would
       // hide the opt-out from the list, and writing `new` after a failure would
       // hand the prospect straight back to "Queue all new" and have it audited
@@ -240,13 +232,18 @@ export function productionDrainDependencies(): DrainDependencies {
       await getDb()
         .update(prospects)
         .set({
-          ...snapshot,
           ...lifecycle,
           lastAuditId: auditId,
           lastAuditedAt: new Date(),
           updatedAt: new Date(),
         })
         .where(eq(prospects.id, prospectId));
+
+      // The score and opportunity are recomputed rather than copied from this
+      // result. After a failed run, an earlier completed audit is still the
+      // evidence, and business fit, contact and reviewer adjustments belong in
+      // the total too.
+      await refreshQualificationSnapshot(prospectId);
     },
 
     now: () => Date.now(),

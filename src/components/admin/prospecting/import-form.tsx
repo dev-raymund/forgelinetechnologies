@@ -253,6 +253,13 @@ export function ImportForm() {
               <dd className="mt-1 font-mono text-[1.25rem] text-graphite">{result.skippedSuppressed}</dd>
             </div>
           </dl>
+          {result.staleScores > 0 ? (
+            <p role="status" className="mt-4 text-[0.875rem] text-muted">
+              {result.staleScores} list {result.staleScores === 1 ? "score" : "scores"} could not be
+              refreshed. Run <code className="font-mono">npm run prospecting:requalify</code> to update
+              them.
+            </p>
+          ) : null}
           <Link
             href="/admin/prospecting/prospects"
             className="mt-6 inline-block text-[0.9375rem] font-medium underline decoration-rule-strong underline-offset-4 hover:decoration-accent"

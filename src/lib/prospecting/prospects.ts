@@ -9,14 +9,28 @@ import {
 } from "../../db/index.ts";
 import { saveAuditFailure } from "./audit.ts";
 import { isLostClaim } from "./queue.ts";
+import { refreshQualificationSnapshot } from "./qualification.ts";
+import { qualificationSnapshot, qualifyProspect } from "./qualify.ts";
 import type { ParsedProspect } from "./csv.ts";
 
-export type UpsertSummary = { inserted: number; updated: number; skippedSuppressed: number };
+export type UpsertSummary = {
+  inserted: number;
+  updated: number;
+  skippedSuppressed: number;
+  /** Updated prospects whose list score could not be refreshed. */
+  staleScores: number;
+};
 
 /**
  * Pure: turns parsed rows into insert values. Deliberately sets no lifecycle,
- * score, or suppression field — those belong to the row that already exists and
- * must survive a re-import untouched.
+ * suppression or decision field — those belong to the row that already exists
+ * and must survive a re-import untouched.
+ *
+ * The score snapshot is set because a new prospect has no audit and no
+ * reviewer input yet, so its qualification is exactly its business fit and
+ * contact. It reaches inserted rows only: the conflict `set` in
+ * `upsertProspects` names its columns and leaves an existing row's snapshot
+ * alone.
  */
 export function buildUpsertValues(
   rows: ParsedProspect[],
@@ -34,7 +48,27 @@ export function buildUpsertValues(
     contactProvenance: row.contactProvenance,
     sources: [source],
     createdBy,
+    ...qualificationSnapshot(
+      qualifyProspect({ audit: null, prospect: row, adjustments: {}, opportunityOverride: null }),
+    ),
   }));
+}
+
+type QualificationFields = {
+  country: string;
+  industry: string;
+  contactChannel: string;
+  contactProvenance: string;
+};
+
+/** Pure: whether a re-import changed anything business fit or contact is scored from. */
+export function qualificationInputsChanged(before: QualificationFields, after: QualificationFields): boolean {
+  return (
+    before.country !== after.country ||
+    before.industry !== after.industry ||
+    before.contactChannel !== after.contactChannel ||
+    before.contactProvenance !== after.contactProvenance
+  );
 }
 
 /**
@@ -49,15 +83,23 @@ export async function upsertProspects(
   source: ProspectSource,
   actorId: number | null,
 ): Promise<UpsertSummary> {
-  if (rows.length === 0) return { inserted: 0, updated: 0, skippedSuppressed: 0 };
+  if (rows.length === 0) return { inserted: 0, updated: 0, skippedSuppressed: 0, staleScores: 0 };
 
   const values = buildUpsertValues(rows, source, actorId);
   const before = await getDb()
-    .select({ domain: prospects.domain, suppressedAt: prospects.suppressedAt })
+    .select({
+      id: prospects.id,
+      domain: prospects.domain,
+      suppressedAt: prospects.suppressedAt,
+      country: prospects.country,
+      industry: prospects.industry,
+      contactChannel: prospects.contactChannel,
+      contactProvenance: prospects.contactProvenance,
+    })
     .from(prospects)
     .where(inArray(prospects.domain, values.map((v) => v.domain!)));
 
-  const existing = new Set(before.map((r) => r.domain));
+  const existing = new Map(before.map((r) => [r.domain, r]));
   const suppressed = new Set(before.filter((r) => r.suppressedAt !== null).map((r) => r.domain));
 
   const returned = await getDb()
@@ -81,10 +123,31 @@ export async function upsertProspects(
     .returning({ domain: prospects.domain });
 
   const touched = new Set(returned.map((r) => r.domain));
+
+  // The upsert is one statement and cannot recompute a score, so a re-import
+  // that changed what business fit or contact is scored from refreshes those
+  // snapshots here. Suppressed prospects never reach this: the conflict
+  // `setWhere` refuses them, so they are not in `touched`.
+  let staleScores = 0;
+  for (const row of rows) {
+    const previous = existing.get(row.domain);
+    if (!previous || !touched.has(row.domain) || !qualificationInputsChanged(previous, row)) continue;
+    try {
+      await refreshQualificationSnapshot(previous.id);
+    } catch (error) {
+      // The rows are already saved, so this must not read as a failed import.
+      // The list keeps this prospect's old score until the next refresh; the
+      // detail page is unaffected because it always recomputes.
+      console.error("[prospecting] snapshot refresh after import failed", previous.id, error);
+      staleScores += 1;
+    }
+  }
+
   return {
     inserted: [...touched].filter((d) => !existing.has(d)).length,
     updated: [...touched].filter((d) => existing.has(d)).length,
     skippedSuppressed: [...suppressed].filter((d) => !touched.has(d)).length,
+    staleScores,
   };
 }
 

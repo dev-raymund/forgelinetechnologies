@@ -90,7 +90,13 @@ export type ImportPreview =
 
 export type ImportResult =
   | { status: "error"; message: string }
-  | { status: "imported"; inserted: number; updated: number; skippedSuppressed: number };
+  | {
+      status: "imported";
+      inserted: number;
+      updated: number;
+      skippedSuppressed: number;
+      staleScores: number;
+    };
 
 /** Parses only. Nothing is written until the reviewer confirms the preview. */
 export async function previewImport(formData: FormData): Promise<ImportPreview> {
@@ -164,7 +170,9 @@ export async function commitImport(formData: FormData): Promise<ImportResult> {
     userId: authorised.user.id,
     actorEmail: authorised.user.email,
     entity: "prospect",
-    detail: `${sourceName}: ${summary.inserted} new, ${summary.updated} updated, ${summary.skippedSuppressed} suppressed`,
+    detail: `${sourceName}: ${summary.inserted} new, ${summary.updated} updated, ${summary.skippedSuppressed} suppressed${
+      summary.staleScores ? `, ${summary.staleScores} scores not refreshed` : ""
+    }`,
   });
 
   return { status: "imported", ...summary };
