@@ -92,3 +92,27 @@ test("a decision reason over 300 characters or an unknown decision is rejected",
   assert.equal(validateDecision({ decision: "", reason }).ok, false);
   assert.equal(validateDecision({ decision: "suppressed", reason }).ok, false);
 });
+
+test("validateAdjustment guards against null and undefined input", () => {
+  for (const bad of [null, undefined]) {
+    const result = validateAdjustment(bad);
+    assert.equal(result.ok, false, String(bad));
+    assert.equal(result.ok === false ? result.error : "", "Unknown score component.");
+  }
+});
+
+test("validateOverride guards against null and undefined input", () => {
+  for (const bad of [null, undefined]) {
+    const result = validateOverride(bad);
+    assert.equal(result.ok, false, String(bad));
+    assert.equal(result.ok === false ? result.error : "", "Choose a primary opportunity from the list.");
+  }
+});
+
+test("validateDecision guards against null and undefined input", () => {
+  for (const bad of [null, undefined]) {
+    const result = validateDecision(bad);
+    assert.equal(result.ok, false, String(bad));
+    assert.equal(result.ok === false ? result.error : "", "Unknown decision.");
+  }
+});

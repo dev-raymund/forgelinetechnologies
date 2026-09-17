@@ -25,6 +25,10 @@ function isOpportunity(value: unknown): value is Opportunity {
   return typeof value === "string" && (OPPORTUNITIES as readonly string[]).includes(value);
 }
 
+function isValidObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
 export function validateProspectId(raw: unknown): Validated<number> {
   return typeof raw === "number" && Number.isSafeInteger(raw) && raw > 0
     ? { ok: true, value: raw }
@@ -36,15 +40,13 @@ export function validateComponentKey(raw: unknown): Validated<ComponentKey> {
   return definition ? { ok: true, value: definition.key } : { ok: false, error: "Unknown score component." };
 }
 
-export function validateAdjustment(input: {
-  component: unknown;
-  points: unknown;
-  reason: unknown;
-}): Validated<{ component: ComponentKey; points: number; reason: string }> {
+export function validateAdjustment(input: unknown): Validated<{ component: ComponentKey; points: number; reason: string }> {
+  if (!isValidObject(input)) return { ok: false, error: "Unknown score component." };
+
   const definition = COMPONENTS.find((component) => component.key === input.component);
   if (!definition) return { ok: false, error: "Unknown score component." };
 
-  const { points } = input;
+  const { points } = input as { component?: unknown; points?: unknown; reason?: unknown };
   if (typeof points !== "number" || !Number.isInteger(points) || points < 0 || points > definition.cap) {
     return { ok: false, error: `${definition.label} must be a whole number from 0 to ${definition.cap}.` };
   }
@@ -55,12 +57,10 @@ export function validateAdjustment(input: {
   return { ok: true, value: { component: definition.key, points, reason: reason.value } };
 }
 
-export function validateOverride(input: {
-  primary: unknown;
-  secondary: unknown;
-  reason: unknown;
-}): Validated<{ primary: Opportunity; secondary: Opportunity[]; reason: string }> {
-  const { primary, secondary } = input;
+export function validateOverride(input: unknown): Validated<{ primary: Opportunity; secondary: Opportunity[]; reason: string }> {
+  if (!isValidObject(input)) return { ok: false, error: "Choose a primary opportunity from the list." };
+
+  const { primary, secondary, reason: inputReason } = input as { primary?: unknown; secondary?: unknown; reason?: unknown };
   if (!isOpportunity(primary)) return { ok: false, error: "Choose a primary opportunity from the list." };
   if (!Array.isArray(secondary) || !secondary.every(isOpportunity)) {
     return { ok: false, error: "Secondary opportunities must come from the list." };
@@ -72,20 +72,19 @@ export function validateOverride(input: {
     return { ok: false, error: "The primary opportunity cannot also be a secondary one." };
   }
 
-  const reason = validateReason(input.reason, true, "this override");
+  const reason = validateReason(inputReason, true, "this override");
   if (!reason.ok) return reason;
 
   return { ok: true, value: { primary, secondary, reason: reason.value } };
 }
 
-export function validateDecision(input: {
-  decision: unknown;
-  reason: unknown;
-}): Validated<{ decision: "qualified" | "dismissed"; reason: string }> {
-  const { decision } = input;
+export function validateDecision(input: unknown): Validated<{ decision: "qualified" | "dismissed"; reason: string }> {
+  if (!isValidObject(input)) return { ok: false, error: "Unknown decision." };
+
+  const { decision, reason: inputReason } = input as { decision?: unknown; reason?: unknown };
   if (decision !== "qualified" && decision !== "dismissed") return { ok: false, error: "Unknown decision." };
 
-  const reason = validateReason(input.reason, decision === "dismissed", "dismissing this prospect");
+  const reason = validateReason(inputReason, decision === "dismissed", "dismissing this prospect");
   if (!reason.ok) return reason;
 
   return { ok: true, value: { decision, reason: reason.value } };
