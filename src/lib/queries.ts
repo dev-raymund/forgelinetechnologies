@@ -1,47 +1,14 @@
 import "server-only";
 import { and, asc, desc, eq, gte, sql } from "drizzle-orm";
 import { getDb, projects, posts, inquiries, type Project, type Post } from "@/db";
+import { withRetry } from "@/lib/retry";
 
 /**
- * Neon's serverless tier suspends after inactivity, and the first query
- * against a cold instance can exceed the driver's connect timeout — which
- * otherwise surfaces to a visitor as a 500. Those failures are transient, so
- * retry them briefly.
- *
- * Only connection-level failures retry. A genuine SQL error throws
- * immediately, because retrying bad SQL just delays the same failure.
+ * `withRetry` lives in `@/lib/retry` so the plain-Node CLIs can import it.
+ * It is re-exported here because every page already imports it from this
+ * module.
  */
-const TRANSIENT =
-  /fetch failed|ConnectTimeout|UND_ERR_CONNECT_TIMEOUT|ECONNRESET|ETIMEDOUT|socket hang up|terminated/i;
-
-function isTransient(err: unknown): boolean {
-  if (!(err instanceof Error)) return false;
-  const cause = (err as { cause?: unknown }).cause;
-  const source = (err as { sourceError?: unknown }).sourceError;
-  return TRANSIENT.test(
-    [err.message, err.name, String(cause ?? ""), String(source ?? "")].join(
-      " ",
-    ),
-  );
-}
-
-export async function withRetry<T>(
-  fn: () => Promise<T>,
-  attempts = 3,
-): Promise<T> {
-  let last: unknown;
-  for (let i = 0; i < attempts; i++) {
-    try {
-      return await fn();
-    } catch (err) {
-      last = err;
-      if (!isTransient(err) || i === attempts - 1) throw err;
-      // 300ms, then 600ms — enough for a suspended instance to wake.
-      await new Promise((resolve) => setTimeout(resolve, 300 * 2 ** i));
-    }
-  }
-  throw last;
-}
+export { withRetry };
 
 /* ---------------------------------------------------------------- projects */
 

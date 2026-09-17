@@ -11,6 +11,7 @@
  */
 import { drainAuditQueue } from "../src/lib/prospecting/drain.ts";
 import { productionDrainDependencies } from "../src/lib/prospecting/queue.ts";
+import { describeError } from "../src/lib/retry.ts";
 
 const flag = process.argv.indexOf("--limit");
 const limit = flag === -1 ? 500 : Number(process.argv[flag + 1]);
@@ -22,12 +23,19 @@ if (!Number.isSafeInteger(limit) || limit < 1) {
 
 console.log(`Draining up to ${limit} queued audits. Ctrl-C to stop.`);
 
-const summary = await drainAuditQueue(
-  { limit, budgetMs: Number.MAX_SAFE_INTEGER, perAuditMs: 0, pauseMs: 2_000 },
-  productionDrainDependencies(),
-);
+try {
+  const summary = await drainAuditQueue(
+    { limit, budgetMs: Number.MAX_SAFE_INTEGER, perAuditMs: 0, pauseMs: 2_000 },
+    productionDrainDependencies(),
+  );
 
-console.log(
-  `Done: ${summary.completed} completed, ${summary.failed} failed, ` +
-    `${summary.skipped} already claimed (stopped: ${summary.stoppedBecause}).`,
-);
+  console.log(
+    `Done: ${summary.completed} completed, ${summary.failed} failed, ` +
+      `${summary.skipped} already claimed (stopped: ${summary.stoppedBecause}).`,
+  );
+} catch (error) {
+  // The reads have already been retried. What reaches here is a real failure,
+  // and the operator needs its cause, not a stack trace.
+  console.error(`Drain stopped: ${describeError(error)}`);
+  process.exitCode = 1;
+}

@@ -3,6 +3,7 @@ import { getDb, prospectAudits, prospects } from "../../db/index.ts";
 import { saveAuditRunning } from "./audit.ts";
 import { runAuditJob } from "./runner.ts";
 import { auditJobDependencies } from "./run.ts";
+import { withRetry } from "../retry.ts";
 import type { DrainDependencies } from "./drain.ts";
 
 export type EnqueueDependencies = {
@@ -127,34 +128,38 @@ const STALE_CLAIM_MS = 15 * 60 * 1000;
 export function productionDrainDependencies(): DrainDependencies {
   return {
     listQueuedAuditIds: async (limit) => {
-      const rows = await getDb()
-        .select({ id: prospectAudits.id })
-        .from(prospectAudits)
-        .where(
-          or(
-            eq(prospectAudits.status, "queued"),
-            and(
-              eq(prospectAudits.status, "running"),
-              lt(prospectAudits.startedAt, new Date(Date.now() - STALE_CLAIM_MS)),
+      const rows = await withRetry(() =>
+        getDb()
+          .select({ id: prospectAudits.id })
+          .from(prospectAudits)
+          .where(
+            or(
+              eq(prospectAudits.status, "queued"),
+              and(
+                eq(prospectAudits.status, "running"),
+                lt(prospectAudits.startedAt, new Date(Date.now() - STALE_CLAIM_MS)),
+              ),
             ),
-          ),
-        )
-        .orderBy(asc(prospectAudits.id))
-        .limit(limit);
+          )
+          .orderBy(asc(prospectAudits.id))
+          .limit(limit),
+      );
       return rows.map((row) => row.id);
     },
 
     claimAudit: async (id) => {
-      const [row] = await getDb()
-        .select({
-          requestedUrl: prospectAudits.requestedUrl,
-          prospectId: prospectAudits.prospectId,
-          status: prospectAudits.status,
-          startedAt: prospectAudits.startedAt,
-        })
-        .from(prospectAudits)
-        .where(eq(prospectAudits.id, id))
-        .limit(1);
+      const [row] = await withRetry(() =>
+        getDb()
+          .select({
+            requestedUrl: prospectAudits.requestedUrl,
+            prospectId: prospectAudits.prospectId,
+            status: prospectAudits.status,
+            startedAt: prospectAudits.startedAt,
+          })
+          .from(prospectAudits)
+          .where(eq(prospectAudits.id, id))
+          .limit(1),
+      );
       if (!row) return null;
       const claimed = { requestedUrl: row.requestedUrl, prospectId: row.prospectId };
 
@@ -201,11 +206,13 @@ export function productionDrainDependencies(): DrainDependencies {
     applyResult: async ({ prospectId, auditId, result }) => {
       if (prospectId === null) return;
 
-      const [prospect] = await getDb()
-        .select({ suppressedAt: prospects.suppressedAt })
-        .from(prospects)
-        .where(eq(prospects.id, prospectId))
-        .limit(1);
+      const [prospect] = await withRetry(() =>
+        getDb()
+          .select({ suppressedAt: prospects.suppressedAt })
+          .from(prospects)
+          .where(eq(prospects.id, prospectId))
+          .limit(1),
+      );
       if (!prospect) return;
 
       // A failed audit returns the prospect to `new` so it can be queued again,
