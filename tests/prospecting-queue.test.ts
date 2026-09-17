@@ -1,8 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { PgDialect } from "drizzle-orm/pg-core";
+import type { SQL } from "drizzle-orm";
 import {
   enqueueProspects,
   isLostClaim,
+  markQueuedWhere,
+  queueableWhere,
   type EnqueueDependencies,
 } from "../src/lib/prospecting/queue.ts";
 
@@ -120,4 +124,34 @@ test("nothing is written when no prospect is queueable", async () => {
 
   assert.deepEqual(calls, []);
   assert.equal(queued, 0);
+});
+
+function render(where: SQL | undefined) {
+  assert.ok(where, "expected a where clause");
+  return new PgDialect().sqlToQuery(where);
+}
+
+/** Asserts `column <> 'dismissed'` with the value bound to its own placeholder. */
+function assertExcludesDismissed(query: { sql: string; params: unknown[] }) {
+  const index = query.params.indexOf("dismissed");
+  assert.notEqual(index, -1, "dismissed is not a bound parameter");
+  assert.ok(
+    query.sql.includes(`"prospects"."decision" <> $${index + 1}`),
+    `no decision guard in: ${query.sql}`,
+  );
+}
+
+test("the queueable SELECT refuses dismissed and suppressed prospects", () => {
+  const query = render(queueableWhere([1, 2]));
+  assertExcludesDismissed(query);
+  assert.match(query.sql, /"prospects"\."suppressed_at" is null/);
+  assert.match(query.sql, /"prospects"\."status" = \$\d+/);
+});
+
+test("the queueing UPDATE repeats the dismissed and suppressed guards at write time", () => {
+  // A dismissal that commits between the read and the write must still win,
+  // exactly as a suppression does.
+  const query = render(markQueuedWhere([1, 2]));
+  assertExcludesDismissed(query);
+  assert.match(query.sql, /"prospects"\."suppressed_at" is null/);
 });

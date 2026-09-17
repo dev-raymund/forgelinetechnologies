@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
+import { and, between, desc, eq, inArray, isNull, ne, sql } from "drizzle-orm";
 import {
   getDb,
   prospectAudits,
@@ -10,7 +10,7 @@ import {
 import { saveAuditFailure } from "./audit.ts";
 import { isLostClaim } from "./queue.ts";
 import { refreshQualificationSnapshot } from "./qualification.ts";
-import { qualificationSnapshot, qualifyProspect } from "./qualify.ts";
+import { BANDS, qualificationSnapshot, qualifyProspect } from "./qualify.ts";
 import type { ParsedProspect } from "./csv.ts";
 
 export type UpsertSummary = {
@@ -156,20 +156,49 @@ export type ProspectFilter = {
   opportunity?: string;
   country?: string;
   industry?: string;
+  /** One of `DECISION_FILTERS`. Anything else hides dismissed prospects. */
+  decision?: string;
+  /** A `BandKey`. Anything else is ignored. */
+  band?: string;
 };
 
-export async function listProspects(filter: ProspectFilter = {}): Promise<Prospect[]> {
-  const clauses = [
+export const DECISION_FILTERS = ["undecided", "qualified", "dismissed"] as const;
+
+/**
+ * Dismissed prospects are hidden unless asked for by name: a dismissal is the
+ * reviewer saying "stop showing me this".
+ */
+function decisionClause(decision: string | undefined) {
+  switch (decision) {
+    case "qualified":
+    case "dismissed":
+      return eq(prospects.decision, decision);
+    case "undecided":
+      return eq(prospects.decision, "");
+    default:
+      return ne(prospects.decision, "dismissed");
+  }
+}
+
+export function prospectListWhere(filter: ProspectFilter) {
+  const band = BANDS.find((candidate) => candidate.key === filter.band);
+  return and(
     filter.status ? eq(prospects.status, filter.status) : undefined,
     filter.opportunity ? eq(prospects.primaryOpportunity, filter.opportunity) : undefined,
     filter.country ? eq(prospects.country, filter.country) : undefined,
     filter.industry ? eq(prospects.industry, filter.industry) : undefined,
-  ].filter((clause) => clause !== undefined);
+    decisionClause(filter.decision),
+    // Bands are read from the stored effective total, which is exactly what
+    // the list shows in its Score column.
+    band ? between(prospects.totalScore, band.min, band.max) : undefined,
+  );
+}
 
+export async function listProspects(filter: ProspectFilter = {}): Promise<Prospect[]> {
   return getDb()
     .select()
     .from(prospects)
-    .where(clauses.length ? and(...clauses) : undefined)
+    .where(prospectListWhere(filter))
     .orderBy(desc(prospects.totalScore), desc(prospects.id))
     .limit(200);
 }

@@ -182,6 +182,9 @@ export async function queueAllNew(): Promise<{ queued: number } | { error: strin
   const authorised = await authorise("prospecting.manage");
   if (!authorised.ok) return { error: authorised.error };
 
+  // `listProspects` hides dismissed prospects by default, and
+  // `enqueueProspects` refuses them again in SQL, so neither the list nor a
+  // stale id can queue one.
   const ids = (await listProspects({ status: "new" })).map((p) => p.id);
   const queued = await enqueueProspects(ids, authorised.user.id);
   await audit({

@@ -1,4 +1,4 @@
-import { and, asc, eq, inArray, isNull, lt, or } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, lt, ne, or } from "drizzle-orm";
 import { getDb, prospectAudits, prospects } from "../../db/index.ts";
 import { saveAuditRunning } from "./audit.ts";
 import { runAuditJob } from "./runner.ts";
@@ -8,7 +8,7 @@ import { refreshQualificationSnapshot } from "./qualification.ts";
 import type { DrainDependencies } from "./drain.ts";
 
 export type EnqueueDependencies = {
-  /** Prospects that may be queued: still at `new`, and not suppressed. */
+  /** Prospects that may be queued: still at `new`, not suppressed, not dismissed. */
   selectQueueable: (ids: number[]) => Promise<{ id: number; websiteUrl: string }[]>;
   /**
    * Moves prospects to `queued`, returning only the ids it actually changed.
@@ -21,25 +21,42 @@ export type EnqueueDependencies = {
   ) => Promise<void>;
 };
 
+/**
+ * What `enqueueProspects` may select: still at `new`, not suppressed, and not
+ * dismissed. Dismissal is enforced here and in `markQueuedWhere`, not just by
+ * hiding a button, so a direct call to the action cannot queue one either.
+ */
+export function queueableWhere(ids: number[]) {
+  return and(
+    inArray(prospects.id, ids),
+    eq(prospects.status, "new"),
+    isNull(prospects.suppressedAt),
+    ne(prospects.decision, "dismissed"),
+  );
+}
+
+/** The write-time guard: the opt-out and dismissal checks again, at the UPDATE. */
+export function markQueuedWhere(ids: number[]) {
+  return and(
+    inArray(prospects.id, ids),
+    isNull(prospects.suppressedAt),
+    ne(prospects.decision, "dismissed"),
+  );
+}
+
 export function productionEnqueueDependencies(): EnqueueDependencies {
   return {
     selectQueueable: async (ids) =>
       getDb()
         .select({ id: prospects.id, websiteUrl: prospects.websiteUrl })
         .from(prospects)
-        .where(
-          and(
-            inArray(prospects.id, ids),
-            eq(prospects.status, "new"),
-            isNull(prospects.suppressedAt),
-          ),
-        ),
+        .where(queueableWhere(ids)),
 
     markQueued: async (ids) => {
       const rows = await getDb()
         .update(prospects)
         .set({ status: "queued", updatedAt: new Date() })
-        .where(and(inArray(prospects.id, ids), isNull(prospects.suppressedAt)))
+        .where(markQueuedWhere(ids))
         .returning({ id: prospects.id });
       return rows.map((row) => row.id);
     },
@@ -66,6 +83,9 @@ export function productionEnqueueDependencies(): EnqueueDependencies {
  * audit row for the next drain to fetch. So the UPDATE carries the same
  * suppression guard and reports back the ids it really changed, and only those
  * ids get an audit row — a prospect suppressed mid-flight gets neither.
+ *
+ * A dismissed prospect is refused by the same two statements, for the same
+ * reason: a dismissal committing between the read and the write must win.
  */
 export async function enqueueProspects(
   ids: number[],
