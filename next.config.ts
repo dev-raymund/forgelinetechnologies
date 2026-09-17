@@ -38,28 +38,29 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
-  /* No `images.remotePatterns` yet, deliberately.
+  /* Uploaded media is served from exactly one Blob store: `ft-blob-public`
+     (store_oGAQjTOQEdAMuk2m). Only that store's host is allowed, and only under the
+     upload prefix.
 
-     A wildcard such as `*.public.blob.vercel-storage.com` turns /_next/image into
-     an anonymous open proxy: that endpoint is public, its `url` parameter is
-     whatever the caller sends, and the matcher checks only the hostname glob.
-     Anyone could make this domain fetch, resize and serve images from ANY
-     Vercel Blob store, against this project's image-optimisation usage.
+     Never widen this to a wildcard such as `*.public.blob.vercel-storage.com`.
+     /_next/image is a public endpoint whose `url` parameter is caller-supplied, and
+     the matcher checks only the hostname pattern, so a wildcard would let anyone
+     make this domain fetch, resize and serve images from ANY Vercel Blob store,
+     against this project's image-optimisation usage.
 
-     Only works render images through next/image; blog covers and the media
-     library use a plain <img>, which needs no entry here. So nothing breaks
-     without it today.
-
-     When the public Blob store exists, add exactly that store's host, lower-cased,
-     scoped to the upload prefix — BEFORE an uploaded image is chosen for a work:
-
-       images: {
-         remotePatterns: [
-           { protocol: "https", hostname: "<store-id>.public.blob.vercel-storage.com", pathname: "/media/**" },
-         ],
-       },
-
-     Without it, a work whose image is a Blob URL fails to render on its public page. */
+     Only works render images through next/image; blog covers and the media library
+     use a plain <img>. If the Blob store is ever replaced, update this host before
+     choosing an image from the new store for a work, or that work's page cannot
+     render it. */
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "ogaqjtoqedamuk2m.public.blob.vercel-storage.com",
+        pathname: "/media/**",
+      },
+    ],
+  },
 };
 
 export default nextConfig;
