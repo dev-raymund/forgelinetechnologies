@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { upload } from "@vercel/blob/client";
+import { uploadPresigned } from "@vercel/blob/client";
 import { deleteMedia } from "@/lib/media/actions";
 import {
   ALLOWED_UPLOAD_TYPES,
@@ -26,19 +26,32 @@ const field =
   "w-full rounded-sm border border-rule-strong bg-white px-3 py-2 text-[0.9375rem] focus:border-ink focus:outline-none";
 
 /**
- * `upload()` from `@vercel/blob/client` throws this exact string (double
- * space and all — it's the library's own typo) for *any* non-OK response to
- * the token request, so the route's actual reason — not authorised, file
- * name rejected, session expired — never reaches the admin. Matched
- * case-insensitively, with `\s+` standing in for the double space so a fix
- * upstream doesn't silently break this match.
+ * `@vercel/blob/client` replaces the upload route's actual reason — not
+ * authorised, file name rejected, session expired — with a fixed string for
+ * *any* non-OK response: "Failed to retrieve the presigned URL" from
+ * `uploadPresigned()`, and "Failed to  retrieve the client token" (double
+ * space, the library's own typo) from the older `upload()`. Both are matched,
+ * case-insensitively, with `\s+` for the spacing, so the message survives a
+ * fix upstream or a switch back.
  */
-const TOKEN_REQUEST_FAILED = /retrieve\s+the\s+client\s+token/i;
+const TOKEN_REQUEST_FAILED = /retrieve\s+the\s+(?:presigned\s+url|client\s+token)/i;
+
+/**
+ * The SDK also masks Blob's own rejections: whenever the Blob API answers
+ * `forbidden`, it throws this generic sentence and discards the real reason.
+ * In practice that has meant the project's Blob credentials pointing at a
+ * different store than the one it should use — the exact failure that led
+ * to switching uploads to OIDC — so say that instead of "provide a valid token".
+ */
+const BLOB_FORBIDDEN = /access\s+denied,\s+please\s+provide\s+a\s+valid\s+token/i;
 
 function uploadErrorMessage(error: unknown, filename: string): string {
   if (error instanceof Error) {
     if (TOKEN_REQUEST_FAILED.test(error.message)) {
       return "The upload was refused. Your session may have expired — sign in again — or the file was not accepted.";
+    }
+    if (BLOB_FORBIDDEN.test(error.message)) {
+      return "Blob storage refused this upload. The project's Blob credentials may point at a different or private store — see docs/environment.md.";
     }
     return error.message;
   }
@@ -136,7 +149,7 @@ export function MediaLibrary({
 
         try {
           const pathname = blobPathname(file.name);
-          await upload(pathname, file, {
+          await uploadPresigned(pathname, file, {
             access: "public",
             handleUploadUrl: "/api/media/upload",
             contentType: file.type,

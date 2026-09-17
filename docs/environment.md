@@ -12,7 +12,8 @@ Six variables. `.env.example` lists the names with no values; copy it to
 | `RESEND_API_KEY` | `src/lib/email.ts` | Runtime | Both emails skipped |
 | `CONTACT_EMAIL` | `src/lib/email.ts` | Runtime | Notification skipped |
 | `RESEND_FROM` | `src/lib/email.ts` | Runtime | Both emails skipped |
-| `BLOB_READ_WRITE_TOKEN` | `src/lib/media/library.ts` and the upload route (`src/app/api/media/upload/route.ts`) | Runtime | Uploads unavailable; committed assets still list |
+| `BLOB_STORE_ID` + `BLOB_WEBHOOK_PUBLIC_KEY` | `@vercel/blob` via OIDC, for listing, deleting and uploading media | Runtime | Uploads and uploaded media unavailable; committed assets still list |
+| `BLOB_READ_WRITE_TOKEN` | `@vercel/blob`, only as a fallback when no OIDC token is available (local development) | Runtime | Nothing on Vercel; locally, no Blob access without `vercel env pull` |
 
 ## DATABASE_URL
 
@@ -44,55 +45,54 @@ The guards are asymmetric and worth knowing:
 Setting the key without `CONTACT_EMAIL` gives the worst outcome: the prospect
 is confirmed while nobody is told the enquiry exists. Set them together.
 
-## BLOB_READ_WRITE_TOKEN
+## Vercel Blob: media uploads
 
-Read/write token for the Vercel Blob store, generated from the Blob store in
-the Vercel dashboard. `src/lib/media/library.ts` uses it to list uploaded
-media, and the upload route (`src/app/api/media/upload/route.ts`) uses it —
-via `@vercel/blob/client`'s `handleUpload` — to authorise and accept uploads.
+Uploaded images live in the Vercel Blob store **`ft-blob-public`**
+(`store_oGAQjTOQEdAMuk2m`), which is connected to this project through **OIDC**.
+Connecting it added `BLOB_STORE_ID` and `BLOB_WEBHOOK_PUBLIC_KEY` to Production and
+Preview, and Vercel supplies a short-lived OIDC token to every deployment at runtime.
 
-**The store must be created with Public access.** Access is chosen at
-creation, and Vercel documents no way to change it afterwards, so treat it as
-fixed. A private store still issues a token and still lists,
-so nothing looks wrong until the first upload, which fails with "Cannot use
-public access on a private store": the admin picker calls
-`upload(pathname, file, { access: "public", ... })`, and a private store
-refuses that access level outright. If a store already exists as private,
-create a new one with Public access and point `BLOB_READ_WRITE_TOKEN` at it —
-there is no in-place conversion.
+**How the SDK chooses credentials.** In `@vercel/blob` 2.8.0, every Blob API call
+resolves credentials in this order: an explicit token, then the OIDC token together
+with `BLOB_STORE_ID`, and only then `BLOB_READ_WRITE_TOKEN`. So on Vercel, OIDC wins
+even when a read-write token is also set.
 
-Set it locally in `.env`, and in Vercel's **Production** and **Preview**
-environments — not just Production, since Preview deployments exercise the
-admin too. Without it, `listMedia()` degrades: the images committed under
-`public/assets` still list, and the library reports that uploads are
-unavailable rather than failing silently.
+**Uploads use OIDC too.** The upload route (`src/app/api/media/upload/route.ts`) uses
+`handleUploadPresigned` and `issueSignedToken`, which go through the same resolver as
+`list` and `del`. The browser calls `uploadPresigned()` and sends the bytes straight to
+Blob, never through a server action (whose default body limit is 1 MB).
 
-Uploads go directly from the browser to Blob storage (`@vercel/blob/client`'s
-`upload()` against `handleUploadUrl: "/api/media/upload"`), not through a
-server action's request body. That is what lets an 8 MB image upload at all:
-a Next.js server action's default body limit is 1 MB, and the upload route
-only ever handles the small token-exchange and webhook requests, never the
-file bytes themselves.
+This replaced `handleUpload`, which signs upload tokens with `BLOB_READ_WRITE_TOKEN`
+**only**, with no OIDC fallback. A read-write token left over from an earlier private
+store therefore sent every upload to that store while the library listed
+`ft-blob-public`. Blob answered `forbidden`, which the SDK reports as the unhelpful
+"Access denied, please provide a valid token for this resource."
 
-Two things worth knowing that are easy to hit by accident:
+**The store must be created with Public access.** Access is chosen at creation, and
+Vercel documents no way to change it afterwards, so treat it as fixed. A private store
+still connects and still lists, so nothing looks wrong until the first upload.
 
-- In `@vercel/blob` 2.8.0, `list()` and `del()` prefer OIDC credentials when
-  running on Vercel and use `BLOB_STORE_ID` if it is set, while uploads
-  (`handleUpload`/`upload()`) always use `BLOB_READ_WRITE_TOKEN`. A stale
-  `BLOB_STORE_ID` left over from an earlier store can silently split reads
-  and writes across two different stores — uploads land in one, the library
-  lists another.
-- On a preview deployment behind Vercel's Deployment Protection, Vercel's own
-  upload-completed callback (`onUploadCompleted`, which writes the
-  `media.upload` audit entry) can itself be rejected by that protection. The
-  upload still succeeds; the audit entry may simply not appear there.
-- `next.config.ts` has no `images.remotePatterns` entry until a public store
-  exists, on purpose (a hostname wildcard would make `/_next/image` an open
-  proxy for every Vercel Blob store). Works render their image through
-  `next/image`, so when the public store is created, add that store's exact
-  lower-cased host with `pathname: "/media/**"` and redeploy **before**
-  choosing an uploaded image for a work — otherwise that work's public page
-  cannot render the image. Blog covers use a plain `<img>` and are unaffected.
+**`handleUploadPresigned` requires `BLOB_WEBHOOK_PUBLIC_KEY`.** It throws
+"Missing webhook public key" on every request without it, before authorisation even
+runs. It also uses that key to verify the Ed25519 signature on Vercel's
+upload-completed callback, which is what writes the `media.upload` audit entry.
+
+**Local development.** There is no OIDC token on a laptop by default. Run
+`vercel env pull .env.local` to get `VERCEL_OIDC_TOKEN` (valid for about 12 hours),
+`BLOB_STORE_ID` and `BLOB_WEBHOOK_PUBLIC_KEY`. Without them, local uploads fail and the
+library still lists the committed assets. Vercel cannot reach `localhost`, so the
+`media.upload` audit entry never appears locally.
+
+**Images on work pages.** Works render through `next/image`, so `next.config.ts`
+allows exactly `ogaqjtoqedamuk2m.public.blob.vercel-storage.com` under `/media/**`.
+Never widen it to a wildcard: `/_next/image` is public and its `url` parameter is
+caller-supplied, so a wildcard turns it into an open image proxy for every Vercel Blob
+store. If the store is ever replaced, update that host before choosing a new-store
+image for a work. Blog covers use a plain `<img>` and are unaffected.
+
+**Preview deployments.** Behind Vercel's Deployment Protection, the upload-completed
+callback can itself be rejected. The upload still succeeds; the audit entry may not
+appear there.
 
 ## Never set in production
 

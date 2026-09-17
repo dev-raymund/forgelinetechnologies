@@ -41,7 +41,7 @@ export async function listMedia(): Promise<{ items: MediaItem[]; blobError: stri
       return {
         items,
         blobError:
-          "This Blob store is private. Uploaded images will not load on the public site — create a store with Public access and update BLOB_READ_WRITE_TOKEN.",
+          "This Blob store is private. Uploaded images will not load on the public site — connect a store created with Public access (see docs/environment.md).",
       };
     }
 
@@ -51,8 +51,10 @@ export async function listMedia(): Promise<{ items: MediaItem[]; blobError: stri
     return {
       items: mergeMedia([], assets),
       blobError:
-        error instanceof Error && error.message.includes("BLOB_READ_WRITE_TOKEN")
-          ? "Uploads are unavailable: BLOB_READ_WRITE_TOKEN is not set in this environment."
+        // The SDK's "No blob credentials found" message names BLOB_READ_WRITE_TOKEN,
+        // but on Vercel the missing piece is the OIDC connection, so name neither.
+        error instanceof Error && error.message.includes("No blob credentials found")
+          ? "Uploads are unavailable: Blob storage is not configured in this environment (see docs/environment.md)."
           : "Uploads are unavailable right now. The assets committed to the repository are still listed.",
     };
   }
