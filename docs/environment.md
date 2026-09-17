@@ -1,6 +1,6 @@
 # Environment variables
 
-Six variables. `.env.example` lists the names with no values; copy it to
+`.env.example` lists every name with no values; copy it to
 `.env` locally and set the same names in the Vercel project for production.
 
 `.env` is gitignored. `.env.example` is committed.
