@@ -70,6 +70,8 @@ const TONES: Record<string, string> = {
   draft: "bg-black/[0.06] text-muted",
   archived: "bg-black/[0.06] text-muted",
   rejected: "bg-black/[0.06] text-muted",
+  qualified: "bg-ink text-on-ink",
+  dismissed: "bg-black/[0.06] text-muted",
 };
 
 export function Status({ value }: { value: string }) {

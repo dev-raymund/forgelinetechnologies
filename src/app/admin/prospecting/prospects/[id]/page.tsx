@@ -2,11 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { desc, eq } from "drizzle-orm";
 import { requireCapability } from "@/lib/auth/guard";
-import { getProspect } from "@/lib/prospecting/prospects";
+import { loadQualification } from "@/lib/prospecting/qualification";
 import { getDb, prospectAudits } from "@/db";
 import { withRetry } from "@/lib/queries";
 import { Empty, PageTitle, Status, when } from "@/components/admin/ui";
 import { SuppressControls } from "@/components/admin/prospecting/suppress-controls";
+import { QualificationPanel } from "@/components/admin/prospecting/qualification-panel";
 
 export const metadata = { title: "Prospect" };
 
@@ -36,8 +37,11 @@ export default async function ProspectDetailPage({
   await requireCapability("prospecting.manage", `/admin/prospecting/prospects/${raw}`);
   if (!Number.isSafeInteger(id) || id < 1) notFound();
 
-  const prospect = await withRetry(() => getProspect(id));
-  if (!prospect) notFound();
+  // The breakdown is recomputed on every view rather than read from the
+  // snapshot columns, so this page can never disagree with the evidence.
+  const loaded = await withRetry(() => loadQualification(id));
+  if (!loaded) notFound();
+  const { prospect, qualification } = loaded;
 
   const audits = await withRetry(() =>
     getDb()
@@ -104,11 +108,11 @@ export default async function ProspectDetailPage({
               </div>
               <div>
                 <dt className="font-mono text-micro text-faint">Score</dt>
-                <dd className="mt-1 text-graphite">{prospect.totalScore}/100</dd>
+                <dd className="mt-1 text-graphite">{qualification.effectiveTotal}/100</dd>
               </div>
               <div>
                 <dt className="font-mono text-micro text-faint">Primary opportunity</dt>
-                <dd className="mt-1 text-graphite">{prospect.primaryOpportunity || "—"}</dd>
+                <dd className="mt-1 text-graphite">{qualification.effectiveOpportunities.primary ?? "—"}</dd>
               </div>
               <div>
                 <dt className="font-mono text-micro text-faint">Last audited</dt>
@@ -187,6 +191,19 @@ export default async function ProspectDetailPage({
           </section>
         </div>
       </div>
+
+      <QualificationPanel
+        prospectId={prospect.id}
+        qualification={qualification}
+        override={prospect.opportunityOverride}
+        decision={{
+          decision: prospect.decision,
+          reason: prospect.decisionReason,
+          decidedBy: prospect.decidedBy,
+          decidedAt: prospect.decidedAt,
+        }}
+        suppressed={suppressed}
+      />
 
       <section className="mt-6">
         <h2 className="mb-3 text-[1.0625rem] font-semibold">
