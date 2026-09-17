@@ -84,3 +84,51 @@ test("analysis records response, crawler, resource, and mobile evidence when sup
     assert.ok(rules.has(rule), `expected ${rule}`);
   }
 });
+
+function indicatorsFor(body: string) {
+  return analyzePage({
+    pageUrl: "https://shop.example/",
+    finalUrl: "https://shop.example/",
+    status: 200,
+    headers: {},
+    body,
+    bytes: Buffer.byteLength(body),
+    elapsedMs: 10,
+  }).technologyIndicators;
+}
+
+test("WooCommerce is detected from its generator tag even after WordPress's", () => {
+  // WordPress prints its own generator first, so reading only the first
+  // generator tag would never see WooCommerce's.
+  const found = indicatorsFor(`<html><head>
+    <meta name="generator" content="WordPress 6.6">
+    <meta name="generator" content="WooCommerce 9.1.2">
+  </head><body></body></html>`);
+
+  assert.deepEqual(
+    found.find((indicator) => indicator.name === "WooCommerce"),
+    { name: "WooCommerce", signal: "generator:WooCommerce 9.1.2", confidence: "high" },
+  );
+});
+
+test("WooCommerce is detected from its plugin asset path", () => {
+  const found = indicatorsFor(`<html><head>
+    <meta name="generator" content="WordPress 6.6">
+    <link rel="stylesheet" href="https://shop.example/wp-content/plugins/woocommerce/assets/css/woocommerce.css">
+  </head><body></body></html>`);
+
+  assert.deepEqual(
+    found.find((indicator) => indicator.name === "WooCommerce"),
+    { name: "WooCommerce", signal: "asset-path:/wp-content/plugins/woocommerce/", confidence: "high" },
+  );
+});
+
+test("a plain WordPress site is not reported as WooCommerce", () => {
+  const found = indicatorsFor(`<html><head>
+    <meta name="generator" content="WordPress 6.6">
+    <script src="/wp-content/plugins/contact-form-7/includes/js/index.js"></script>
+  </head><body></body></html>`);
+
+  assert.ok(found.some((indicator) => indicator.name === "WordPress"));
+  assert.equal(found.some((indicator) => indicator.name === "WooCommerce"), false);
+});

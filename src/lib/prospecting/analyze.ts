@@ -138,6 +138,25 @@ export function technologyIndicators(
   if (lowerGenerator.includes("shopify")) {
     indicators.push({ name: "Shopify", signal: `generator:${generator}`, confidence: "high" });
   }
+  // WordPress prints its own generator tag first, so every generator tag is
+  // read here: `attr()` on the selection above returns only the first.
+  const wooGenerator = $("meta[name='generator']")
+    .map((_, element) => $(element).attr("content") ?? "")
+    .get()
+    .find((content) => content.toLowerCase().includes("woocommerce"));
+  const wooAsset =
+    $(
+      "script[src*='/wp-content/plugins/woocommerce/'], link[href*='/wp-content/plugins/woocommerce/']",
+    ).length > 0;
+  if (wooGenerator) {
+    indicators.push({ name: "WooCommerce", signal: `generator:${wooGenerator}`, confidence: "high" });
+  } else if (wooAsset) {
+    indicators.push({
+      name: "WooCommerce",
+      signal: "asset-path:/wp-content/plugins/woocommerce/",
+      confidence: "high",
+    });
+  }
   if (lowerServer.includes("vercel")) {
     indicators.push({ name: "Vercel", signal: `server:${headers.server}`, confidence: "medium" });
   }
