@@ -28,6 +28,9 @@ export type AuditAction =
   | "prospecting.audit.rerun"
   | "prospect.import" | "prospect.queue" | "prospect.suppress"
   | "prospect.unsuppress"
+  | "prospect.qualify" | "prospect.dismiss" | "prospect.decision.clear"
+  | "prospect.score.adjust" | "prospect.score.clear"
+  | "prospect.opportunity.set" | "prospect.opportunity.clear"
   | "media.upload" | "media.delete";
 
 export async function clientIp(): Promise<string> {

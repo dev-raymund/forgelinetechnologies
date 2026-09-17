@@ -9,6 +9,7 @@ import {
   jsonb,
   index,
 } from "drizzle-orm/pg-core";
+import type { OpportunityOverride, ScoreAdjustments } from "../lib/prospecting/types.ts";
 
 /**
  * Admin accounts.
@@ -366,12 +367,18 @@ export type ProspectSource = {
  * never create a second row for the same business, which is what stops anyone
  * being worked or contacted twice.
  *
- * `totalScore` and `primaryOpportunity` are denormalized snapshots of the
- * latest audit, kept so the list can sort and filter in SQL. Nothing yet
- * recomputes them: the prospect pages render these columns, and the audit
- * report is where a score can be read back against the findings that produced
- * it. Recomputing a prospect's score from `audit_findings` is deferred to
- * Phase 3 (Prospect Qualification), which rebuilds this surface anyway.
+ * `totalScore` and `primaryOpportunity` are denormalized snapshots so the list
+ * can sort and filter in SQL. They hold the effective qualification — the
+ * latest usable audit's findings, business fit, contact, and any reviewer
+ * adjustment or override — and `refreshQualificationSnapshot` rewrites them on
+ * every path that can change one. The detail page never reads them for the
+ * breakdown: it recomputes.
+ *
+ * `decision` is the reviewer's judgement and has its own columns, never a
+ * value of `status`. The drain writes `status` after every audit, and Phase
+ * 2's worst defect was a pipeline write overwriting a human decision held
+ * there. Suppression stays separate too: it is the business's opt-out, while
+ * dismissal is ForgeLine's judgement.
  */
 export const prospects = pgTable(
   "prospects",
@@ -393,6 +400,13 @@ export const prospects = pgTable(
     lastAuditedAt: timestamp("last_audited_at", { withTimezone: true }),
     totalScore: integer("total_score").notNull().default(0),
     primaryOpportunity: varchar("primary_opportunity", { length: 32 }).notNull().default(""),
+    scoreAdjustments: jsonb("score_adjustments").$type<ScoreAdjustments>().notNull().default({}),
+    opportunityOverride: jsonb("opportunity_override").$type<OpportunityOverride>(),
+    /** `""` (undecided), `qualified` or `dismissed`. */
+    decision: varchar("decision", { length: 16 }).notNull().default(""),
+    decisionReason: text("decision_reason").notNull().default(""),
+    decidedBy: integer("decided_by").references(() => users.id, { onDelete: "set null" }),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
     createdBy: integer("created_by").references(() => users.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
@@ -402,6 +416,7 @@ export const prospects = pgTable(
     index("prospects_score_idx").on(t.totalScore),
     index("prospects_country_idx").on(t.country),
     index("prospects_industry_idx").on(t.industry),
+    index("prospects_decision_idx").on(t.decision),
   ],
 );
 
