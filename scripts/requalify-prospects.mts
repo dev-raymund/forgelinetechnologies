@@ -9,7 +9,11 @@
  * else rewrites a row that no audit, adjustment or import has touched since.
  */
 import { asc } from "drizzle-orm";
-import { getDb, prospects } from "../src/db/index.ts";
+// `prospects` comes from `schema.ts` rather than the `db/index.ts` barrel:
+// the CLI loader does not follow that file's `export *`, which is why
+// `create-admin.mts` imports its table the same way.
+import { getDb } from "../src/db/index.ts";
+import { prospects } from "../src/db/schema.ts";
 import { refreshQualificationSnapshot } from "../src/lib/prospecting/qualification.ts";
 import { describeError, withRetry } from "../src/lib/retry.ts";
 
