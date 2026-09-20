@@ -1,7 +1,16 @@
 import { assertSafeUrl, type HostResolver } from "./url-safety.ts";
 
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
-const DEFAULT_MAX_BYTES = 1_000_000;
+/**
+ * A real homepage can be far heavier than it looks: one audited site carries
+ * 1.8MB of HTML, 1.36MB of it inside `<head>`. Truncating at a smaller cap
+ * and analysing what arrived would be worse than refusing — the body would be
+ * missing, and every absence check ("no primary CTA", "no image alt text")
+ * would report a finding about content that was never read. The cap is high
+ * enough to read pages like that whole, and `analyzePage` scores the weight
+ * itself through `oversized-html`.
+ */
+const DEFAULT_MAX_BYTES = 3_000_000;
 const DEFAULT_MAX_REDIRECTS = 5;
 const DEFAULT_TIMEOUT_MS = 10_000;
 

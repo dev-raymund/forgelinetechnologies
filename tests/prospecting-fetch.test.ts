@@ -92,3 +92,43 @@ test("aborts a fetch that exceeds the timeout", async () => {
     /timeout|abort/i,
   );
 });
+
+/**
+ * The default cap, exercised without overriding `maxBytes`. A real audited
+ * homepage carries 1.8MB of HTML — 1.36MB of it inside `<head>` — so a cap
+ * that refused it made the site unauditable rather than merely heavy, and
+ * `analyzePage` never got to score the weight through `oversized-html`.
+ */
+function defaultCapOptions(fetchImpl: NonNullable<FetchOptions["fetchImpl"]>): FetchOptions {
+  return { fetchImpl, resolveHost: publicResolver, timeoutMs: 1_000, maxRedirects: 2 };
+}
+
+function htmlOf(bytes: number): string {
+  return `<html><body>${"x".repeat(bytes - 26)}</body></html>`;
+}
+
+function htmlResponse(body: string): Response {
+  return new Response(body, { status: 200, headers: { "content-type": "text/html" } });
+}
+
+test("a heavy but realistic page is read whole under the default cap", async () => {
+  const body = htmlOf(1_800_000);
+  const result = await fetchBoundedPage(
+    "https://example.com/",
+    defaultCapOptions(async () => htmlResponse(body)),
+  );
+
+  assert.equal(result.bytes, 1_800_000);
+  assert.equal(result.body.length, 1_800_000);
+});
+
+test("the default cap still refuses a response past it", async () => {
+  const body = htmlOf(3_500_000);
+  await assert.rejects(
+    fetchBoundedPage(
+      "https://example.com/",
+      defaultCapOptions(async () => htmlResponse(body)),
+    ),
+    /exceeds the 3000000-byte limit/,
+  );
+});

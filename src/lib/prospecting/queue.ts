@@ -4,7 +4,7 @@ import { saveAuditRunning } from "./audit.ts";
 import { runAuditJob } from "./runner.ts";
 import { auditJobDependencies } from "./run.ts";
 import { withRetry } from "../retry.ts";
-import { refreshQualificationSnapshot } from "./qualification.ts";
+import { recordAuditOutcome } from "./outcome.ts";
 import type { DrainDependencies } from "./drain.ts";
 
 export type EnqueueDependencies = {
@@ -153,19 +153,6 @@ const STALE_CLAIM_MS = 15 * 60 * 1000;
  * touches the decision or reviewer-adjustment columns renders the same
  * object `applyResult` uses rather than a restatement of it.
  */
-export function applyResultSet(
-  lifecycle: Record<string, unknown>,
-  auditId: number,
-  now: Date = new Date(),
-) {
-  return {
-    ...lifecycle,
-    lastAuditId: auditId,
-    lastAuditedAt: now,
-    updatedAt: now,
-  };
-}
-
 export function productionDrainDependencies(): DrainDependencies {
   return {
     listQueuedAuditIds: async (limit) => {
@@ -244,52 +231,9 @@ export function productionDrainDependencies(): DrainDependencies {
     runAudit: (input) =>
       runAuditJob(input, { ...auditJobDependencies(), markRunning: async () => undefined }),
 
-    applyResult: async ({ prospectId, auditId, result }) => {
-      if (prospectId === null) return;
-
-      const [prospect] = await withRetry(() =>
-        getDb()
-          .select({ suppressedAt: prospects.suppressedAt })
-          .from(prospects)
-          .where(eq(prospects.id, prospectId))
-          .limit(1),
-      );
-      if (!prospect) return;
-
-      // A failed audit returns the prospect to `new` so it can be queued again,
-      // while still pointing at the failed run so the error is readable.
-      //
-      // A suppressed prospect keeps its status. Writing `audited` here would
-      // hide the opt-out from the list, and writing `new` after a failure would
-      // hand the prospect straight back to "Queue all new" and have it audited
-      // again, forever. The audit links are still written so the run that was
-      // already in flight stays traceable.
-      const lifecycle =
-        prospect.suppressedAt === null
-          ? { status: result.status === "failed" ? "new" : "audited" }
-          : {};
-
-      await getDb()
-        .update(prospects)
-        .set(applyResultSet(lifecycle, auditId))
-        .where(eq(prospects.id, prospectId));
-
-      // The score and opportunity are recomputed rather than copied from this
-      // result. After a failed run, an earlier completed audit is still the
-      // evidence, and business fit, contact and reviewer adjustments belong in
-      // the total too.
-      //
-      // The snapshot is derived data, and the audit is already saved above. A
-      // transient failure here must not abort the rest of the batch: retry
-      // it, then log and move on, the way `upsertProspects` already does for
-      // this same call. `prospecting:requalify` rebuilds anything that
-      // slipped through.
-      try {
-        await withRetry(() => refreshQualificationSnapshot(prospectId));
-      } catch (error) {
-        console.error("[prospecting] snapshot refresh after audit failed", prospectId, error);
-      }
-    },
+    // Both audit paths record their outcome the same way. See `outcome.ts`.
+    applyResult: ({ prospectId, auditId, result }) =>
+      recordAuditOutcome({ prospectId, auditId, status: result.status }),
 
     now: () => Date.now(),
     delay: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),

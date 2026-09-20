@@ -1,8 +1,7 @@
 import { fetchBoundedPage } from "./fetch.ts";
 import { getAuditSummary, saveAuditFailure, saveAuditResult, saveAuditRunning } from "./audit.ts";
-import { runAuditJob, type AuditJobDependencies } from "./runner.ts";
-import { refreshQualificationSnapshot } from "./qualification.ts";
-import { withRetry } from "../retry.ts";
+import { runAuditJob, type AuditJobDependencies, type AuditJobResult } from "./runner.ts";
+import { recordAuditOutcome } from "./outcome.ts";
 
 /**
  * robots.txt and sitemap.xml are not HTML, so the supporting fetches accept the
@@ -39,29 +38,33 @@ export async function runAuditInBackground(input: {
   auditId: number;
   requestedUrl: string;
 }): Promise<void> {
+  let result: AuditJobResult | undefined;
   try {
-    await runAuditJob(input, auditJobDependencies());
+    result = await runAuditJob(input, auditJobDependencies());
   } catch (error) {
     console.error(`Prospecting audit ${input.auditId} could not be recorded.`, error);
   }
+  // Nothing was recorded on the row, so there is no outcome to apply either.
+  if (!result) return;
 
   // This inline path — `requestAudit` and `rerunAudit`, both routed through
-  // `startAudit` — never goes through the drain, so nothing else refreshes
-  // the list's snapshot for a prospect-linked audit here. Without this, the
-  // detail page (which always recomputes) and the list (which reads the
-  // snapshot) visibly disagree after a re-run. Retried, then caught: a
-  // transient failure here must never fail the audit itself, which is
-  // already saved.
+  // `startAudit` — never goes through the drain, so this is where a
+  // prospect-linked audit records its outcome. Without it a re-run left the
+  // prospect at `queued`, pointing at the superseded run, with a stale list
+  // snapshot the recomputing detail page visibly disagreed with.
+  //
+  // Caught, never thrown: the audit itself is already saved, and this runs
+  // after the response has been sent.
   try {
     const summary = await getAuditSummary(input.auditId);
-    if (summary && summary.prospectId !== null) {
-      const prospectId = summary.prospectId;
-      await withRetry(() => refreshQualificationSnapshot(prospectId));
+    if (summary) {
+      await recordAuditOutcome({
+        prospectId: summary.prospectId,
+        auditId: input.auditId,
+        status: result.status,
+      });
     }
   } catch (error) {
-    console.error(
-      `[prospecting] snapshot refresh after audit ${input.auditId} failed`,
-      error,
-    );
+    console.error(`[prospecting] recording audit ${input.auditId} against its prospect failed`, error);
   }
 }

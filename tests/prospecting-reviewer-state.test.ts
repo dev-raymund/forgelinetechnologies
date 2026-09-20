@@ -5,7 +5,7 @@ import { PgDialect } from "drizzle-orm/pg-core";
 import type { UpdateSet } from "drizzle-orm/utils";
 import { prospects } from "../src/db/index.ts";
 import { upsertConflictSet } from "../src/lib/prospecting/prospects.ts";
-import { applyResultSet } from "../src/lib/prospecting/queue.ts";
+import { applyResultSet } from "../src/lib/prospecting/outcome.ts";
 
 /**
  * The branch's central safety claim: a pipeline write cannot touch reviewer
