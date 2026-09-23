@@ -14,8 +14,6 @@
     "db:generate": "node --env-file=.env ./node_modules/drizzle-kit/bin.cjs generate",
     "admin:create": "node --env-file=.env ./node_modules/tsx/dist/cli.mjs scripts/create-admin.mts",
     "seed:works": "node --env-file=.env ./node_modules/tsx/dist/cli.mjs scripts/seed-works.mts",
-    "prospecting:drain": "node --env-file=.env ./node_modules/tsx/dist/cli.mjs scripts/drain-prospecting.mts",
-    "prospecting:requalify": "node --env-file=.env ./node_modules/tsx/dist/cli.mjs scripts/requalify-prospects.mts",
     "media:manifest": "node ./node_modules/tsx/dist/cli.mjs scripts/build-media-manifest.mts"
   },
   "dependencies": {

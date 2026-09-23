@@ -1,5 +1,12 @@
 # Forgeline Prospecting Engine
 
+> **Historical.** This describes the prospecting engine as it was before the
+> simplification, including the 100-point qualification model, score bands,
+> the bulk CSV import and the audit queue — none of which still exist. It is
+> kept for the reasoning behind those decisions and why they were reversed.
+> For how prospecting works now, see
+> [`prospecting-architecture.md`](prospecting-architecture.md).
+
 ## Objective
 
 Create an internal, evidence-led system that supports this flow:

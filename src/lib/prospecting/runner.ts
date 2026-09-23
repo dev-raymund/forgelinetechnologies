@@ -1,9 +1,13 @@
 import { analyzePage, collectAuditLinks, type PageAnalysis, type ResourceCheck } from "./analyze.ts";
 import { fetchBoundedPage, type BoundedPageResponse } from "./fetch.ts";
-import { scoreReport } from "./score.ts";
-import type { AuditFinding, AuditScore } from "./types.ts";
+import { failedQuickScan, toQuickScanResult, type QuickScanResult } from "./quick-scan.ts";
+import type { AuditFinding, AuditMode } from "./types.ts";
 
-export type AuditJobInput = { auditId: number; requestedUrl: string };
+/**
+ * `mode` defaults to `full`, so every existing caller keeps the deeper audit
+ * it already had without naming it.
+ */
+export type AuditJobInput = { auditId: number; requestedUrl: string; mode?: AuditMode };
 
 export type AuditResultToPersist = {
   id: number;
@@ -13,8 +17,6 @@ export type AuditResultToPersist = {
   https: boolean;
   redirectChain: string[];
   report: Record<string, unknown>;
-  scores: Record<string, number>;
-  totalScore: number;
   findings: AuditFinding[];
 };
 
@@ -38,8 +40,17 @@ export type AuditJobDependencies = {
   saveFailure: (id: number, detail: string) => Promise<unknown>;
 };
 
-export type AuditJobSuccess = { status: "completed" | "partial"; analysis: PageAnalysis; score: AuditScore };
-export type AuditJobFailure = { status: "failed"; error: string };
+/**
+ * `scan` is on both outcomes and in both modes: it is a projection of the same
+ * analysis, so a consumer reads one shape and never branches on the mode.
+ * `analysis` carries the fuller detail the stored report page renders.
+ */
+export type AuditJobSuccess = {
+  status: "completed" | "partial";
+  analysis: PageAnalysis;
+  scan: QuickScanResult;
+};
+export type AuditJobFailure = { status: "failed"; error: string; scan: QuickScanResult };
 export type AuditJobResult = AuditJobSuccess | AuditJobFailure;
 
 function errorDetail(error: unknown): string {
@@ -117,7 +128,12 @@ export function prepareAuditResult(input: {
   auditId: number;
   page: BoundedPageResponse;
   support?: AuditSupport;
-}): { analysis: PageAnalysis; score: AuditScore; persistence: AuditResultToPersist } {
+  mode?: AuditMode;
+}): {
+  analysis: PageAnalysis;
+  scan: QuickScanResult;
+  persistence: AuditResultToPersist;
+} {
   const { page } = input;
   const support = input.support ?? { linkChecks: [] };
   const partialChecks = [
@@ -140,15 +156,12 @@ export function prepareAuditResult(input: {
   });
   const allFindings = [...analysis.findings, ...linkFindings(page.finalUrl, support.linkChecks)];
   const completeAnalysis = { ...analysis, findings: allFindings };
-  const score = scoreReport({
-    findings: allFindings,
-    businessFit: { status: "not_assessed", points: 0 },
-    decisionMakerAvailability: { status: "not_assessed", points: 0 },
-  });
 
   return {
     analysis: completeAnalysis,
-    score,
+    // Projected from the analysis with every finding the mode gathered, so a
+    // full audit's scan carries its link findings too.
+    scan: toQuickScanResult(page, completeAnalysis),
     persistence: {
       id: input.auditId,
       status,
@@ -157,24 +170,15 @@ export function prepareAuditResult(input: {
       https: page.finalUrl.startsWith("https:"),
       redirectChain: page.redirectChain,
       report: {
-        auditVersion: "phase1-v1",
+        auditVersion: input.mode === "quick" ? "quick-v1" : "phase1-v1",
+        mode: input.mode ?? "full",
         requestedUrl: page.requestedUrl,
         performance: analysis.performance,
         technologyIndicators: analysis.technologyIndicators,
         links: analysis.links,
         linkChecks: support.linkChecks,
         partialChecks,
-        primaryOpportunity: score.primaryOpportunity,
       },
-      scores: {
-        websiteUx: score.websiteUx,
-        seo: score.seo,
-        technical: score.technical,
-        conversion: score.conversion,
-        businessFit: score.businessFit,
-        decisionMakerAvailability: score.decisionMakerAvailability,
-      },
-      totalScore: score.total,
       findings: allFindings,
     },
   };
@@ -193,16 +197,25 @@ export async function runAuditJob(
 
   try {
     const page = await dependencies.fetchPage(input.requestedUrl);
-    const support = dependencies.fetchResource
-      ? await collectAuditSupport(page, dependencies.fetchResource)
-      : undefined;
-    const prepared = prepareAuditResult({ auditId: input.auditId, page, support });
+    // The single branch between the two modes. Quick mode makes no request
+    // beyond the primary page, and is decided by the mode alone — never by
+    // whether a `fetchResource` dependency happens to have been supplied,
+    // which the production wiring always does.
+    const support =
+      input.mode !== "quick" && dependencies.fetchResource
+        ? await collectAuditSupport(page, dependencies.fetchResource)
+        : undefined;
+    const prepared = prepareAuditResult({ auditId: input.auditId, page, support, mode: input.mode });
     await dependencies.saveResult(prepared.persistence);
 
-    return { status: prepared.persistence.status, analysis: prepared.analysis, score: prepared.score };
+    return {
+      status: prepared.persistence.status,
+      analysis: prepared.analysis,
+      scan: prepared.scan,
+    };
   } catch (error) {
     const detail = errorDetail(error);
     await dependencies.saveFailure(input.auditId, detail);
-    return { status: "failed", error: detail };
+    return { status: "failed", error: detail, scan: failedQuickScan(input.requestedUrl, detail) };
   }
 }

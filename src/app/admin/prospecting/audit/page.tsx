@@ -1,21 +1,25 @@
 import { requireCapability } from "@/lib/auth/guard";
 import { PageTitle } from "@/components/admin/ui";
-import { AuditForm } from "@/components/admin/prospecting/audit-form";
+import { ScanPanel } from "@/components/admin/prospecting/scan-panel";
 
-export const metadata = { title: "Prospecting audit" };
+export const metadata = { title: "New prospect" };
 
 /**
- * The audit runs in this invocation via `after`, once the response is sent.
- * Its bounded fetches cap out near 30 seconds, so 60 leaves clear headroom.
+ * `analyzeWebsite`, the server action this page's form calls, runs the quick
+ * scan inline: one bounded fetch with a ten second timeout. 60 leaves clear
+ * headroom, matching the other prospecting pages.
  */
 export const maxDuration = 60;
 
-export default async function ProspectingAuditPage() {
+export default async function ProspectingScanPage() {
   await requireCapability("prospecting.manage", "/admin/prospecting/audit");
   return (
     <>
-      <PageTitle title="Prospecting audit" count="Manual, evidence-led review of one public URL" />
-      <AuditForm />
+      <PageTitle
+        title="New prospect"
+        count="Read one homepage, and see whether there is a reason to make contact"
+      />
+      <ScanPanel />
     </>
   );
 }

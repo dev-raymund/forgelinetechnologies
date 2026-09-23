@@ -38,10 +38,48 @@ export type TechnologyIndicator = {
   confidence: Confidence;
 };
 
+/**
+ * What the page actually declared. `null` and `false` mean "not present on the
+ * page", never "not checked" — every field here is read from the one HTML
+ * response, so absence is always an observation.
+ *
+ * `robotsMeta` and `sitemapLink` are the `<meta name="robots">` tag and the
+ * `<link rel="sitemap">` element. They are NOT `/robots.txt` and
+ * `/sitemap.xml`, which cost a request each and are only fetched by a full
+ * audit — naming them apart keeps a rule from reading "no sitemap link" as
+ * "no sitemap".
+ */
+export type PageObservations = {
+  title: string | null;
+  metaDescription: string | null;
+  h1: string | null;
+  canonical: string | null;
+  viewport: boolean;
+  robotsMeta: boolean;
+  sitemapLink: boolean;
+  /** At least one `application/ld+json` block that parses. */
+  jsonLd: boolean;
+};
+
+/** Counted facts about the page. Plain totals, with nothing inferred from them. */
+export type PageSignals = {
+  forms: number;
+  ctas: number;
+  images: number;
+  imagesWithoutAlt: number;
+  scripts: number;
+  stylesheets: number;
+  htmlBytes: number;
+  /** A storefront platform was detected by name. */
+  ecommerce: boolean;
+};
+
 export type PageAnalysis = {
   findings: AuditFinding[];
   links: DiscoveredLink[];
   technologyIndicators: TechnologyIndicator[];
+  observations: PageObservations;
+  signals: PageSignals;
   performance: {
     status: number;
     responseTimeMs: number;
@@ -80,10 +118,22 @@ function headersLowercase(headers: Record<string, string>): Record<string, strin
   return Object.fromEntries(Object.entries(headers).map(([key, value]) => [key.toLowerCase(), value]));
 }
 
-function hasPrimaryCta($: CheerioAPI): boolean {
+const CTA_TEXT = /get started|contact|book|learn|start|quote|call|buy|shop/i;
+
+/** Platforms whose presence is a storefront, by name from `technologyIndicators`. */
+const ECOMMERCE_PLATFORMS = new Set(["Shopify", "WooCommerce"]);
+
+/**
+ * Elements whose own text reads as a next step.
+ *
+ * Counted rather than merely detected, so a scan can report how many were
+ * seen. The `missing-primary-cta` finding is this count being zero, so the
+ * number and the finding can never disagree about the same page.
+ */
+function countCtas($: CheerioAPI): number {
   return $("a, button, input[type='submit']")
     .toArray()
-    .some((element) => /get started|contact|book|learn|start|quote|call|buy|shop/i.test($(element).text().trim()));
+    .filter((element) => CTA_TEXT.test($(element).text().trim())).length;
 }
 
 function canonicalUrl(pageUrl: string, raw: string): string | null {
@@ -181,6 +231,12 @@ export function analyzePage(input: PageAnalysisInput): PageAnalysis {
   const stylesheets = $("link[rel~='stylesheet']").length;
   const scripts = $("script").length;
   const images = $("img").length;
+  const forms = $("form").length;
+  const ctas = countCtas($);
+  const sitemapLink = $("link[rel='sitemap']").length > 0;
+  const h1 = $("h1").first().text().trim();
+  let imagesWithoutAlt = 0;
+  let validJsonLd = false;
 
   if (!title) {
     findings.push(finding(input.finalUrl, "missing-title", "seo", "high", {}, "Add a unique, descriptive page title."));
@@ -260,6 +316,7 @@ export function analyzePage(input: PageAnalysisInput): PageAnalysis {
     const raw = $(element).text().trim();
     try {
       JSON.parse(raw);
+      validJsonLd = true;
     } catch {
       findings.push(
         finding(
@@ -278,6 +335,7 @@ export function analyzePage(input: PageAnalysisInput): PageAnalysis {
 
   $("img").each((index, element) => {
     if ($(element).attr("alt") === undefined) {
+      imagesWithoutAlt += 1;
       findings.push(
         finding(
           input.finalUrl,
@@ -329,7 +387,7 @@ export function analyzePage(input: PageAnalysisInput): PageAnalysis {
     }
   });
 
-  if (!hasPrimaryCta($)) {
+  if (ctas === 0) {
     findings.push(
       finding(
         input.finalUrl,
@@ -348,6 +406,26 @@ export function analyzePage(input: PageAnalysisInput): PageAnalysis {
     findings,
     links,
     technologyIndicators: indicators,
+    observations: {
+      title: title || null,
+      metaDescription: metaDescription || null,
+      h1: h1 || null,
+      canonical: canonical || null,
+      viewport: Boolean(viewport),
+      robotsMeta: Boolean(robots),
+      sitemapLink,
+      jsonLd: validJsonLd,
+    },
+    signals: {
+      forms,
+      ctas,
+      images,
+      imagesWithoutAlt,
+      scripts,
+      stylesheets,
+      htmlBytes: input.bytes,
+      ecommerce: indicators.some((indicator) => ECOMMERCE_PLATFORMS.has(indicator.name)),
+    },
     performance: {
       status: input.status,
       responseTimeMs: input.elapsedMs,

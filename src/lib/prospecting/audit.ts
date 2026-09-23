@@ -116,8 +116,6 @@ export async function saveAuditResult(input: {
   https: boolean;
   redirectChain: string[];
   report: Record<string, unknown>;
-  scores: Record<string, number>;
-  totalScore: number;
   findings: ObservedFinding[];
 }) {
   const row = await transitionAudit(input.id, input.status, {
@@ -126,8 +124,6 @@ export async function saveAuditResult(input: {
     https: input.https,
     redirectChain: input.redirectChain,
     report: input.report,
-    scores: input.scores,
-    totalScore: input.totalScore,
     completedAt: new Date(),
     errorDetail: "",
   });

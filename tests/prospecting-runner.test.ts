@@ -14,7 +14,7 @@ const page = {
   redirectChain: [],
 };
 
-test("runAuditJob persists observed findings and leaves unassessed fit at zero", async () => {
+test("runAuditJob persists observed findings and no score at all", async () => {
   const calls: string[] = [];
   let saved: Record<string, unknown> | undefined;
   const result = await runAuditJob(
@@ -32,9 +32,10 @@ test("runAuditJob persists observed findings and leaves unassessed fit at zero",
 
   assert.equal(result.status, "completed");
   assert.deepEqual(calls, ["running:7", "result:7"]);
-  assert.equal((saved?.scores as { businessFit: number }).businessFit, 0);
-  assert.equal((saved?.scores as { decisionMakerAvailability: number }).decisionMakerAvailability, 0);
   assert.ok(Array.isArray(saved?.findings));
+  // The audit records observations. It no longer produces points of any kind.
+  assert.equal("scores" in (saved ?? {}), false);
+  assert.equal("totalScore" in (saved ?? {}), false);
 });
 
 test("runAuditJob records a bounded failure and does not emit a partial report", async () => {

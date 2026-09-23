@@ -9,7 +9,11 @@ import {
   jsonb,
   index,
 } from "drizzle-orm/pg-core";
-import type { OpportunityOverride, ScoreAdjustments } from "../lib/prospecting/types.ts";
+import type {
+  ForgelineService,
+  Opportunity,
+  ProspectStatus,
+} from "../lib/prospecting/types.ts";
 
 /**
  * Admin accounts.
@@ -313,8 +317,6 @@ export const prospectAudits = pgTable(
     https: boolean("https").notNull().default(false),
     redirectChain: jsonb("redirect_chain").$type<string[]>().notNull().default([]),
     report: jsonb("report").$type<Record<string, unknown>>().notNull().default({}),
-    scores: jsonb("scores").$type<Record<string, number>>().notNull().default({}),
-    totalScore: integer("total_score").notNull().default(0),
     errorDetail: text("error_detail").notNull().default(""),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
@@ -367,18 +369,22 @@ export type ProspectSource = {
  * never create a second row for the same business, which is what stops anyone
  * being worked or contacted twice.
  *
- * `totalScore` and `primaryOpportunity` are denormalized snapshots so the list
- * can sort and filter in SQL. They hold the effective qualification — the
- * latest usable audit's findings, business fit, contact, and any reviewer
- * adjustment or override — and `refreshQualificationSnapshot` rewrites them on
- * every path that can change one. The detail page never reads them for the
- * breakdown: it recomputes.
+ * The simplified model (Phase 1) is one opportunity, one service, one reason
+ * and one status. `opportunity` is what the deterministic rules decided or a
+ * person chose; `service` is the single ForgeLine service that follows from
+ * it; `opportunity_reason` is the evidence-based sentence a human reads and
+ * the outreach email quotes.
  *
- * `decision` is the reviewer's judgement and has its own columns, never a
- * value of `status`. The drain writes `status` after every audit, and Phase
- * 2's worst defect was a pipeline write overwriting a human decision held
- * there. Suppression stays separate too: it is the business's opt-out, while
- * dismissal is ForgeLine's judgement.
+ * `status` is the outreach lifecycle and belongs to the person working the
+ * prospect. Nothing in the pipeline writes it — that separation is the whole
+ * lesson of Phase 2, whose worst defect was a pipeline write overwriting human
+ * state.
+ *
+ * Suppression stays its own pair of columns and is never folded into `status`:
+ * "Not a Fit" is ForgeLine's judgement, while `suppressed_at` is the business
+ * asking not to be contacted. They are different facts with different
+ * obligations, and the opt-out is enforced in SQL rather than in application
+ * logic.
  */
 export const prospects = pgTable(
   "prospects",
@@ -390,33 +396,41 @@ export const prospects = pgTable(
     industry: varchar("industry", { length: 80 }).notNull().default(""),
     country: varchar("country", { length: 2 }).notNull().default(""),
     location: text("location").notNull().default(""),
-    contactChannel: text("contact_channel").notNull().default(""),
-    contactProvenance: text("contact_provenance").notNull().default(""),
+    /**
+     * A role or company address, never a named individual's.
+     * `classifyContact` is the gate on every write; see `contact.ts` for why.
+     */
+    contactEmail: varchar("contact_email", { length: 255 }).notNull().default(""),
+    contactPhone: varchar("contact_phone", { length: 40 }).notNull().default(""),
     sources: jsonb("sources").$type<ProspectSource[]>().notNull().default([]),
-    status: varchar("status", { length: 16 }).notNull().default("new"),
+    /* The outreach lifecycle. Typed now that the Phase 2 and 3 pipeline
+       writers are gone, so the retired vocabulary cannot be written at all. */
+    status: varchar("status", { length: 24 })
+      .$type<ProspectStatus>()
+      .notNull()
+      .default("To Contact"),
     suppressedAt: timestamp("suppressed_at", { withTimezone: true }),
     suppressionReason: text("suppression_reason").notNull().default(""),
     lastAuditId: integer("last_audit_id"),
     lastAuditedAt: timestamp("last_audited_at", { withTimezone: true }),
-    totalScore: integer("total_score").notNull().default(0),
-    primaryOpportunity: varchar("primary_opportunity", { length: 32 }).notNull().default(""),
-    scoreAdjustments: jsonb("score_adjustments").$type<ScoreAdjustments>().notNull().default({}),
-    opportunityOverride: jsonb("opportunity_override").$type<OpportunityOverride>(),
-    /** `""` (undecided), `qualified` or `dismissed`. */
-    decision: varchar("decision", { length: 16 }).notNull().default(""),
-    decisionReason: text("decision_reason").notNull().default(""),
-    decidedBy: integer("decided_by").references(() => users.id, { onDelete: "set null" }),
-    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    /** `""` until the first scan classifies it. */
+    opportunity: varchar("opportunity", { length: 32 }).$type<Opportunity | "">().notNull().default(""),
+    /** Derived from `opportunity` through `SERVICE_FOR_OPPORTUNITY`. */
+    service: varchar("service", { length: 40 }).$type<ForgelineService | "">().notNull().default(""),
+    /** The evidence-based sentence. Never a claim the scan did not support. */
+    opportunityReason: text("opportunity_reason").notNull().default(""),
+    /** Set when a person chose the opportunity instead of the rules. */
+    opportunitySetBy: integer("opportunity_set_by").references(() => users.id, { onDelete: "set null" }),
     createdBy: integer("created_by").references(() => users.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+
   },
   (t) => [
     index("prospects_status_idx").on(t.status),
-    index("prospects_score_idx").on(t.totalScore),
     index("prospects_country_idx").on(t.country),
     index("prospects_industry_idx").on(t.industry),
-    index("prospects_decision_idx").on(t.decision),
+    index("prospects_opportunity_idx").on(t.opportunity),
   ],
 );
 

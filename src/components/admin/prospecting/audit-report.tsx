@@ -44,9 +44,7 @@ export function AuditReport({
   const report = object(audit.report);
   const performance = object(report.performance);
   const indicators = Array.isArray(report.technologyIndicators) ? report.technologyIndicators : [];
-  const scores = object(audit.scores);
   const redirectChain = Array.isArray(audit.redirectChain) ? audit.redirectChain : [];
-  const classification = text(report.primaryOpportunity) || "Build Audit";
 
   return (
     <div className="space-y-8">
@@ -54,7 +52,7 @@ export function AuditReport({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="font-mono text-micro text-faint">Audit #{audit.id}</p>
-            <h2 className="mt-1 text-[1.15rem] font-semibold">{classification}</h2>
+            <h2 className="mt-1 text-[1.15rem] font-semibold">Website report</h2>
           </div>
           <div className="flex items-center gap-3">
             <Status value={audit.status} />
@@ -132,20 +130,6 @@ export function AuditReport({
       </section>
 
       <section>
-        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-[1.0625rem] font-semibold">Score components</h2>
-          <span className="font-mono text-micro text-faint">Total {audit.totalScore}/100</span>
-        </div>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-          {[
-            ["Website UX", "websiteUx"], ["SEO", "seo"], ["Technical", "technical"],
-            ["Conversion", "conversion"], ["Business fit", "businessFit"], ["Decision-maker availability", "decisionMakerAvailability"],
-          ].map(([label, key]) => <MetricCard key={key} label={label} value={number(scores[key]) === null ? "Not assessed" : String(scores[key])} />)}
-        </div>
-        <p className="mt-3 text-[0.8125rem] text-faint">Business fit and decision-maker availability are not assessed in Phase 1.</p>
-      </section>
-
-      <section>
         <div className="mb-3 flex items-baseline justify-between gap-3">
           <h2 className="text-[1.0625rem] font-semibold">Findings and evidence</h2>
           <span className="font-mono text-micro text-faint">{findings.length} recorded</span>
@@ -182,6 +166,3 @@ function Metric({ label, value }: { label: string; value: string }) {
   return <div className="flex justify-between gap-3"><dt className="text-muted">{label}</dt><dd className="font-mono text-graphite">{value}</dd></div>;
 }
 
-function MetricCard({ label, value }: { label: string; value: string }) {
-  return <div className="rounded-sm border border-rule bg-white px-4 py-3"><span className="block font-mono text-[1.2rem] text-graphite">{value}</span><span className="mt-1 block text-[0.8125rem] text-muted">{label}</span></div>;
-}

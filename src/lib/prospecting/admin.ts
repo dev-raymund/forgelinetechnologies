@@ -33,15 +33,6 @@ type OnQueued = (input: {
   actor: AuditActor;
 }) => Promise<unknown>;
 
-type AuditRequestDependencies = {
-  authorize: () => Promise<Authorisation>;
-  createAuditRequest: CreateAuditRequest;
-  startAudit: StartAudit;
-  saveFailure: (id: number, detail: string) => Promise<unknown>;
-  onQueued?: OnQueued;
-  resolveHost?: HostResolver;
-};
-
 export type StoredAuditSummary = {
   id: number;
   requestedUrl: string;
@@ -108,34 +99,6 @@ async function createAndStart(
   });
 
   return queued(created.id);
-}
-
-/**
- * The authenticated input workflow, kept dependency-injected so it can be
- * tested without cookies, Neon, a background job, or a network request.
- */
-export async function requestAuditForUser(
-  formData: FormData,
-  dependencies: AuditRequestDependencies,
-): Promise<AuditActionResult> {
-  const authorised = await dependencies.authorize();
-  if (!authorised.ok) return { status: "error", message: authorised.error };
-
-  const rawUrl = String(formData.get("url") ?? "").trim();
-  if (!rawUrl) return { status: "error", field: "url", message: "Enter a website URL." };
-
-  let normalizedUrl: string;
-  try {
-    normalizedUrl = (await normalizeAuditUrl(rawUrl, dependencies.resolveHost)).url;
-  } catch {
-    return {
-      status: "error",
-      field: "url",
-      message: "Enter a public HTTP or HTTPS URL without credentials.",
-    };
-  }
-
-  return createAndStart({ requestedUrl: normalizedUrl, actor: authorised.user }, dependencies);
 }
 
 /**

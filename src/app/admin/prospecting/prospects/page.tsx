@@ -1,237 +1,183 @@
 import Link from "next/link";
 import { requireCapability } from "@/lib/auth/guard";
-import { DECISION_FILTERS, listProspects } from "@/lib/prospecting/prospects";
-import { BANDS, bandFor } from "@/lib/prospecting/qualify";
-import { OPPORTUNITIES } from "@/lib/prospecting/types";
+import { listProspectRows, pipelineCounts } from "@/lib/prospecting/prospect-store";
+import { OPPORTUNITY_VALUES, PROSPECT_STATUSES } from "@/lib/prospecting/types";
 import { withRetry } from "@/lib/queries";
-import { Empty, PageTitle, Status, when } from "@/components/admin/ui";
-import { QueueActions } from "@/components/admin/prospecting/queue-actions";
+import { pageFrom } from "@/lib/admin/pagination";
+import { Empty, PageTitle, Pagination, Status, when } from "@/components/admin/ui";
 
 export const metadata = { title: "Prospects" };
 
 /**
- * `runQueueNow`, a server action invoked from this page, runs real audits
- * inline via `drainAuditQueue` (bounded to a 45s budget). 60 leaves clear
- * headroom, matching the comment on the audit pages that do the same thing.
+ * The pipeline.
+ *
+ * Answers one question: who am I contacting, what am I offering, and where are
+ * they up to. No score, no band, no qualification breakdown — those belonged
+ * to the retired model and are not read here at all.
  */
-export const maxDuration = 60;
-
-const STATUSES = ["new", "queued", "audited", "suppressed"];
-const DECISION_LABELS: Record<(typeof DECISION_FILTERS)[number], string> = {
-  undecided: "Undecided",
-  qualified: "Qualified",
-  dismissed: "Dismissed",
-};
-
 export default async function ProspectsPage({
   searchParams,
 }: {
-  searchParams: Promise<{
-    status?: string;
-    opportunity?: string;
-    country?: string;
-    industry?: string;
-    decision?: string;
-    band?: string;
-  }>;
+  searchParams: Promise<{ q?: string; status?: string; opportunity?: string; page?: string }>;
 }) {
   await requireCapability("prospecting.manage", "/admin/prospecting/prospects");
   const sp = await searchParams;
-  const filter = {
-    status: sp.status,
-    opportunity: sp.opportunity,
-    // `country` is stored as an upper-case ISO code and matched with `eq`, and
-    // the input's `uppercase` class only restyles the glyphs — the form still
-    // submits what was typed. Without this, "au" matches nothing and the empty
-    // result is indistinguishable from having no Australian prospects.
-    country: sp.country?.toUpperCase(),
-    industry: sp.industry,
-    decision: sp.decision,
-    band: sp.band,
-  };
-  const filtered = Boolean(
-    sp.status || sp.opportunity || sp.country || sp.industry || sp.decision || sp.band,
-  );
-  // Only the default (no decision filter chosen) actually hides dismissed
-  // prospects — filtering to Qualified or Undecided narrows to that decision
-  // and shows no dismissed prospects either, but not because of the note.
-  const hidingDismissed = sp.decision === undefined;
+  const page = pageFrom(sp.page);
+  const filter = { search: sp.q, status: sp.status, opportunity: sp.opportunity, page };
+  const filtered = Boolean(sp.q || sp.status || sp.opportunity);
 
-  const rows = await withRetry(() => listProspects(filter));
-
-  const href = (patch: Record<string, string | undefined>) => {
-    const params = new URLSearchParams();
-    const merged = { ...filter, ...patch };
-    for (const [key, value] of Object.entries(merged)) if (value) params.set(key, value);
-    const query = params.toString();
-    return `/admin/prospecting/prospects${query ? `?${query}` : ""}`;
-  };
+  const [list, counts] = await Promise.all([
+    withRetry(() => listProspectRows(filter)),
+    withRetry(() => pipelineCounts()),
+  ]);
+  const rows = list.rows;
 
   return (
     <>
       <PageTitle
         title="Prospects"
-        count={`${rows.length} ${rows.length === 1 ? "prospect" : "prospects"}${
-          filtered ? " matching" : ""
-        }${rows.length === 200 ? " — showing the top 200 by score" : ""}${
-          hidingDismissed ? " · dismissed hidden" : ""
-        }`}
-        action={<QueueActions />}
+        count={`${list.total} ${list.total === 1 ? "prospect" : "prospects"}${filtered ? " matching" : ""}`}
+        action={
+          <Link
+            href="/admin/prospecting/audit"
+            className="rounded-sm bg-accent px-4 py-2 text-[0.875rem] font-medium text-white transition-colors hover:bg-accent-deep"
+          >
+            New prospect
+          </Link>
+        }
       />
 
-      <form method="get" className="mb-4 flex flex-wrap items-end gap-3">
-        <FilterField label="Country">
+      {/* Counts only. No rates, no conversion percentages, no win rate. */}
+      <div className="mb-6 flex flex-wrap gap-2">
+        {PROSPECT_STATUSES.slice(0, 6).map((status) => (
+          <Link
+            key={status}
+            href={`/admin/prospecting/prospects?status=${encodeURIComponent(status)}`}
+            className={`rounded-sm border px-3 py-2 text-[0.8125rem] transition-colors ${
+              sp.status === status ? "border-ink bg-ink text-on-ink" : "border-rule bg-white hover:border-rule-strong"
+            }`}
+          >
+            {status}
+            <span className="ml-2 font-mono text-micro opacity-70">{counts[status] ?? 0}</span>
+          </Link>
+        ))}
+      </div>
+
+      <form method="get" className="mb-5 flex flex-wrap items-end gap-3">
+        <label className="flex flex-col gap-1 text-[0.8125rem] text-muted">
+          Search
           <input
-            type="text"
-            name="country"
-            defaultValue={filter.country ?? ""}
-            placeholder="AU"
-            maxLength={2}
-            className="w-20 rounded-sm border border-rule-strong bg-white px-3 py-2 text-[0.875rem] uppercase focus:border-ink focus:outline-none"
+            type="search"
+            name="q"
+            defaultValue={sp.q ?? ""}
+            placeholder="Company or domain"
+            className="w-56 rounded-sm border border-rule-strong bg-white px-3 py-2 text-[0.875rem] focus:border-ink focus:outline-none"
           />
-        </FilterField>
-        <FilterField label="Industry">
-          <input
-            type="text"
-            name="industry"
-            defaultValue={sp.industry ?? ""}
-            placeholder="e.g. Accounting"
+        </label>
+        <label className="flex flex-col gap-1 text-[0.8125rem] text-muted">
+          Status
+          <select
+            name="status"
+            defaultValue={sp.status ?? ""}
             className="rounded-sm border border-rule-strong bg-white px-3 py-2 text-[0.875rem] focus:border-ink focus:outline-none"
-          />
-        </FilterField>
-        <FilterField label="Opportunity">
+          >
+            <option value="">All</option>
+            {PROSPECT_STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="flex flex-col gap-1 text-[0.8125rem] text-muted">
+          Opportunity
           <select
             name="opportunity"
             defaultValue={sp.opportunity ?? ""}
             className="rounded-sm border border-rule-strong bg-white px-3 py-2 text-[0.875rem] focus:border-ink focus:outline-none"
           >
             <option value="">All</option>
-            {OPPORTUNITIES.map((o) => (
+            {OPPORTUNITY_VALUES.map((o) => (
               <option key={o} value={o}>
                 {o}
               </option>
             ))}
           </select>
-        </FilterField>
-        <FilterField label="Decision">
-          <select
-            name="decision"
-            defaultValue={sp.decision ?? ""}
-            className="rounded-sm border border-rule-strong bg-white px-3 py-2 text-[0.875rem] focus:border-ink focus:outline-none"
-          >
-            <option value="">All except dismissed</option>
-            {DECISION_FILTERS.map((d) => (
-              <option key={d} value={d}>
-                {DECISION_LABELS[d]}
-              </option>
-            ))}
-          </select>
-        </FilterField>
-        <FilterField label="Band">
-          <select
-            name="band"
-            defaultValue={sp.band ?? ""}
-            className="rounded-sm border border-rule-strong bg-white px-3 py-2 text-[0.875rem] focus:border-ink focus:outline-none"
-          >
-            <option value="">All</option>
-            {BANDS.map((b) => (
-              <option key={b.key} value={b.key}>
-                {b.label} ({b.min}–{b.max})
-              </option>
-            ))}
-          </select>
-        </FilterField>
-        {sp.status ? <input type="hidden" name="status" value={sp.status} /> : null}
+        </label>
         <button
           type="submit"
           className="rounded-sm border border-rule-strong bg-white px-4 py-2 text-[0.875rem] font-medium hover:bg-black/[0.04]"
         >
           Filter
         </button>
+        {filtered ? (
+          <Link
+            href="/admin/prospecting/prospects"
+            className="py-2 text-[0.875rem] text-muted underline decoration-rule-strong underline-offset-4"
+          >
+            Clear
+          </Link>
+        ) : null}
       </form>
-
-      <div className="mb-5 flex flex-wrap gap-1.5">
-        <FilterChip href={href({ status: undefined })} active={!sp.status}>
-          All
-        </FilterChip>
-        {STATUSES.map((s) => (
-          <FilterChip key={s} href={href({ status: s })} active={sp.status === s}>
-            {s}
-          </FilterChip>
-        ))}
-      </div>
 
       {rows.length === 0 ? (
         <Empty>
-          {filtered
-            ? "No prospects match that filter."
-            : "No prospects yet. Import a CSV to get started."}
+          {filtered ? (
+            "No prospects match your filters."
+          ) : (
+            <>
+              No prospects yet.{" "}
+              <Link href="/admin/prospecting/audit" className="underline decoration-rule-strong underline-offset-4">
+                Analyze a website
+              </Link>{" "}
+              to add your first prospect.
+            </>
+          )}
         </Empty>
       ) : (
         <div className="overflow-x-auto rounded-sm border border-rule bg-white">
-          <table className="w-full min-w-[66rem] border-collapse text-left">
+          <table className="w-full min-w-[56rem] border-collapse text-left">
             <thead>
               <tr className="border-b border-rule">
-                {[
-                  "Company",
-                  "Domain",
-                  "Industry",
-                  "Location",
-                  "Status",
-                  "Decision",
-                  "Score",
-                  "Band",
-                  "Last audited",
-                  "",
-                ].map((h) => (
-                  <th
-                    key={h}
-                    scope="col"
-                    className="px-4 py-2.5 font-mono text-micro font-normal text-faint"
-                  >
+                {["Company", "Website", "Opportunity", "Service", "Status", "Updated", ""].map((h) => (
+                  <th key={h} scope="col" className="px-4 py-2.5 font-mono text-micro font-normal text-faint">
                     {h}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {rows.map((r) => (
-                <tr key={r.id} className="border-b border-rule last:border-b-0">
+              {rows.map((row) => (
+                <tr key={row.id} className="border-b border-rule last:border-b-0">
                   <td className="px-4 py-3 text-[0.9375rem] font-medium">
-                    <Link href={`/admin/prospecting/prospects/${r.id}`} className="hover:underline">
-                      {r.companyName}
+                    <Link href={`/admin/prospecting/prospects/${row.id}`} className="hover:underline">
+                      {row.companyName}
                     </Link>
+                    {row.suppressedAt ? (
+                      <span className="ml-2 font-mono text-micro text-muted">suppressed</span>
+                    ) : null}
                   </td>
                   <td className="px-4 py-3 font-mono text-[0.8125rem] text-muted">
                     <a
-                      href={r.websiteUrl}
+                      href={row.websiteUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="underline decoration-rule-strong underline-offset-4 hover:decoration-accent"
                     >
-                      {r.domain}
+                      {row.domain}
                     </a>
                   </td>
-                  <td className="px-4 py-3 text-[0.875rem] text-muted">{r.industry || "—"}</td>
-                  <td className="px-4 py-3 text-[0.875rem] text-muted">
-                    {[r.location, r.country].filter(Boolean).join(", ") || "—"}
+                  <td className="px-4 py-3 text-[0.875rem] text-graphite">
+                    {row.opportunity || <span className="text-faint">Not analyzed</span>}
                   </td>
+                  <td className="px-4 py-3 text-[0.875rem] text-muted">{row.service || "—"}</td>
                   <td className="px-4 py-3">
-                    <Status value={r.status} />
+                    <Status value={row.status} />
                   </td>
-                  <td className="px-4 py-3">
-                    {r.decision ? (
-                      <Status value={r.decision} />
-                    ) : (
-                      <span className="text-[0.875rem] text-faint">—</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 font-mono text-[0.875rem] text-graphite">{r.totalScore}</td>
-                  <td className="px-4 py-3 text-[0.875rem] text-muted">{bandFor(r.totalScore).label}</td>
-                  <td className="px-4 py-3 text-[0.875rem] text-muted">{when(r.lastAuditedAt)}</td>
+                  <td className="px-4 py-3 text-[0.875rem] text-muted">{when(row.updatedAt)}</td>
                   <td className="px-4 py-3 text-right">
                     <Link
-                      href={`/admin/prospecting/prospects/${r.id}`}
+                      href={`/admin/prospecting/prospects/${row.id}`}
                       className="text-[0.875rem] font-medium underline decoration-rule-strong underline-offset-4 hover:decoration-accent"
                     >
                       Open
@@ -243,37 +189,22 @@ export default async function ProspectsPage({
           </table>
         </div>
       )}
+
+      <Pagination
+        page={list.page}
+        pages={list.pages}
+        total={list.total}
+        label="prospects"
+        href={(n) => {
+          const p = new URLSearchParams();
+          for (const [k, v] of Object.entries({ q: sp.q, status: sp.status, opportunity: sp.opportunity })) {
+            if (v) p.set(k, v);
+          }
+          if (n > 1) p.set("page", String(n));
+          const s = p.toString();
+          return `/admin/prospecting/prospects${s ? `?${s}` : ""}`;
+        }}
+      />
     </>
-  );
-}
-
-function FilterField({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <label className="flex flex-col gap-1 text-[0.8125rem] text-muted">
-      {label}
-      {children}
-    </label>
-  );
-}
-
-function FilterChip({
-  href,
-  active,
-  children,
-}: {
-  href: string;
-  active: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      aria-current={active ? "true" : undefined}
-      className={`rounded-sm px-2.5 py-1 font-mono text-micro transition-colors ${
-        active ? "bg-ink text-on-ink" : "bg-white text-muted hover:bg-black/[0.04]"
-      }`}
-    >
-      {children}
-    </Link>
   );
 }
