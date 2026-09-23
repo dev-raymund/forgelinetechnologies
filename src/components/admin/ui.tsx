@@ -102,3 +102,101 @@ export function when(d: Date | null): string {
     year: "numeric",
   }).format(d);
 }
+
+/**
+ * Paging for an admin list.
+ *
+ * Renders nothing for a single page — a control that cannot do anything is
+ * just noise. `href` builds a URL for a page number, so each list keeps its own
+ * filters in the query string.
+ *
+ * Numbered links, not only Previous and Next: on a long list "page 7 of 30" is
+ * somewhere you want to jump to, not walk to. The window is narrow so the row
+ * does not wrap on a phone, with first and last always reachable.
+ */
+export function Pagination({
+  page,
+  pages,
+  total,
+  label = "results",
+  href,
+}: {
+  page: number;
+  pages: number;
+  total: number;
+  /** Plural noun for the count, e.g. "posts". */
+  label?: string;
+  href: (page: number) => string;
+}) {
+  if (pages <= 1) return null;
+
+  const numbers: (number | "gap")[] = [];
+  for (let n = 1; n <= pages; n += 1) {
+    if (n === 1 || n === pages || Math.abs(n - page) <= 1) numbers.push(n);
+    else if (numbers[numbers.length - 1] !== "gap") numbers.push("gap");
+  }
+
+  return (
+    <nav
+      aria-label="Pagination"
+      className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-rule pt-4"
+    >
+      <p className="font-mono text-micro text-faint">
+        Page {page} of {pages} · {total} {label}
+      </p>
+      <div className="flex flex-wrap items-center gap-1">
+        <PageLink href={href(page - 1)} disabled={page === 1} rel="prev">
+          Previous
+        </PageLink>
+        {numbers.map((n, i) =>
+          n === "gap" ? (
+            <span key={`gap-${i}`} aria-hidden="true" className="px-1 text-faint">
+              …
+            </span>
+          ) : (
+            <Link
+              key={n}
+              href={href(n)}
+              aria-label={`Page ${n}`}
+              aria-current={n === page ? "page" : undefined}
+              className={`min-w-8 rounded-sm px-2.5 py-1.5 text-center font-mono text-[0.8125rem] transition-colors ${
+                n === page
+                  ? "bg-ink text-on-ink"
+                  : "border border-rule bg-white text-muted hover:border-rule-strong hover:text-graphite"
+              }`}
+            >
+              {n}
+            </Link>
+          ),
+        )}
+        <PageLink href={href(page + 1)} disabled={page === pages} rel="next">
+          Next
+        </PageLink>
+      </div>
+    </nav>
+  );
+}
+
+function PageLink({
+  href,
+  disabled,
+  rel,
+  children,
+}: {
+  href: string;
+  disabled: boolean;
+  rel: "prev" | "next";
+  children: React.ReactNode;
+}) {
+  const base = "rounded-sm px-3 py-1.5 text-[0.8125rem] font-medium";
+  // A disabled control stays in the layout so the row does not shift when you
+  // reach an end, but it is a span rather than a link nothing would follow.
+  if (disabled) {
+    return <span aria-disabled="true" className={`${base} text-faint`}>{children}</span>;
+  }
+  return (
+    <Link href={href} rel={rel} className={`${base} border border-rule bg-white text-muted hover:border-rule-strong hover:text-graphite`}>
+      {children}
+    </Link>
+  );
+}

@@ -1,36 +1,48 @@
 import Link from "next/link";
-import { asc, desc } from "drizzle-orm";
+import { asc, count, desc } from "drizzle-orm";
 import { requireCapability } from "@/lib/auth/guard";
 import { getDb, projects } from "@/db";
 import { withRetry } from "@/lib/queries";
-import { Empty, PageTitle, Status, when } from "@/components/admin/ui";
+import { PAGE_SIZE, offsetFor, pageFrom, paged } from "@/lib/admin/pagination";
+import { Empty, PageTitle, Pagination, Status, when } from "@/components/admin/ui";
 
 export const metadata = { title: "Works" };
 
-export default async function WorksPage() {
+export default async function WorksPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   await requireCapability("works.manage", "/admin/works");
+  const page = pageFrom((await searchParams).page);
 
-  const rows = await withRetry(() =>
-    getDb()
-      .select({
-        id: projects.id,
-        title: projects.title,
-        slug: projects.slug,
-        kind: projects.kind,
-        status: projects.status,
-        featured: projects.featured,
-        liveUrl: projects.liveUrl,
-        updatedAt: projects.updatedAt,
-      })
-      .from(projects)
-      .orderBy(asc(projects.sortOrder), desc(projects.updatedAt)),
-  );
+  const [rows, totals] = await Promise.all([
+    withRetry(() =>
+      getDb()
+        .select({
+          id: projects.id,
+          title: projects.title,
+          slug: projects.slug,
+          kind: projects.kind,
+          status: projects.status,
+          featured: projects.featured,
+          liveUrl: projects.liveUrl,
+          updatedAt: projects.updatedAt,
+        })
+        .from(projects)
+        .orderBy(asc(projects.sortOrder), desc(projects.updatedAt))
+        .limit(PAGE_SIZE)
+        .offset(offsetFor(page)),
+    ),
+    withRetry(() => getDb().select({ n: count() }).from(projects)),
+  ]);
+  const list = paged(rows, totals[0]?.n ?? 0, page);
 
   return (
     <>
       <PageTitle
         title="Works"
-        count={`${rows.length} ${rows.length === 1 ? "project" : "projects"}`}
+        count={`${list.total} ${list.total === 1 ? "project" : "projects"}`}
         action={
           <Link
             href="/admin/works/new"
@@ -41,7 +53,7 @@ export default async function WorksPage() {
         }
       />
 
-      {rows.length === 0 ? (
+      {list.rows.length === 0 ? (
         <Empty>No projects yet.</Empty>
       ) : (
         <div className="overflow-x-auto rounded-sm border border-rule bg-white">
@@ -56,7 +68,7 @@ export default async function WorksPage() {
               </tr>
             </thead>
             <tbody>
-              {rows.map((r) => (
+              {list.rows.map((r) => (
                 <tr key={r.id} className="border-b border-rule last:border-b-0">
                   <td className="px-4 py-3 text-[0.9375rem] font-medium">
                     <Link href={`/admin/works/${r.id}/edit`} className="hover:underline">
@@ -101,6 +113,14 @@ export default async function WorksPage() {
           </table>
         </div>
       )}
+
+      <Pagination
+        page={list.page}
+        pages={list.pages}
+        total={list.total}
+        label="projects"
+        href={(n) => (n === 1 ? "/admin/works" : `/admin/works?page=${n}`)}
+      />
     </>
   );
 }

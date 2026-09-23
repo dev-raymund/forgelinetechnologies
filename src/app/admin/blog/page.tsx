@@ -1,38 +1,49 @@
 import Link from "next/link";
-import { desc } from "drizzle-orm";
+import { count, desc, eq } from "drizzle-orm";
 import { requireCapability } from "@/lib/auth/guard";
 import { getDb, posts, users } from "@/db";
 import { withRetry } from "@/lib/queries";
-import { Empty, PageTitle, Status, when } from "@/components/admin/ui";
-import { eq } from "drizzle-orm";
+import { PAGE_SIZE, offsetFor, pageFrom, paged } from "@/lib/admin/pagination";
+import { Empty, PageTitle, Pagination, Status, when } from "@/components/admin/ui";
 
-export const metadata = { title: "Blog posts" };
+export const metadata = { title: "Blogs" };
 
-export default async function BlogPage() {
+export default async function BlogPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   await requireCapability("posts.manage", "/admin/blog");
+  const page = pageFrom((await searchParams).page);
 
-  const rows = await withRetry(() =>
-    getDb()
-      .select({
-        id: posts.id,
-        title: posts.title,
-        slug: posts.slug,
-        status: posts.status,
-        publishedAt: posts.publishedAt,
-        updatedAt: posts.updatedAt,
-        authorName: users.name,
-        authorEmail: users.email,
-      })
-      .from(posts)
-      .leftJoin(users, eq(posts.authorId, users.id))
-      .orderBy(desc(posts.updatedAt)),
-  );
+  const [rows, totals] = await Promise.all([
+    withRetry(() =>
+      getDb()
+        .select({
+          id: posts.id,
+          title: posts.title,
+          slug: posts.slug,
+          status: posts.status,
+          publishedAt: posts.publishedAt,
+          updatedAt: posts.updatedAt,
+          authorName: users.name,
+          authorEmail: users.email,
+        })
+        .from(posts)
+        .leftJoin(users, eq(posts.authorId, users.id))
+        .orderBy(desc(posts.updatedAt))
+        .limit(PAGE_SIZE)
+        .offset(offsetFor(page)),
+    ),
+    withRetry(() => getDb().select({ n: count() }).from(posts)),
+  ]);
+  const list = paged(rows, totals[0]?.n ?? 0, page);
 
   return (
     <>
       <PageTitle
-        title="Blog posts"
-        count={`${rows.length} ${rows.length === 1 ? "post" : "posts"}`}
+        title="Blogs"
+        count={`${list.total} ${list.total === 1 ? "post" : "posts"}`}
         action={
           <Link
             href="/admin/blog/new"
@@ -43,7 +54,7 @@ export default async function BlogPage() {
         }
       />
 
-      {rows.length === 0 ? (
+      {list.rows.length === 0 ? (
         <Empty>
           No posts yet. A published post appears at /blog and in the sitemap;
           a draft appears nowhere public.
@@ -61,7 +72,7 @@ export default async function BlogPage() {
               </tr>
             </thead>
             <tbody>
-              {rows.map((r) => (
+              {list.rows.map((r) => (
                 <tr key={r.id} className="border-b border-rule last:border-b-0">
                   <td className="px-4 py-3 text-[0.9375rem] font-medium">
                     <Link href={`/admin/blog/${r.id}/edit`} className="hover:underline">
@@ -91,6 +102,14 @@ export default async function BlogPage() {
           </table>
         </div>
       )}
+
+      <Pagination
+        page={list.page}
+        pages={list.pages}
+        total={list.total}
+        label="posts"
+        href={(n) => (n === 1 ? "/admin/blog" : `/admin/blog?page=${n}`)}
+      />
     </>
   );
 }

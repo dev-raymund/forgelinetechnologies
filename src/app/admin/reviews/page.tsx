@@ -3,7 +3,8 @@ import { count, desc, eq } from "drizzle-orm";
 import { requireCapability, roleHas } from "@/lib/auth/guard";
 import { getDb, reviews, projects } from "@/db";
 import { withRetry } from "@/lib/queries";
-import { Empty, PageTitle, Status, when } from "@/components/admin/ui";
+import { PAGE_SIZE, offsetFor, pageFrom, paged } from "@/lib/admin/pagination";
+import { Empty, PageTitle, Pagination, Status, when } from "@/components/admin/ui";
 import { ReviewControls } from "@/components/admin/review-controls";
 
 export const metadata = { title: "Reviews" };
@@ -13,10 +14,11 @@ const STATUSES = ["pending", "approved", "published", "rejected"] as const;
 export default async function ReviewsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: Promise<{ status?: string; page?: string }>;
 }) {
   const user = await requireCapability("reviews.manage", "/admin/reviews");
-  const { status } = await searchParams;
+  const { status, page: rawPage } = await searchParams;
+  const page = pageFrom(rawPage);
   const filter = (STATUSES as readonly string[]).includes(status ?? "") ? status : undefined;
 
   const [rows, counts] = await Promise.all([
@@ -37,7 +39,9 @@ export default async function ReviewsPage({
         .from(reviews)
         .leftJoin(projects, eq(reviews.projectId, projects.id))
         .where(filter ? eq(reviews.status, filter) : undefined)
-        .orderBy(desc(reviews.createdAt)),
+        .orderBy(desc(reviews.createdAt))
+        .limit(PAGE_SIZE)
+        .offset(offsetFor(page)),
     ),
     withRetry(() =>
       getDb().select({ status: reviews.status, n: count() }).from(reviews).groupBy(reviews.status),
@@ -46,6 +50,8 @@ export default async function ReviewsPage({
 
   const byStatus = Object.fromEntries(counts.map((c) => [c.status, c.n]));
   const total = counts.reduce((a, c) => a + c.n, 0);
+  // Paging counts the filtered set, which the status counts already give us.
+  const list = paged(rows, filter ? (byStatus[filter] ?? 0) : total, page);
 
   return (
     <>
@@ -124,6 +130,20 @@ export default async function ReviewsPage({
           ))}
         </ul>
       )}
+
+      <Pagination
+        page={list.page}
+        pages={list.pages}
+        total={list.total}
+        label="reviews"
+        href={(n) => {
+          const p = new URLSearchParams();
+          if (filter) p.set("status", filter);
+          if (n > 1) p.set("page", String(n));
+          const s = p.toString();
+          return `/admin/reviews${s ? `?${s}` : ""}`;
+        }}
+      />
     </>
   );
 }
