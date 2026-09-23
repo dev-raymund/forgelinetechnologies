@@ -18,8 +18,10 @@ import {
   describeEvidence,
   generateOutreach,
   outreachFromView,
+  selectOutreachEvidence,
   type OutreachGenerationResult,
 } from "../src/lib/prospecting/outreach.ts";
+import { observationFor } from "../src/lib/prospecting/findings-summary.ts";
 import type { BoundedPageResponse } from "../src/lib/prospecting/fetch.ts";
 
 async function scanOf(
@@ -347,4 +349,163 @@ test("homepage and standalone observations never collide into a double 'and'", (
 
   assert.doesNotMatch(draft.body, /and .* and the site/);
   assert.match(draft.body, /I also noticed that/);
+});
+
+/* ============================================================================
+ * Evidence selection — the email is about the reason the rule fired
+ * ========================================================================= */
+
+/** A page shaped like the Vanguard Roofing review: one layout fault, and a
+ *  pile of unrelated SEO and accessibility noise around it. */
+const VANGUARD = `<!doctype html><html><head>
+  <title>Vanguard Roofing</title><title>Vanguard Roofing Ltd</title>
+  <meta name="description" content="Roofing across the North West.">
+  <meta name="viewport" content="width=device-width">
+</head><body style="width: 1600px">
+  <h2>Vanguard Roofing</h2>
+  ${Array.from({ length: 35 }, (_, i) =>
+    i < 12 ? `<img src="/i${i}.jpg">` : `<img src="/i${i}.jpg" alt="Roof ${i}" width="400" height="300">`,
+  ).join("")}
+  <a href="/contact">Contact us</a>
+  <form><button type="submit">Send</button></form>
+</body></html>`;
+
+test("the Vanguard Roofing page is a Website Development opportunity on its layout", async () => {
+  const scan = await scanOf(VANGUARD);
+  const detected = detectOpportunity(scan);
+
+  assert.equal(detected.opportunity, "Website Development");
+  assert.deepEqual(detected.evidence, ["A large fixed-width layout was detected."]);
+});
+
+test("its email is about the layout, not the five quick findings", async () => {
+  const scan = await scanOf(VANGUARD);
+  const draft = mustDraft(outreachFromView(toScanView(scan, detectOpportunity(scan))));
+
+  assert.match(draft.body, /fixed-width layout/i, "the reason the rule fired");
+
+  // Everything the scan also noticed, and none of it belongs in this email.
+  assert.doesNotMatch(draft.body, /main heading|H1/i);
+  assert.doesNotMatch(draft.body, /more than one page title/i);
+  assert.doesNotMatch(draft.body, /alt text/i);
+  assert.doesNotMatch(draft.body, /canonical/i);
+  assert.doesNotMatch(draft.body, /robots/i);
+});
+
+test("its email adds one supporting layout observation, and only one", async () => {
+  const scan = await scanOf(VANGUARD);
+  const draft = mustDraft(outreachFromView(toScanView(scan, detectOpportunity(scan))));
+
+  assert.match(draft.body, /width or height/i, "images without dimensions support a layout point");
+  assert.equal((draft.body.match(/I also noticed/g) ?? []).length, 1);
+});
+
+test("a Website Development email never reaches into SEO findings", () => {
+  const selected = selectOutreachEvidence(
+    { opportunity: "Website Development", service: "Business websites", evidence: ["The site is served without HTTPS."] },
+    [
+      { rule: "missing-title", line: "No page title detected." },
+      { rule: "missing-meta-description", line: "No meta description detected." },
+      { rule: "missing-h1", line: "No H1 detected." },
+    ],
+  );
+
+  assert.deepEqual(selected.primary, ["The site is served without HTTPS."]);
+  assert.equal(selected.supporting, null, "no SEO finding may support a build opportunity");
+});
+
+test("an SEO email cites its own observations and no layout one", async () => {
+  const scan = await scanOf(SEO_GAPS);
+  const draft = mustDraft(outreachFromView(toScanView(scan, detectOpportunity(scan))));
+
+  assert.match(draft.body, /no page title, no meta description and no main heading/);
+  assert.doesNotMatch(draft.body, /fixed-width|viewport|phone/i);
+});
+
+test("an e-commerce email uses only the evidence its own rule fired on", () => {
+  const selected = selectOutreachEvidence(
+    {
+      opportunity: "E-commerce",
+      service: "E-commerce",
+      evidence: ["Storefront platform detected: Shopify.", "No obvious call to action detected in the page text."],
+    },
+    [
+      { rule: "missing-primary-cta", line: "No obvious call to action detected in the page text." },
+      { rule: "missing-title", line: "No page title detected." },
+      { rule: "missing-canonical", line: "No canonical URL declared." },
+    ],
+  );
+
+  assert.deepEqual(selected.primary, ["No obvious call to action detected in the page text."]);
+  assert.equal(selected.supporting, null, "SEO findings never support a commerce opportunity");
+});
+
+test("a supporting observation is added only when there is a single primary one", () => {
+  const observations = [{ rule: "missing-canonical", line: "No canonical URL declared." }];
+
+  const many = selectOutreachEvidence(
+    {
+      opportunity: "SEO",
+      service: "SEO",
+      evidence: ["No page title detected.", "No meta description detected.", "No H1 detected."],
+    },
+    observations,
+  );
+  assert.equal(many.supporting, null, "three observations are already enough");
+
+  const one = selectOutreachEvidence(
+    { opportunity: "SEO", service: "SEO", evidence: ["No page title detected."] },
+    observations,
+  );
+  assert.equal(one.supporting, "No canonical URL declared.");
+});
+
+test("the supporting observation never repeats one the rule already cited", () => {
+  const selected = selectOutreachEvidence(
+    { opportunity: "Website Development", service: "Business websites", evidence: ["A large fixed-width layout was detected."] },
+    [{ rule: "fixed-width-layout", line: "A large fixed-width layout was detected." }],
+  );
+  assert.equal(selected.supporting, null);
+});
+
+test("a human-selected opportunity draws no supporting observation from a scan", () => {
+  for (const manual of ["Automation", "Web Application", "Integration"] as const) {
+    const selected = selectOutreachEvidence(
+      { opportunity: manual, service: "Business automation", evidence: ["Something a person recorded."] },
+      [{ rule: "missing-canonical", line: "No canonical URL declared." }],
+    );
+    assert.equal(selected.supporting, null, manual);
+  }
+});
+
+test("a page full of unrelated findings still produces a focused email", async () => {
+  const scan = await scanOf(VANGUARD);
+  const draft = mustDraft(outreachFromView(toScanView(scan, detectOpportunity(scan))));
+
+  // At most two observation sentences reach the reader, however much the scan saw.
+  const observed = (draft.body.match(/I (also )?noticed/g) ?? []).length;
+  assert.ok(observed <= 2, `${observed} observation sentences`);
+});
+
+test("the email no longer falls back on a generic closing observation", async () => {
+  for (const html of [VANGUARD, SEO_GAPS, STORE_WITH_OBSTACLE]) {
+    const scan = await scanOf(html);
+    const result = outreachFromView(toScanView(scan, detectOpportunity(scan)));
+    if (result.kind !== "draft") continue;
+    assert.doesNotMatch(result.draft.body, /a few things worth looking at around/i, html.slice(0, 30));
+  }
+});
+
+test("every phrase and supporting rule names something the scanner can actually produce", async () => {
+  // Guards the two string-keyed maps against a typo that would silently stop
+  // matching. Each key must be a line `observationFor` really emits.
+  const scan = await scanOf(VANGUARD);
+  const produced = new Set<string>();
+  for (const rule of new Set(scan.findings.map((f) => f.rule))) {
+    const line = observationFor(rule, scan);
+    if (line) produced.add(rule);
+  }
+  for (const rule of ["fixed-width-layout", "missing-image-dimensions", "duplicate-title", "missing-canonical"]) {
+    assert.ok(produced.has(rule), `${rule} should be produced by this fixture`);
+  }
 });

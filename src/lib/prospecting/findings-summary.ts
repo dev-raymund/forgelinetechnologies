@@ -120,14 +120,17 @@ export function observationFor(rule: string, scan: QuickScanResult): string | nu
   }
 }
 
+/** One rule the scan reported, with the sentence that states it. */
+export type Observation = { rule: string; line: string };
+
 /**
- * The scan's observations as short factual lines, most severe first and one
- * line per rule.
+ * Every observation the scan supports, most severe first and one per rule.
  *
- * `limit` keeps the list readable on a prospect page. It is a display bound,
- * not a filter on importance.
+ * Carries the rule identifier beside the sentence so a caller can select by
+ * rule rather than by matching prose. Ordering is by the severity the scanner
+ * itself recorded, which is its own metadata and not a judgement about value.
  */
-export function summarizeFindings(scan: QuickScanResult, limit = 6): string[] {
+export function observationList(scan: QuickScanResult): Observation[] {
   const bestSeverity = new Map<string, FindingSeverity>();
   for (const finding of scan.findings) {
     const current = bestSeverity.get(finding.rule);
@@ -138,7 +141,19 @@ export function summarizeFindings(scan: QuickScanResult, limit = 6): string[] {
 
   return [...bestSeverity.entries()]
     .sort((a, b) => SEVERITY_ORDER[a[1]] - SEVERITY_ORDER[b[1]])
-    .map(([rule]) => observationFor(rule, scan))
-    .filter((line): line is string => line !== null)
+    .map(([rule]) => ({ rule, line: observationFor(rule, scan) }))
+    .filter((o): o is Observation => o.line !== null);
+}
+
+/**
+ * The scan's observations as short factual lines, most severe first and one
+ * line per rule.
+ *
+ * `limit` keeps the list readable on a prospect page. It is a display bound,
+ * not a filter on importance.
+ */
+export function summarizeFindings(scan: QuickScanResult, limit = 6): string[] {
+  return observationList(scan)
+    .map((o) => o.line)
     .slice(0, limit);
 }

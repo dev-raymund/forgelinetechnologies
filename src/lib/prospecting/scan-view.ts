@@ -15,7 +15,7 @@
  *
  * Pure: no database, no network, no React.
  */
-import { summarizeFindings } from "./findings-summary.ts";
+import { observationList, summarizeFindings, type Observation } from "./findings-summary.ts";
 import type { OpportunityResult } from "./opportunity.ts";
 import type { QuickScanResult } from "./quick-scan.ts";
 import type { ForgelineService, Opportunity } from "./types.ts";
@@ -33,8 +33,17 @@ export type ScanView = {
   redirected: boolean;
   /** Whether a page was read at all. False means the Website block has little to say. */
   reached: boolean;
-  /** Short factual observation lines. Empty when the scan reached nothing. */
+  /** Short factual observation lines for the screen. Capped for readability. */
   quickFindings: string[];
+  /**
+   * Every observation the scan supports, with its rule identifier.
+   *
+   * The screen shows `quickFindings`; this is the complete set, and it is what
+   * the outreach draft draws a supporting observation from. Keeping the rule
+   * beside the sentence means a caller selects by identifier rather than by
+   * matching prose.
+   */
+  observations: Observation[];
   opportunity: Opportunity;
   /** `null` for No Clear Opportunity and Needs Manual Review. */
   service: ForgelineService | null;
@@ -78,6 +87,7 @@ export function toScanView(scan: QuickScanResult, opportunity: OpportunityResult
     redirected: scan.finalUrl !== null && scan.finalUrl !== scan.requestedUrl,
     reached: scan.finalUrl !== null && scan.httpStatus !== null,
     quickFindings: summarizeFindings(scan),
+    observations: observationList(scan),
     opportunity: opportunity.opportunity,
     service: opportunity.service,
     reason: opportunity.reason,

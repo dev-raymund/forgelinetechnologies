@@ -18,6 +18,7 @@
  * Pure: no database, no network, no authentication, no React, no environment
  * variable, no AI.
  */
+import type { Observation } from "./findings-summary.ts";
 import type { OpportunityResult } from "./opportunity.ts";
 import type { ScanView } from "./scan-view.ts";
 import type { ForgelineService, Opportunity } from "./types.ts";
@@ -70,6 +71,11 @@ export type OutreachInput = {
    */
   contactName?: never;
   opportunity: OutreachOpportunity;
+  /**
+   * Everything the scan observed, for choosing one supporting line. Optional:
+   * without it the draft cites only the rule's own evidence.
+   */
+  observations?: readonly Observation[];
   sender?: OutreachSender;
 };
 
@@ -107,22 +113,57 @@ const ISSUE_PHRASE: Record<string, Issue> = {
     scope: "homepage",
     text: "a form with no working submit control",
   },
+  "Images without declared width or height were detected.": {
+    scope: "homepage",
+    text: "images without declared width or height, which can make the layout move as the page loads",
+  },
+  "More than one title element detected.": { scope: "homepage", text: "more than one page title" },
+  "More than one meta description detected.": {
+    scope: "homepage",
+    text: "more than one meta description",
+  },
+  "More than one H1 detected.": { scope: "homepage", text: "more than one main heading" },
+  "No canonical URL declared.": { scope: "homepage", text: "no canonical URL" },
+  "No JSON-LD structured data detected.": { scope: "homepage", text: "no structured data" },
   "The site is served without HTTPS.": {
     scope: "standalone",
     text: "the site is currently being served without HTTPS",
   },
 };
 
-/** What the email says the conversation would be about. */
-const TOPIC: Record<Opportunity, string> = {
-  SEO: "the on-page basics",
-  "Website Development": "how the site is built",
-  "E-commerce": "the store setup",
-  Automation: "that process",
-  "Web Application": "that",
-  Integration: "those integrations",
-  "No Clear Opportunity": "",
-  "Needs Manual Review": "",
+/**
+ * One further observation that genuinely strengthens the same opportunity.
+ *
+ * Keyed by the rule identifiers `analyze.ts` emits, and deliberately narrow:
+ * an email that lists everything the scan noticed reads like a report, and
+ * an email that reaches across opportunities reads like it was generated.
+ * A finding outside this map is never mentioned, however prominent it is in
+ * the quick findings.
+ *
+ * Website Development takes the observations about how the page is laid out
+ * and rendered. SEO takes the on-page metadata ones. E-commerce takes the
+ * obstacles on the path to buying, which is exactly the set its own rule
+ * fires on. The three human-selected opportunities take none: nothing in a
+ * homepage fetch evidences them, so nothing here may claim to.
+ */
+const SUPPORTING_RULES: Record<Opportunity, readonly string[]> = {
+  "Website Development": ["fixed-width-layout", "missing-viewport", "missing-image-dimensions"],
+  SEO: [
+    "missing-title",
+    "missing-meta-description",
+    "missing-h1",
+    "duplicate-title",
+    "duplicate-meta-description",
+    "multiple-h1",
+    "missing-canonical",
+    "missing-structured-data",
+  ],
+  "E-commerce": ["missing-primary-cta", "form-without-submit-control", "missing-viewport", "fixed-width-layout"],
+  Automation: [],
+  "Web Application": [],
+  Integration: [],
+  "No Clear Opportunity": [],
+  "Needs Manual Review": [],
 };
 
 /** The service, cased for the middle of a sentence. Never renamed. */
@@ -178,6 +219,52 @@ export function describeEvidence(evidence: readonly string[]): {
   return { platform, homepage, standalone, verbatim };
 }
 
+export type SelectedEvidence = {
+  /** The observations the rule fired on. What the email is actually about. */
+  primary: string[];
+  /** At most one further observation, from the same opportunity. */
+  supporting: string | null;
+};
+
+/**
+ * Chooses what the email may mention.
+ *
+ * The primary evidence is the rule's own: `opportunity.ts` already builds it
+ * from that rule's finding set, so it is the reason the opportunity was
+ * chosen rather than a sample of everything the scan saw.
+ *
+ * At most one supporting observation is added, and only from
+ * `SUPPORTING_RULES` for that same opportunity. So a Website Development
+ * email may cite a layout observation; it may not reach for a missing meta
+ * description because the scan happened to notice one.
+ *
+ * Pure, and no ranking: the supporting observation is the first candidate in
+ * the scan's own severity order, not the winner of a score.
+ */
+export function selectOutreachEvidence(
+  opportunity: OutreachOpportunity,
+  observations: readonly Observation[] = [],
+): SelectedEvidence {
+  const primary = opportunity.evidence.filter((line) => !line.startsWith(PLATFORM_PREFIX));
+
+  // A supporting line exists to give a single observation some substance. The
+  // rule already cited several, so a fourth is padding, and the email starts
+  // reading like a report instead of a note from a person.
+  if (primary.length > 1) return { primary, supporting: null };
+
+  const allowed = SUPPORTING_RULES[opportunity.opportunity] ?? [];
+  const already = new Set(primary);
+
+  // Only a candidate the email can actually phrase; an unmapped one would be
+  // pasted in raw, which reads like a report rather than a sentence.
+  const supporting =
+    observations.find(
+      (o) => allowed.includes(o.rule) && !already.has(o.line) && ISSUE_PHRASE[o.line] !== undefined,
+    )?.line ?? null;
+
+  return { primary, supporting };
+}
+
 /**
  * The draft for one opportunity, or a reason not to write one.
  *
@@ -204,7 +291,11 @@ export function generateOutreach(input: OutreachInput): OutreachGenerationResult
     };
   }
 
-  const { platform, homepage, standalone, verbatim } = describeEvidence(evidence);
+  const selected = selectOutreachEvidence(input.opportunity, input.observations);
+  const { platform, homepage, standalone, verbatim } = describeEvidence([
+    ...evidence.filter((line) => line.startsWith(PLATFORM_PREFIX)),
+    ...selected.primary,
+  ]);
   if (homepage.length === 0 && standalone.length === 0 && verbatim.length === 0) {
     return {
       kind: "skip",
@@ -223,9 +314,18 @@ export function generateOutreach(input: OutreachInput): OutreachGenerationResult
   const lead = platform ? `I noticed you're running on ${platform}, and that` : "I noticed that";
   const first = homepageClause ?? standalone[0] ?? null;
   const rest = homepageClause ? standalone : standalone.slice(1);
+  // The supporting observation gets its own sentence rather than joining the
+  // primary list. Several of these phrases carry their own "which …" clause,
+  // and two of them joined by "and" is a sentence nobody would write.
+  const support = selected.supporting ? ISSUE_PHRASE[selected.supporting] : undefined;
+  const supportSentence = support
+    ? `I also noticed that ${support.scope === "homepage" ? `the homepage has ${support.text}` : support.text}.`
+    : null;
+
   const observedSentences = [
     first ? `${lead} ${first}.` : null,
     rest.length ? `I also noticed that ${sentenceList(rest)}.` : null,
+    supportSentence,
   ].filter((line): line is string => line !== null);
 
   const lines = [
@@ -239,7 +339,7 @@ export function generateOutreach(input: OutreachInput): OutreachGenerationResult
     ...(verbatim.length ? [verbatim.join(" "), ""] : []),
     `I run ${sender.company}, a small web development studio, and we work on ${SERVICE_IN_SENTENCE[service]}.`,
     "",
-    `There may be a few things worth looking at around ${TOPIC[opportunity]}. If it would be useful, I can put together a short, no-obligation review for ${company} and send it over.`,
+    `If it would be useful, I can put together a short, no-obligation review for ${company} — what I would look at first, and what I would leave alone.`,
     "",
     "No hard sell — just a few practical things you could consider.",
     "",
@@ -261,6 +361,7 @@ export function outreachFromView(view: ScanView, sender?: OutreachSender): Outre
     companyName: view.siteName,
     websiteUrl: view.finalUrl ?? view.requestedUrl,
     opportunity: { opportunity: view.opportunity, service: view.service, evidence: view.evidence },
+    observations: view.observations,
     ...(sender ? { sender } : {}),
   });
 }
