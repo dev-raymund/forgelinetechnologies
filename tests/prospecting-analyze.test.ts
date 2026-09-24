@@ -60,7 +60,10 @@ test("analysis records response, crawler, resource, and mobile evidence when sup
     finalUrl: "https://example.com/",
     status: 404,
     headers: {},
-    body: "<html><head><title>A</title><title>B</title><meta name=description content='a'><meta name=description content='b'></head><body><img src='/large.jpg' style='width: 1600px'></body></html>",
+    // The fixed width sits on the body, which is what a fixed-width layout
+    // means. It used to sit on the image, and the rule fired on that — which
+    // was the false positive that twenty real sites exposed.
+    body: "<html><head><title>A</title><title>B</title><meta name=description content='a'><meta name=description content='b'></head><body style='width: 1600px'><img src='/large.jpg'></body></html>",
     bytes: 600_000,
     elapsedMs: 4_001,
     redirectChain: ["https://example.com/a", "https://example.com/b", "https://example.com/c", "https://example.com/"],
@@ -131,4 +134,22 @@ test("a plain WordPress site is not reported as WooCommerce", () => {
 
   assert.ok(found.some((indicator) => indicator.name === "WordPress"));
   assert.equal(found.some((indicator) => indicator.name === "WooCommerce"), false);
+});
+
+test("an intrinsic image width no longer counts as a fixed-width layout", () => {
+  // The exact fixture this file used to assert against. It must now be clean:
+  // an image declaring its own size is correct practice, and is what
+  // `missing-image-dimensions` asks for.
+  const result = analyzePage({
+    pageUrl: "https://example.com/",
+    finalUrl: "https://example.com/",
+    status: 200,
+    headers: {},
+    body: "<html><head><title>A</title></head><body><img src='/large.jpg' style='width: 1600px' width='1600'></body></html>",
+    bytes: 900,
+    elapsedMs: 100,
+  });
+
+  const rules = new Set(result.findings.map((finding) => finding.rule));
+  assert.equal(rules.has("fixed-width-layout"), false);
 });

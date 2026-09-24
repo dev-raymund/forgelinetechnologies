@@ -68,7 +68,8 @@ const SEO_GAPS = `${HEAD(`<meta name="viewport" content="width=device-width">`)}
 test("the view names the site from its own title, and always shows the domain", async () => {
   const view = await viewOf(HEALTHY);
 
-  assert.equal(view.siteName, "Acme Plumbing — Sydney");
+  // The title reads "Acme Plumbing — Sydney"; the SEO tail is cut off.
+  assert.equal(view.siteName, "Acme Plumbing");
   assert.equal(view.domain, "acme.example");
   assert.equal(view.requestedUrl, "https://acme.example/");
   assert.equal(view.finalUrl, "https://acme.example/");

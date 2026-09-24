@@ -1,4 +1,5 @@
 import { load, type CheerioAPI } from "cheerio";
+import type { Element } from "domhandler";
 import type {
   AuditFinding,
   Confidence,
@@ -134,6 +135,87 @@ function countCtas($: CheerioAPI): number {
   return $("a, button, input[type='submit']")
     .toArray()
     .filter((element) => CTA_TEXT.test($(element).text().trim())).length;
+}
+
+/**
+ * Elements a page's layout is actually built from. A width on anything else
+ * is not a layout width.
+ */
+const LAYOUT_TAGS = new Set(["body", "div", "main", "section", "header", "footer", "article", "table"]);
+
+/**
+ * How sliders, carousels and marquees name themselves. A wide track inside one
+ * is the component working, not the page being fixed-width.
+ */
+const SLIDER_NAME = /slid|carousel|swiper|owl|slick|flickity|glide|splide|marquee|track|ticker|scroller|masonry/i;
+
+/**
+ * The width range a real fixed-width layout occupies.
+ *
+ * Designers who fix a page width pick something near a desktop viewport. A
+ * value far outside that is a slider track (17100px was one observed in the
+ * wild) or a decorative element, not a layout decision.
+ */
+const MIN_LAYOUT_PX = 1_000;
+const MAX_LAYOUT_PX = 2_000;
+
+/** How far below `body` a genuine layout wrapper sits. */
+const MAX_WRAPPER_DEPTH = 3;
+
+function names($: CheerioAPI, element: Element): string {
+  return `${$(element).attr("class") ?? ""} ${$(element).attr("id") ?? ""}`;
+}
+
+/**
+ * A page whose layout is pinned to a pixel width.
+ *
+ * This rule used to read the `width` attribute of any element and any inline
+ * `width:` declaration. Against twenty real sites that produced twenty
+ * findings and zero true positives: every one was an `<img width="1941">`
+ * declaring its own intrinsic size, which is correct practice and is what
+ * `missing-image-dimensions` asks for. The two rules were contradicting each
+ * other, and the outreach told mobile-ready businesses their site did not work
+ * on a phone.
+ *
+ * So the `width` attribute is not consulted at all. On `img`, `svg`, `canvas`,
+ * `video` and `iframe` it is an intrinsic dimension; on a legacy `table` it
+ * could once have meant layout, but not reliably enough to justify a claim to
+ * a stranger.
+ *
+ * What remains is narrow on purpose: an inline pixel width, in the range a
+ * desktop layout actually uses, on an element the layout is built from, near
+ * the top of the tree, with no sign of slider machinery on it or above it.
+ * Where those cannot all be established the finding is not raised — a false
+ * negative costs a prospect, a false positive costs credibility.
+ */
+export function fixedWidthLayout($: CheerioAPI): { element: string; widthPx: number } | null {
+  for (const element of $("[style]").toArray()) {
+    const tag = (element as Element).tagName?.toLowerCase() ?? "";
+    if (!LAYOUT_TAGS.has(tag)) continue;
+
+    const style = $(element).attr("style") ?? "";
+    // Anchored so `min-width`, `max-width` and custom properties such as
+    // `--smush-placeholder-width` are not read as a layout width.
+    const declared = /(?:^|;)\s*width\s*:\s*(\d{3,5})px/i.exec(style);
+    if (!declared) continue;
+
+    const widthPx = Number(declared[1]);
+    if (widthPx < MIN_LAYOUT_PX || widthPx > MAX_LAYOUT_PX) continue;
+
+    // A transform on the same element is how a slider positions its track.
+    if (/transform\s*:/i.test(style)) continue;
+    if (SLIDER_NAME.test(names($, element as Element))) continue;
+
+    const ancestors = $(element).parents().toArray();
+    if (ancestors.some((parent) => SLIDER_NAME.test(names($, parent as Element)))) continue;
+
+    // A layout wrapper sits near the top. A repeated slide or card does not.
+    const depth = ancestors.filter((a) => (a as Element).tagName?.toLowerCase() !== "html").length;
+    if (tag !== "body" && depth > MAX_WRAPPER_DEPTH) continue;
+
+    return { element: tag, widthPx };
+  }
+  return null;
 }
 
 function canonicalUrl(pageUrl: string, raw: string): string | null {
@@ -363,13 +445,18 @@ export function analyzePage(input: PageAnalysisInput): PageAnalysis {
     }
   });
 
-  const fixedWidth = $("[style], [width]").toArray().some((element) => {
-    const style = $(element).attr("style") ?? "";
-    const width = $(element).attr("width") ?? "";
-    return /width\s*:\s*([1-9]\d{3,})px/i.test(style) || Number(width) > 1_200;
-  });
+  const fixedWidth = fixedWidthLayout($);
   if (fixedWidth) {
-    findings.push(finding(input.finalUrl, "fixed-width-layout", "mobile", "medium", { signal: "large fixed width attribute or inline style" }, "Review large fixed-width layout signals at mobile breakpoints."));
+    findings.push(
+      finding(
+        input.finalUrl,
+        "fixed-width-layout",
+        "mobile",
+        "medium",
+        { element: fixedWidth.element, widthPx: fixedWidth.widthPx },
+        "Review the fixed pixel width on this layout container at mobile breakpoints.",
+      ),
+    );
   }
 
   $("form").each((index, element) => {

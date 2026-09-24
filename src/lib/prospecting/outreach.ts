@@ -111,7 +111,7 @@ const ISSUE_PHRASE: Record<string, Issue> = {
   },
   "A form without a usable submit control was detected.": {
     scope: "homepage",
-    text: "a form with no working submit control",
+    text: "a form without an obvious submit control",
   },
   "Images without declared width or height were detected.": {
     scope: "homepage",
@@ -147,7 +147,14 @@ const ISSUE_PHRASE: Record<string, Issue> = {
  * homepage fetch evidences them, so nothing here may claim to.
  */
 const SUPPORTING_RULES: Record<Opportunity, readonly string[]> = {
-  "Website Development": ["fixed-width-layout", "missing-viewport", "missing-image-dimensions"],
+  "Website Development": [
+    "fixed-width-layout",
+    "missing-viewport",
+    "missing-image-dimensions",
+    "slow-response",
+    "oversized-html",
+    "form-without-submit-control",
+  ],
   SEO: [
     "missing-title",
     "missing-meta-description",
@@ -178,6 +185,47 @@ const SERVICE_IN_SENTENCE: Record<ForgelineService, string> = {
 };
 
 const PLATFORM_PREFIX = "Storefront platform detected: ";
+
+/**
+ * Observations that carry a measured number, so their sentence is built rather
+ * than looked up.
+ *
+ * Both are tied to the moment of the scan on purpose. Response time and
+ * payload size vary with the network and the server, so "took about six
+ * seconds to respond when I checked" is something the scan can stand behind;
+ * "your website is slow" is not.
+ */
+function measuredIssue(line: string): Issue | null {
+  const responseMs = /^Response time: ([\d,]+) ms\.$/.exec(line);
+  if (responseMs) {
+    const ms = Number(responseMs[1]!.replace(/,/g, ""));
+    const seconds = ms / 1000;
+    const rounded = seconds >= 10 ? Math.round(seconds) : Math.round(seconds * 10) / 10;
+    return {
+      scope: "standalone",
+      text: `the homepage took about ${rounded} seconds to respond when I checked`,
+    };
+  }
+
+  const htmlBytes = /^HTML size: ([\d,]+) bytes\.$/.exec(line);
+  if (htmlBytes) {
+    const bytes = Number(htmlBytes[1]!.replace(/,/g, ""));
+    const size = bytes >= 1_000_000
+      ? `${(bytes / 1_000_000).toFixed(1)} MB`
+      : `${Math.round(bytes / 1_000)} KB`;
+    return {
+      scope: "standalone",
+      text: `the homepage returned about ${size} of HTML when I checked`,
+    };
+  }
+
+  return null;
+}
+
+/** The sentence form of one observation, looked up or measured. */
+function issueFor(line: string): Issue | undefined {
+  return ISSUE_PHRASE[line] ?? measuredIssue(line) ?? undefined;
+}
 
 /** Joins with commas and a final "and". */
 function sentenceList(items: readonly string[]): string {
@@ -210,7 +258,7 @@ export function describeEvidence(evidence: readonly string[]): {
       platform = line.slice(PLATFORM_PREFIX.length).replace(/\.$/, "") || null;
       continue;
     }
-    const issue = ISSUE_PHRASE[line];
+    const issue = issueFor(line);
     if (!issue) verbatim.push(line);
     else if (issue.scope === "homepage") homepage.push(issue.text);
     else standalone.push(issue.text);
@@ -259,7 +307,7 @@ export function selectOutreachEvidence(
   // pasted in raw, which reads like a report rather than a sentence.
   const supporting =
     observations.find(
-      (o) => allowed.includes(o.rule) && !already.has(o.line) && ISSUE_PHRASE[o.line] !== undefined,
+      (o) => allowed.includes(o.rule) && !already.has(o.line) && issueFor(o.line) !== undefined,
     )?.line ?? null;
 
   return { primary, supporting };
@@ -313,11 +361,15 @@ export function generateOutreach(input: OutreachInput): OutreachGenerationResult
   const homepageClause = homepage.length ? `the homepage has ${sentenceList(homepage)}` : null;
   const lead = platform ? `I noticed you're running on ${platform}, and that` : "I noticed that";
   const first = homepageClause ?? standalone[0] ?? null;
-  const rest = homepageClause ? standalone : standalone.slice(1);
+  // At most one further observation reaches the reader. A rule that fired on
+  // three things produced "took about 3 seconds to respond when I checked and
+  // returned about 515 KB of HTML when I checked" — accurate, and nobody
+  // writes like that. The rest stay on the prospect page where they belong.
+  const rest = (homepageClause ? standalone : standalone.slice(1)).slice(0, 1);
   // The supporting observation gets its own sentence rather than joining the
   // primary list. Several of these phrases carry their own "which …" clause,
   // and two of them joined by "and" is a sentence nobody would write.
-  const support = selected.supporting ? ISSUE_PHRASE[selected.supporting] : undefined;
+  const support = selected.supporting ? issueFor(selected.supporting) : undefined;
   const supportSentence = support
     ? `I also noticed that ${support.scope === "homepage" ? `the homepage has ${support.text}` : support.text}.`
     : null;

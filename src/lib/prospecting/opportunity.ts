@@ -60,8 +60,51 @@ type OpportunityRule = {
  */
 const CORE_SEO_RULES = ["missing-title", "missing-meta-description", "missing-h1"] as const;
 
-/** Concrete implementation faults, each a deterministic finding or a scan fact. */
-const TECHNICAL_RULES = ["missing-viewport", "fixed-width-layout", "redirect-chain-too-long"] as const;
+/**
+ * Concrete implementation faults, each a deterministic finding or a scan fact.
+ *
+ * `slow-response`, `oversized-html` and `form-without-submit-control` were
+ * added after a twenty-site validation: all three are emitted by the scanner
+ * at thresholds it already defines, all three were observed on real sites, and
+ * none of them could reach an opportunity. A homepage taking six seconds is a
+ * better reason to make contact than most things this tool detects.
+ *
+ * `slow-response` and `oversized-html` were previously excluded because both
+ * vary with the network. They still do, which is why the wording ties them to
+ * the moment of the scan rather than asserting the site is slow or heavy.
+ */
+const TECHNICAL_RULES = [
+  "missing-viewport",
+  "fixed-width-layout",
+  "redirect-chain-too-long",
+  "oversized-html",
+  "form-without-submit-control",
+] as const;
+
+/**
+ * How slow a homepage must be before it is a reason to make contact.
+ *
+ * The scanner reports `slow-response` past 3,000ms, and that finding is left
+ * exactly as it is — it belongs on the prospect page either way. But a
+ * measurement is one sample, over one network, at one moment, and validation
+ * showed how far that moves: the same site answered in 6,366ms and then
+ * 4,798ms, another in 4,265ms and then 5,071ms. At the finding's own threshold
+ * that produced outreach off 3,007ms and 3,163ms — seven milliseconds past the
+ * line, and a different answer on the next run.
+ *
+ * 4,000ms is far enough from the boundary that a result survives the variance.
+ * `>=` rather than `>`, so the boundary itself qualifies.
+ */
+const SLOW_RESPONSE_OPPORTUNITY_MS = 4_000;
+
+/** True when the measured response is slow enough to justify contact. */
+function slowEnoughForOutreach(scan: QuickScanResult): boolean {
+  return (
+    has(scan, "slow-response") &&
+    scan.responseTimeMs !== null &&
+    scan.responseTimeMs >= SLOW_RESPONSE_OPPORTUNITY_MS
+  );
+}
 
 /** Observable obstacles on the path to enquiring or buying. */
 const COMMERCE_RULES = [
@@ -252,13 +295,15 @@ const websiteDevelopmentRule: OpportunityRule = {
     const evidence = [
       insecure ? "The site is served without HTTPS." : null,
       ...evidenceFor(scan, TECHNICAL_RULES),
+      // Held to a higher bar than the finding: see SLOW_RESPONSE_OPPORTUNITY_MS.
+      ...(slowEnoughForOutreach(scan) ? evidenceFor(scan, ["slow-response"]) : []),
     ].filter((line): line is string => line !== null);
     if (evidence.length === 0) return null;
 
     return {
       reason: insecure
         ? "The site is served without HTTPS, which is a concrete technical issue worth reviewing."
-        : "The homepage shows a concrete technical issue in how the site is built, which is worth reviewing.",
+        : "The homepage shows a concrete technical issue in how the site is built or delivered, which is worth reviewing.",
       evidence,
     };
   },

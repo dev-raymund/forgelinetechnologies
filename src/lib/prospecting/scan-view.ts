@@ -53,6 +53,30 @@ export type ScanView = {
   evidence: string[];
 };
 
+/**
+ * Separators a site puts between its name and its SEO tail.
+ *
+ * The ASCII hyphen is deliberately absent. Plenty of real names contain one —
+ * "Roofing in Charlottesville, VA - Vanguard Roofing" is a title where cutting
+ * at the hyphen would throw away the company — so only the separators that are
+ * conventionally decorative are used.
+ */
+const TITLE_SEPARATOR = /\s*[|–—]\s*/;
+
+/**
+ * The business name out of a page title.
+ *
+ * Titles are written for search results, so they routinely read "The Roofing
+ * Company North West | Local Roofing Contractor | Manchester". Addressing an
+ * email to all of that announces it was generated. The first segment is the
+ * name often enough to be worth taking, and nothing is added: no legal suffix,
+ * no expansion, no guess.
+ */
+export function cleanSiteName(title: string): string {
+  const [first = ""] = title.split(TITLE_SEPARATOR);
+  return first.trim();
+}
+
 /** The host of a URL, lower-cased and without `www.`; `""` when unparseable. */
 export function hostOf(url: string | null): string {
   if (!url) return "";
@@ -75,9 +99,10 @@ export function hostOf(url: string | null): string {
  */
 export function toScanView(scan: QuickScanResult, opportunity: OpportunityResult): ScanView {
   const domain = hostOf(scan.finalUrl) || hostOf(scan.requestedUrl);
-  const title = scan.page?.title?.trim() ?? "";
+  const title = cleanSiteName(scan.page?.title ?? "");
 
   return {
+    // Cleaned title, else the domain. Never a name that was not on the page.
     siteName: title || domain || scan.requestedUrl,
     domain,
     requestedUrl: scan.requestedUrl,
