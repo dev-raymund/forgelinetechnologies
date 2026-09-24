@@ -8,8 +8,8 @@ import { Technology } from "@/components/home/technology";
 import { People } from "@/components/sections/people";
 import { Reviews } from "@/components/sections/reviews";
 import { promises, promiseStatement } from "@/data/promise";
-import { site, founder, stats, marketsSentence } from "@/lib/site";
-import { projects } from "@/data/projects";
+import { site, founder, statsWith, marketsSentence } from "@/lib/site";
+import { countPublishedProjects } from "@/lib/queries";
 import { Counter } from "@/components/ui/counter";
 
 export const metadata: Metadata = {
@@ -38,14 +38,17 @@ const poorFit = [
   "Buyers looking for the cheapest possible quote rather than something maintainable afterwards.",
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const projectCount = await countPublishedProjects();
+  const stats = statsWith(projectCount);
+
   return (
     <>
       <PageHeader
         visual={<PageVisual variant="about" />}
         meta="About Forgeline"
-        title="Professional digital solutions, delivered directly"
-        dek="Forgeline Technologies designs, develops and supports websites, web applications, e-commerce and custom software for businesses that need reliable technology without unnecessary layers between the brief and the build."
+        title="An engineering team, not a developer for hire"
+        dek="We work out what a business actually needs before deciding what to build. Sometimes that is a website. Often it is an application, an integration, or removing work a person is doing by hand. The service follows the problem."
       />
 
       <Section ground="paper" size="lg" labelledBy="why-exists">
@@ -127,7 +130,7 @@ export default function AboutPage() {
           id="experience-title"
           eyebrow="Track record"
           title="What we have delivered"
-          dek={`${projects.length} projects delivered for businesses in ${marketsSentence}, across websites, web applications, e-commerce and custom software.`}
+          dek={`${projectCount} projects delivered across websites, web applications, e-commerce and custom software — for businesses in ${marketsSentence}.`}
           aside={
             <Link
               href="/work"

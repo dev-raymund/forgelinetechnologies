@@ -1,5 +1,5 @@
 import { ButtonLink } from "@/components/ui/button";
-import { stats, marketsSentence } from "@/lib/site";
+import { statsWith, marketsSentence } from "@/lib/site";
 import { HeroVisual } from "@/components/home/hero-visual";
 import { ArrowRight, Search } from "@/components/ui/icon";
 import { Counter } from "@/components/ui/counter";
@@ -7,10 +7,11 @@ import { Counter } from "@/components/ui/counter";
 /**
  * Hero.
  *
- * Typography-led, on the dark ground the brief asks for. The headline runs as
- * two statements: what the studio builds, then who builds it. The second is
- * the actual differentiator, so it gets its own sentence at display size
- * rather than being demoted to the paragraph underneath.
+ * Typography-led, on the dark ground the brief asks for. The headline is the
+ * positioning in two lines: the thing a buyer thinks they are shopping for,
+ * and what they should be shopping for instead. It used to open with a list of
+ * services, which reads as a menu — and a menu invites you to compare on price
+ * against everyone else offering the same three words.
  *
  * The right-hand side is deliberately empty. Asymmetry here comes from space
  * rather than from a decorative object, which is both more confident and one
@@ -23,7 +24,8 @@ import { Counter } from "@/components/ui/counter";
  * up from a literal 0 in the HTML, so crawlers and no-JS visitors saw a studio
  * claiming six years of nothing.
  */
-export function Hero() {
+export function Hero({ projectCount }: { projectCount: number }) {
+  const stats = statsWith(projectCount);
   return (
     <section className="on-ink bg-ink text-on-ink" aria-labelledby="hero-title">
       <div className="shell">
@@ -35,16 +37,13 @@ export function Hero() {
                 className="text-display max-w-[19ch] font-semibold text-white"
               >
                 <span className="rise block" style={{ animationDelay: "60ms" }}>
-                  Websites, web applications and custom software.
+                  Don&rsquo;t just hire a developer.
                 </span>
-                {/* Subordinate by size, not just by colour. Two sentences set at
-                the same scale compete; the differentiator reads better as the
-                answering clause than as a second shout. */}
-                <span
-                  className="rise mt-[0.28em] block text-[0.62em] font-normal tracking-[-0.02em] text-on-ink-muted"
-                  style={{ animationDelay: "200ms" }}
-                >
-                  Built by the people you brief.
+                {/* The second line is the claim, so it carries the emphasis.
+                    The first sets up what is being argued against; this answers
+                    it, and the weight belongs on the answer. */}
+                <span className="rise block text-accent" style={{ animationDelay: "200ms" }}>
+                  Hire an engineering team.
                 </span>
               </h1>
 
@@ -53,11 +52,11 @@ export function Hero() {
                 style={{ animationDelay: "340ms" }}
               >
                 <p className="text-dek text-on-ink-muted">
-                  Forgeline Technologies builds and supports websites, web
-                  applications, e-commerce and custom software for businesses
-                  that need technology to work properly — with the scope and
-                  the price agreed before development starts, and direct
-                  access to the people building it.
+                  We don&rsquo;t just build what you ask for. We work out what the
+                  problem actually is, then design and build the right thing —
+                  a website, an application, a store, an automation or an
+                  integration. Scope and price agreed before development
+                  starts, and direct access to the people building it.
                 </p>
               </div>
 
@@ -65,24 +64,20 @@ export function Hero() {
                 className="rise mt-10 flex flex-col gap-3 sm:flex-row sm:items-center"
                 style={{ animationDelay: "440ms" }}
               >
+                {/* Two entry points, deliberately. Half the market knows what
+                  it wants built; the other half knows something is wrong and
+                  cannot specify it. A CTA that assumes a specification only
+                  serves the first, which is why neither of these does. */}
                 <ButtonLink
                   href="/contact"
                   ground="ink"
                   variant="solid"
                   icon={<ArrowRight />}
                 >
-                  Start a project
+                  Talk about your project
                 </ButtonLink>
-                {/* Two entry points, deliberately. Half the market knows what it
-                  wants built; the other half knows something is wrong and
-                  cannot specify it. "Start a project" only serves the first. */}
-                <ButtonLink
-                  href="/build-audit"
-                  ground="ink"
-                  variant="outline"
-                  icon={<Search />}
-                >
-                  Book a Build Audit
+                <ButtonLink href="/work" ground="ink" variant="outline" icon={<Search />}>
+                  See our work
                 </ButtonLink>
               </div>
             </div>

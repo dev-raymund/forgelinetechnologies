@@ -126,7 +126,7 @@ export function SiteHeader() {
                 href="/contact"
                 className="inline-flex items-center gap-2 rounded-sm bg-accent px-4 py-2.5 text-[0.9375rem] font-medium text-white transition-colors hover:bg-accent-deep"
               >
-                Start a project
+                Start a conversation
                 <ArrowRight />
               </Link>
             </div>
@@ -192,7 +192,7 @@ export function SiteHeader() {
               href="/contact"
               className="mt-6 flex items-center justify-center gap-2 rounded-sm bg-accent px-4 py-3.5 text-center font-medium text-white"
             >
-              Start a project
+              Start a conversation
               <ArrowRight />
             </Link>
           </nav>

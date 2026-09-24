@@ -42,9 +42,9 @@ const origin = resolveOrigin();
 export const site = {
   name: "Forgeline Technologies",
   shortName: "Forgeline",
-  tagline: "Web development and digital product engineering",
+  tagline: "An engineering team for digital problems",
   description:
-    "Forgeline Technologies designs, develops and supports websites, web applications, e-commerce and custom software for businesses that need reliable technology — scoped and priced before work starts, and built by the people you brief.",
+    "Forgeline Technologies is an engineering team. We work out what the problem actually is, then design, build and improve the website, application, store, automation or integration that solves it — scoped and priced before work starts, and built by the people you brief.",
   url: origin,
   /**
    * The address shown publicly on the site, and nothing else.
@@ -101,13 +101,7 @@ export function absoluteUrl(src: string): string {
  * measurements look like promises too. It still appears where it belongs, in
  * the closing CTA and the FAQ. Symmetry is not worth a weaker signal.
  */
-export const stats = [
-  { value: "6+", label: "Years building" },
-  { value: "17", label: "Projects shipped" },
-  { value: "4", label: "Countries served" },
-] as const;
-
-/** Markets with delivered work behind the "4 countries" figure. */
+/** Markets with delivered work behind the "countries served" figure. */
 export const markets = [
   "Australia",
   "New Zealand",
@@ -120,6 +114,29 @@ export const markets = [
  * no join() of the list above can produce — so the sentence form is written
  * once here rather than assembled wrongly at each call site.
  */
+export type Stat = { value: string; label: string };
+
+/**
+ * The two figures that do not move on their own.
+ *
+ * "Projects shipped" is deliberately absent: it was hardcoded as 17 while the
+ * database held 19 published, and a number maintained by hand is a number that
+ * drifts. `statsWith` takes the real count from the caller instead.
+ */
+export const fixedStats: readonly Stat[] = [
+  { value: "6+", label: "Years building" },
+  { value: String(markets.length), label: "Countries served" },
+];
+
+/** The credibility row, with the live project count in the middle. */
+export function statsWith(projectCount: number): Stat[] {
+  return [
+    fixedStats[0]!,
+    { value: String(projectCount), label: "Projects shipped" },
+    fixedStats[1]!,
+  ];
+}
+
 export const marketsSentence =
   "Australia, New Zealand, the United States and the Philippines";
 

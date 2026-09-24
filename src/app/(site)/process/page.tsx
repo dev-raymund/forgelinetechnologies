@@ -10,7 +10,7 @@ import { ArrowRight } from "@/components/ui/icon";
 export const metadata: Metadata = {
   title: "How we work",
   description:
-    "Four steps from first call to launch. Scope and price agreed before any code is written, weekly visible progress, and a clean handover you own outright.",
+    "Understand the problem, plan the right solution, engineer it, build it, then keep improving it. Scope and price agreed before any code is written, and a clean handover you own outright.",
   alternates: { canonical: "/process" },
 };
 
@@ -47,12 +47,12 @@ export default function ProcessPage() {
         visual={<PageVisual variant="process" />}
         meta={METHOD_NAME}
         title="How we work"
-        dek="A clear process from first conversation to launch, with agreed scope, visible progress and direct communication throughout. Most projects go wrong quietly — the scope drifts, the budget moves, and nobody says anything until launch. Four steps, no stage you cannot see into, and a diagnosis before a quote."
+        dek="Understand the problem, plan the right solution, engineer it, build it, then keep improving it. Most projects go wrong quietly — the scope drifts, the budget moves, and nobody says anything until launch. No stage you cannot see into, and a diagnosis before a quote."
       />
 
       <Section ground="paper" size="lg" labelledBy="steps-title">
         <h2 id="steps-title" className="sr-only">
-          The four steps
+          {processSteps.length === 5 ? "The five steps" : "The steps"}
         </h2>
 
         <ol className="flex flex-col">

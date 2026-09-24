@@ -40,7 +40,7 @@ export function ClosingCta() {
                 You know what you need
               </p>
               <h3 className="mt-3 text-subtitle font-semibold text-white">
-                Start a project
+                Talk about your project
               </h3>
               <p className="mt-3 max-w-[44ch] text-[0.9375rem] leading-relaxed text-on-ink-muted">
                 Send the details and you get a reply from a developer who
@@ -54,7 +54,7 @@ export function ClosingCta() {
                   variant="solid"
                   icon={<ArrowRight />}
                 >
-                  Start a project
+                  Talk about your project
                 </ButtonLink>
               </div>
             </div>

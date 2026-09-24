@@ -7,6 +7,11 @@
  *
  * Diagnose comes first on purpose. Quoting before understanding the problem is
  * how projects end up building the wrong thing correctly.
+ *
+ * Improve is last for the same reason it is optional: a system that is still
+ * in use keeps changing, and pretending a launch is the end of the work would
+ * be the comfortable lie rather than the true one. It is only ever engaged
+ * where ongoing development is actually agreed.
  */
 
 export type ProcessStep = {
@@ -29,7 +34,7 @@ export const processSteps: ProcessStep[] = [
     number: "02",
     title: "Define",
     summary:
-      "Scope, deliverables, technical approach and price, agreed in writing. Decisions that are expensive to reverse get made here, deliberately, while they are still cheap.",
+      "Scope, deliverables, technical approach and price, agreed in writing. This is where the engineering decisions get made — what to build, what to reuse, what to leave alone — while reversing them is still cheap.",
     outcome: "A fixed scope and a fixed price, before any code is written.",
   },
   {
@@ -43,10 +48,17 @@ export const processSteps: ProcessStep[] = [
     number: "04",
     title: "Launch",
     summary:
-      "Deployed, tested and handed over clean — code, accounts and documentation. You own all of it. Ongoing improvement is available if you want it, not assumed.",
+      "Deployed, tested and handed over clean — code, accounts and documentation. You own all of it, and you are free to take it to any developer.",
     outcome: "A live product, full ownership, and no lock-in.",
+  },
+  {
+    number: "05",
+    title: "Improve",
+    summary:
+      "Systems that stay in use keep changing. Where ongoing development is agreed, we keep the thing working and keep making it better as the business moves — measured against what you actually need next, not a retainer that has to be spent.",
+    outcome: "A system that keeps up, with the option to stop whenever you want.",
   },
 ];
 
-/** The method's name, used wherever the four steps appear together. */
+/** The method's name, used wherever the steps appear together. */
 export const METHOD_NAME = "The Forgeline Build Method";

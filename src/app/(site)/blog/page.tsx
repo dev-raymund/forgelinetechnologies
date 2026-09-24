@@ -11,7 +11,7 @@ import { excerptFrom } from "@/lib/markdown";
 export const metadata: Metadata = {
   title: "Blog",
   description:
-    "Notes on building and maintaining websites, web applications and the systems a business runs on.",
+    "Notes on engineering the systems a business runs on — websites, applications, integrations and the decisions behind them.",
   alternates: { canonical: "/blog" },
 };
 
@@ -31,7 +31,7 @@ export default async function BlogIndex() {
       <PageHeader
         visual={<PageVisual variant="about" />}
         meta="Blog"
-        title="Notes from the build"
+        title="Notes on building things properly"
         dek="Written when there is something worth saying about how a thing was built, or why it went the way it did. No posting schedule."
       />
 

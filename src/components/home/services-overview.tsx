@@ -32,9 +32,9 @@ export function ServicesOverview() {
     <Section id="services" ground="paper" size="lg" labelledBy="services-title">
       <SectionHeading
         id="services-title"
-        eyebrow="What we do"
-        title="Digital solutions built around your business"
-        dek="Websites, web applications, e-commerce, custom software, integrations, search and automation — grouped by what you are trying to achieve rather than by the technology behind it. Most projects begin in one group and touch a second."
+        eyebrow="What we solve"
+        title="One team. Different problems."
+        dek="You do not always need a new website. Sometimes the answer is a better workflow, a custom application, a faster store, an integration, or a system that removes repetitive work. Grouped by what you are trying to achieve rather than by the technology behind it."
       />
 
       <div className="flex flex-col gap-14 md:gap-16">

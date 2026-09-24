@@ -11,7 +11,7 @@ import { marketsSentence } from "@/lib/site";
 import { Reveal } from "@/components/ui/reveal";
 
 export const metadata: Metadata = {
-  title: "Work",
+  title: "Selected work",
   description: `Real websites, web applications, e-commerce and custom software delivered for businesses in ${marketsSentence}.`,
   alternates: { canonical: "/work" },
 };
@@ -42,7 +42,7 @@ export default async function WorkPage({
       <PageHeader
         visual={<PageVisual variant="work" />}
         meta={`${projects.length} projects`}
-        title="Our work"
+        title="Problems we were brought in to solve"
         dek={`${projects.length} projects delivered for businesses in ${marketsSentence} — real websites, applications and digital products. Where a client's site is still publicly reachable the link goes to it; a build can outlive the site it produced, and we say so rather than link to a dead domain.`}
       />
 

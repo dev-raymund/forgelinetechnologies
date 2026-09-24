@@ -11,7 +11,7 @@ import { Reveal } from "@/components/ui/reveal";
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "Published fixed prices. Web app builds from $4,000, websites from $800, ongoing development from $1,500 a month and maintenance from $150 a month.",
+    "Every engagement starts with understanding the problem, the scope and the requirements. These are the published starting figures those fixed quotes are built from.",
   alternates: { canonical: "/pricing" },
 };
 
@@ -118,7 +118,7 @@ export default function PricingPage() {
                         : "border border-rule-strong text-graphite hover:border-graphite hover:bg-paper"
                     }`}
                   >
-                    Start a project
+                    Talk about your project
                     <ArrowRight />
                   </Link>
                 </div>

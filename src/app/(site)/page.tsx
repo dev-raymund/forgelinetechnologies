@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { site } from "@/lib/site";
+import { countPublishedProjects } from "@/lib/queries";
 import {
   organizationSchema,
   websiteSchema,
@@ -14,14 +15,14 @@ import { WhyForgeline } from "@/components/home/why-forgeline";
 import { Promise } from "@/components/home/promise";
 import { Technology } from "@/components/home/technology";
 import { Process } from "@/components/home/process";
-import { Founder } from "@/components/home/founder";
+import { Team } from "@/components/home/team";
 import { Faq } from "@/components/home/faq";
 import { ClosingCta } from "@/components/sections/cta-band";
 
 export const metadata: Metadata = {
   // `absolute` so the homepage title is not suffixed by the layout template.
   title: {
-    absolute: `${site.name} — Web Development & Digital Products`,
+    absolute: `${site.name} | Engineering Digital Solutions`,
   },
   description: site.description,
   alternates: { canonical: "/" },
@@ -43,7 +44,9 @@ export const metadata: Metadata = {
  * Sections carry their own weight via the `size` prop rather than everything
  * defaulting to enormous.
  */
-export default function HomePage() {
+export default async function HomePage() {
+  const projectCount = await countPublishedProjects();
+
   return (
     <>
       <script
@@ -59,7 +62,7 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: jsonLd(faqSchema()) }}
       />
 
-      <Hero />
+      <Hero projectCount={projectCount} />
       <Problem />
       <ServicesOverview />
       <WhyForgeline />
@@ -67,7 +70,7 @@ export default function HomePage() {
       <FeaturedWork />
       <Process />
       <Technology ground="paper" />
-      <Founder />
+      <Team />
       <Faq />
       <ClosingCta />
     </>

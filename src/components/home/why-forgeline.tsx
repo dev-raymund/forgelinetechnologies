@@ -1,15 +1,18 @@
 import { Section, SectionHeading } from "@/components/ui/section";
 import { Reveal } from "@/components/ui/reveal";
+import { differences, engineeringSteps, executionSteps } from "@/data/engineering";
 
 /**
  * Why Forgeline.
  *
- * The studio's actual differentiator is structural, so the section is built
- * structurally: two chains side by side, one long and one short. The argument
- * is made by the difference in length before a word of it is read, which is
- * why this is a diagram rather than another list of adjectives.
+ * The argument is structural, so the section is built structurally: two
+ * sequences side by side. The emphasised one is the LONGER of the two, and
+ * that inversion is the point — the extra steps sit before and after the
+ * build, which is where the decisions that cost money get made.
  *
- * The comparison is to a typical agency structure, not to a named competitor.
+ * The comparison is to a way of working, never to a named competitor and never
+ * to developers as people. Plenty of work genuinely is "build this, to this
+ * spec"; the argument is about what happens when nobody checked the spec.
  *
  * The emphasised chain uses `accent`, not an `accent-bright` variant. That
  * token never existed in the theme, so Tailwind generated no rule for it and
@@ -18,36 +21,6 @@ import { Reveal } from "@/components/ui/reveal";
  * orange on ink measures 5.42:1, so the real token is both correct and legible
  * here.
  */
-
-const typicalChain = [
-  "You",
-  "Account manager",
-  "Project manager",
-  "Design team",
-  "Developer",
-  "Your product",
-];
-
-const forgelineChain = ["You", "The team building it", "Your product"];
-
-const consequences = [
-  {
-    title: "Fewer misunderstandings",
-    body: "Your requirements go directly to the people responsible for implementing them. Nothing is re-interpreted on its way to the build, so what ships matches what you asked for.",
-  },
-  {
-    title: "Faster decisions",
-    body: "Technical questions are answered on the call by the people responsible for the work, instead of being taken away and returned the following week.",
-  },
-  {
-    title: "One point of accountability",
-    body: "One team is responsible for the result. If something is wrong there is no discussion about whose scope it was, which makes it faster to resolve.",
-  },
-  {
-    title: "A handover you can act on",
-    body: "Code, accounts and documentation transfer to you on completion. You own the result outright and are free to take it to any developer.",
-  },
-];
 
 function Chain({
   label,
@@ -109,22 +82,18 @@ export function WhyForgeline() {
       <SectionHeading
         id="why-title"
         eyebrow="Why Forgeline"
-        title="A simpler way to get digital work done"
-        dek="You work directly with the people responsible for your project. Layered teams earn their keep on large programmes; on a website or a web application, every handoff is a point where the brief can drift — and that is where most projects go wrong, long before the code does."
+        title="A developer builds it. An engineering team solves it."
+        dek="Hiring execution gets you the thing you specified, which works when the specification is right. Often nobody has checked — and a project that builds the wrong thing correctly is still a project you pay for twice."
       />
 
       <div className="grid gap-12 md:grid-cols-12 md:gap-8">
         <Reveal className="grid grid-cols-2 gap-8 md:col-span-5">
-          <Chain
-            label="A typical agency"
-            steps={typicalChain}
-            emphasis={false}
-          />
-          <Chain label="Forgeline" steps={forgelineChain} emphasis />
+          <Chain label="Execution only" steps={executionSteps} emphasis={false} />
+          <Chain label="Engineering" steps={engineeringSteps} emphasis />
         </Reveal>
 
         <dl className="grid gap-x-8 gap-y-9 sm:grid-cols-2 md:col-span-6 md:col-start-7">
-          {consequences.map((item, i) => (
+          {differences.map((item, i) => (
             <Reveal key={item.title} delay={i * 60}>
               <dt className="text-[1.0625rem] font-semibold text-white">
                 {item.title}

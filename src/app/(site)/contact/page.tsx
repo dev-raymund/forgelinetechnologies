@@ -7,9 +7,9 @@ import { ContactForm } from "@/components/forms/contact-form";
 import { site, marketsSentence } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Start a project",
+  title: "Talk through the problem",
   description:
-    "Send your project details and get a reply from a developer who would work on it. Free scoping call, then a fixed scope and a fixed price before any code is written.",
+    "Tell us what you are trying to improve, build, automate or connect, and we will help you work out the right next step. Free scoping call, then a fixed scope and a fixed price before any code is written.",
   alternates: { canonical: "/contact" },
 };
 
@@ -31,7 +31,7 @@ const whatHappens = [
   },
   {
     step: "02",
-    title: "You get a reply from a developer",
+    title: "You get a reply from the team",
     body: "Not a sales sequence, and not an account manager. If it is not a fit, we will tell you rather than sell to you.",
   },
   {
@@ -51,8 +51,8 @@ export default function ContactPage() {
     <>
       <PageHeader
         visual={<PageVisual variant="contact" />}
-        meta="Start a project"
-        title="Tell us what you are trying to build"
+        meta="Start a conversation"
+        title="Have a problem worth solving?"
         dek="Whether you are building something new, improving what you have, or automating work your team should not have to repeat, send the details and we will work out the right next step. If you are still deciding what you need, say so — scoping it is part of the job."
       />
 

@@ -9,9 +9,9 @@ import { getProject } from "@/data/projects";
 import { ServiceIcon } from "@/components/ui/service-icon";
 
 export const metadata: Metadata = {
-  title: "Services",
+  title: "What we solve",
   description:
-    "Websites, web applications, e-commerce, custom software, APIs and integrations, and ongoing development — six services, each commissioned on its own.",
+    "You do not always need a new website. Sometimes the answer is a custom application, a faster store, an integration, better search visibility, or removing work someone is doing by hand.",
   alternates: { canonical: "/services" },
 };
 
@@ -28,7 +28,7 @@ export default function ServicesPage() {
       <PageHeader
         visual={<PageVisual variant="services" />}
         meta="Services"
-        title="What we do"
+        title="One team. Different problems."
         dek={`Digital solutions built around your business — ${services.length} services spanning websites, web applications, e-commerce, custom software, integrations, search and automation. Each one is something a business commissions on its own, not a bullet inside a bigger package.`}
       />
 

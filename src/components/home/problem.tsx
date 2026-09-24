@@ -20,7 +20,7 @@ export function Problem() {
       <SectionHeading
         id="problem-title"
         eyebrow="Where projects start"
-        title="The website is rarely the whole problem"
+        title="Most digital problems aren't development problems"
         dek="Most projects arrive described as a redesign and turn out to be something else — two systems that cannot talk to each other, a process still running on a spreadsheet, or a site search engines cannot read properly. Identifying which one you have is the first piece of work."
       />
 

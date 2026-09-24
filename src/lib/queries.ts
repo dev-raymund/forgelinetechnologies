@@ -12,6 +12,14 @@ export { withRetry };
 
 /* ---------------------------------------------------------------- projects */
 
+/** How many projects are actually published. The figure the site quotes. */
+export async function countPublishedProjects(): Promise<number> {
+  const rows = await withRetry(() =>
+    getDb().select({ n: sql<number>`count(*)::int` }).from(projects).where(eq(projects.status, "published")),
+  );
+  return rows[0]?.n ?? 0;
+}
+
 export async function getPublishedProjects(): Promise<Project[]> {
   return withRetry(() =>
     getDb()

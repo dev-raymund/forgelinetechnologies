@@ -19,7 +19,7 @@ export function Process() {
       <SectionHeading
         id="process-title"
         eyebrow={METHOD_NAME}
-        title="How we work"
+        title="Understand. Plan. Engineer. Build. Improve."
         dek="A clear process from first conversation to launch, with agreed scope, visible progress and direct communication at every stage. The first step is a diagnosis rather than a quote, because building the wrong thing correctly is the most expensive mistake in this industry."
       />
 
