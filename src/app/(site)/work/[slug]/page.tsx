@@ -22,11 +22,15 @@ export async function generateStaticParams() {
 }
 
 /**
- * A slug outside the published set is a 404. `dynamicParams` stays false so an
- * unpublished or deleted project cannot be reached by guessing its URL between
- * rebuilds.
+ * A project published after the last deploy is not in the list above, so
+ * `dynamicParams` stays true — otherwise it would 404 until someone redeployed,
+ * while the work index already linked to it.
+ *
+ * An unpublished or deleted project is still a 404: `getWork` returns
+ * undefined for any row that is not published, and `notFound()` below turns
+ * that into one.
  */
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 /** Admin edits reach the public page within the hour without a deploy. */
 export const revalidate = 3600;

@@ -12,11 +12,17 @@ import { absoluteUrl, site } from "@/lib/site";
 import { jsonLd, breadcrumbSchema } from "@/lib/structured-data";
 
 /**
- * Only published posts exist here.
+ * Prerender the posts that exist at build time.
  *
- * generateStaticParams lists published slugs, and dynamicParams is false, so a
- * draft cannot be reached by guessing its URL — it is a 404 rather than a page
- * that happens to be empty.
+ * This is a performance measure, not the access check. A post published from
+ * the admin after the last deploy is not in this list, and with
+ * `dynamicParams` false Next would hard-404 it until someone redeployed — the
+ * listing would link to a page that did not exist. So new slugs are allowed
+ * through and rendered on first request.
+ *
+ * Drafts stay unreachable regardless: `getPostBySlug` filters on
+ * `status = 'published'` in SQL, so a guessed draft URL returns nothing and
+ * `notFound()` below turns it into a 404.
  */
 export async function generateStaticParams() {
   const rows = await withRetry(() =>
@@ -25,7 +31,7 @@ export async function generateStaticParams() {
   return rows.map((r) => ({ slug: r.slug }));
 }
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 export const revalidate = 3600;
 
 const when = (d: Date | null) =>
