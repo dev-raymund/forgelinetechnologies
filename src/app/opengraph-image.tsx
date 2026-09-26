@@ -28,18 +28,20 @@ export default function Image() {
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-        <svg width="56" height="56" viewBox="0 0 40 40">
-          <path
-            fillRule="evenodd"
-            fill="#ffffff"
-            d="M10.5 0 H29.5 A10.5 10.5 0 0 1 40 10.5 V29.5 A10.5 10.5 0 0 1 29.5 40 H10.5 A10.5 10.5 0 0 1 0 29.5 V10.5 A10.5 10.5 0 0 1 10.5 0 Z
-                 M12.5 10.5 H28.5 V15.5 H18 V29.5 H12.5 Z
-                 M18 18.2 H26.4 V22.8 H18 Z"
-          />
+        <svg width="62" height="45" viewBox="0 0 100 71.88">
+          {/* Reversed: the card's ground is the same navy as the header, so
+              the mark's blue takes the white treatment here too. */}
+          <path fill="#ffffff" d="M25.71 0.07L99.93 0L100 0.36L90.7 13.64L32.6 13.64L23.44 33.17L10.16 59.8L2.13 48.08L0 44.53L19.32 4.05L20.17 2.77L22.09 1.14L24.08 0.28Z" />
+          <path fill="#fd6900" d="M47.44 18.96L88.21 19.11L79.05 31.53L65.13 31.53L64.91 31.75L48.01 65.41L46.09 68.75L45.1 69.18L28.48 71.88L48.86 31.75L48.79 31.53L30.11 31.46L36.29 19.03Z" />
         </svg>
-        <span style={{ color: "#ffffff", fontSize: 34, fontWeight: 600 }}>
-          Forgeline
-        </span>
+        <div style={{ display: "flex", alignItems: "baseline" }}>
+          <span style={{ color: "#ffffff", fontSize: 34, fontWeight: 700 }}>
+            FORGE
+          </span>
+          <span style={{ color: "#fd6900", fontSize: 34, fontWeight: 700 }}>
+            LINE
+          </span>
+        </div>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column" }}>

@@ -5,8 +5,10 @@
  * (www is a CNAME to the apex), so metadata, robots and sitemap all agree.
  * If Vercel is ever set to serve www as primary, change it here only.
  *
- * Spelling note: the wordmark in /assets/forgeline-logo.svg reads
- * "Forgeline" — one capital. Earlier code used "ForgeLine"; the logo wins.
+ * Spelling note: the wordmark is set all-caps, so it cannot adjudicate
+ * capitalisation — but it sets FORGELINE as a single unbroken word, with the
+ * colour change at FORGE|LINE doing the only dividing. So the prose spelling
+ * stays "Forgeline", one capital. Earlier code used "ForgeLine".
  */
 /**
  * Canonical origin.

@@ -378,15 +378,26 @@
     transform: translateX(3px);
   }
 
-  /* The logo crossbar — the one orange element in the mark — nudges when the
-     lockup is hovered. Small enough to register without asking for attention. */
-  .logo-bar {
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    transform-origin: left center;
+  /* Brand lockup colours.
+     On light grounds the mark and wordmark carry the artwork's own blues; the
+     wordmark's is fractionally deeper than the mark's, which is how the supplied
+     file is drawn. On ink the blue reverses to white — #0055c6 on #0d2350 is
+     2.3:1, so the mark would otherwise sink into the header. The orange clears
+     5:1 on both grounds and stays put, which is what keeps the two-tone split
+     reading as the logo rather than as a monochrome fallback.
+
+     The previous lockup scaled its orange bar on hover. That bar was a
+     decoration; this one is the letter T, so it no longer moves — the link's
+     own opacity change is the hover affordance. */
+  .logo {
+    --logo-blue: #0055c6;
+    --logo-wordmark: #0546a9;
+    --logo-orange: #fd6900;
   }
 
-  a:hover .logo-bar {
-    transform: scaleX(1.28);
+  .on-ink .logo {
+    --logo-blue: #ffffff;
+    --logo-wordmark: #ffffff;
   }
 
   @keyframes hv-in {
@@ -446,8 +457,7 @@
     transform: none;
   }
 
-  .group:hover .mark,
-  a:hover .logo-bar {
+  .group:hover .mark {
     transform: none;
   }
 }

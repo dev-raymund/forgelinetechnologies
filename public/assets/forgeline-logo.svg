@@ -1,9 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 44" role="img" aria-label="Forgeline Technologies">
-  <g transform="translate(0,2)">
-    <rect x="0.5" y="0.5" width="39" height="39" rx="10.5" fill="#ffffff" stroke="#d7dce5" stroke-width="1"/>
-    <path d="M12.5 10.5 H28.5 V15.5 H18 V29.5 H12.5 Z" fill="#0d2350"/>
-    <rect x="18" y="18.2" width="8.4" height="4.6" rx="0.6" fill="#f97316"/>
-  </g>
-  <text x="51" y="25" font-family="-apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="21" font-weight="800" letter-spacing="-0.4" fill="#0d2350">Forgeline</text>
-  <text x="52" y="37" font-family="-apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="8" font-weight="600" letter-spacing="3" fill="#5b6675">TECHNOLOGIES</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 392 72" role="img" aria-label="Forgeline Technologies">
+  <path fill="#0055c6" d="M25.71 0.07L99.93 0L100 0.36L90.7 13.64L32.6 13.64L23.44 33.17L10.16 59.8L2.13 48.08L0 44.53L19.32 4.05L20.17 2.77L22.09 1.14L24.08 0.28Z"/>
+  <path fill="#fd6900" d="M47.44 18.96L88.21 19.11L79.05 31.53L65.13 31.53L64.91 31.75L48.01 65.41L46.09 68.75L45.1 69.18L28.48 71.88L48.86 31.75L48.79 31.53L30.11 31.46L36.29 19.03Z"/>
+  <text x="118" y="46" font-family="Archivo, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="42" font-weight="700" letter-spacing="-0.5" fill="#0546a9">FORGE<tspan fill="#fd6900">LINE</tspan></text>
+  <text x="120" y="65" font-family="Archivo, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="14" font-weight="600" letter-spacing="5.4" fill="#0546a9">TECHNOLOGIES</text>
 </svg>
